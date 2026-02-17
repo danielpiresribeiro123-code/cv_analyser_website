@@ -157,14 +157,3 @@ http://localhost:5173
 # 7 License
 
 Educational and research use.
-
----
-
-Se quiseres, no próximo passo posso fazer:
-
-* **README académico estilo tese**
-* **diagrama do pipeline**
-* **GIF de demonstração**
-* **badges profissionais**
-
-Isso é o que realmente transforma isto num **portefólio forte**.
