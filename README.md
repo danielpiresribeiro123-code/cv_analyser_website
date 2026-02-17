@@ -1,7 +1,3 @@
-Aqui tens um **README simples, limpo e completo**, pronto a colar no teu repositório.
-
----
-
 # CV Analyser Website
 
 End-to-end system for **automatic Curriculum Vitae processing**, combining:
