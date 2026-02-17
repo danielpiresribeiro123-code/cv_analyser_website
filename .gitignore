@@ -1,0 +1,14 @@
+# Python
+backend/.venv
+__pycache__/
+
+# uploads temporários
+backend/uploads/*
+backend/outputs/*
+
+# Node
+frontend/node_modules
+dist
+
+# OS
+.DS_Store

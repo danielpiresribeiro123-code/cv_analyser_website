@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+pandas
+numpy
+scikit-learn
+pymupdf
+ultralytics
+opencv-python
+pillow
+gliner
+transformers
+sentence-transformers
+pytesseract
