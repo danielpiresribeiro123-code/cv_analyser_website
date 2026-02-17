@@ -8,7 +8,6 @@ ultralytics opencv-python pillow \
 gliner transformers sentence-transformers \
 pytesseract
 
-
 ```
 * langchain-community → loader do PDF
 * pymupdf → leitura de PDFs
