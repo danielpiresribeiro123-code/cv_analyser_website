@@ -25,7 +25,7 @@ def detect_and_segment_cv(
     conf_thres: float = 0.25,
     return_crops: bool = True,
     save_json_path: Optional[Union[str, Path]] = None,
-    save_crops: bool = True,
+    save_crops: bool = False,
 ) -> List[Dict[str, Any]]:
     """
     Detect text_blocks and photos in a CV and optionally export bbox JSON

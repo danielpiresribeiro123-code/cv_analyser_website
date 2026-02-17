@@ -6,15 +6,61 @@ from typing import Union, List, Dict, Optional
 
 # Define label sets globally for reuse
 SKILL_LABELS = [
-    "skill", "personal attribute", "management skill", "competency",
-    "spoken language", "programming language", "software framework",
-    "library", "database", "cloud platform", "devops tool",
-    "operating system", "web technology", "machine learning algorithm",
-    "data analysis tool", "big data tool", "version control system",
-    "creative software", "project management tool", "office suite",
-    "crm software", "erp software", "methodology", "development practice",
-    "soft skill", "leadership skill",
+
+    # ---------------------------
+    # Core generic category
+    # ---------------------------
+    "skill",
+
+    # ---------------------------
+    # Technical skills
+    # ---------------------------
+    "programming language",
+    "software framework",
+    "library",
+    "database",
+    "cloud platform",
+    "devops tool",
+    "operating system",
+    "web technology",
+    "data analysis tool",
+    "machine learning algorithm",
+    "version control system",
+    "software tool",
+    "office suite",
+    "creative software",
+
+    # ---------------------------
+    # Professional / domain skills
+    # ---------------------------
+    "methodology",
+    "project management tool",
+    "management skill",
+    "domain knowledge",
+
+    # ---------------------------
+    # Soft skills
+    # ---------------------------
+    "soft skill",
+    "leadership skill",
+    "personal attribute",
+    "spoken language",
 ]
+
+SOFTWARE_AS_SKILL = {
+    "canva",
+    "solidworks",
+    "microsoft",
+    "excel",
+    "word",
+    "powerpoint",
+    "blender",
+    "spyder",
+    "vscode",
+    "visual studio code",
+    "davinci resolve",
+}
+
 
 OTHER_LABELS = [
     "person name", "address", "years of experience", 
@@ -50,11 +96,39 @@ def extract_entities_from_text(
     entities_by_label = {label: [] for label in result_labels}
     
     for entity in entities:
-        if entity['label'] in SKILL_LABELS:
-            entities_by_label["skills"].append(entity['text'])
-        elif entity['label'] in OTHER_LABELS:
-            entities_by_label[entity['label']].append(entity['text'])
-    
+        raw_text = entity["text"]
+        text_norm = raw_text.lower().strip()
+
+        # --------------------------------------------------
+        # Heuristic 1 — software dictionary (partial match)
+        # --------------------------------------------------
+        if any(sw in text_norm for sw in SOFTWARE_AS_SKILL):
+            entities_by_label["skills"].append(raw_text)
+            continue
+
+        # --------------------------------------------------
+        # Heuristic 2 — GLiNER skill labels
+        # --------------------------------------------------
+        if entity["label"] in SKILL_LABELS:
+            entities_by_label["skills"].append(raw_text)
+            continue
+
+        # --------------------------------------------------
+        # Heuristic 3 — filter fake companies
+        # If detected as company but looks like software → skill
+        # --------------------------------------------------
+        if entity["label"] == "company":
+            if any(sw in text_norm for sw in SOFTWARE_AS_SKILL):
+                entities_by_label["skills"].append(raw_text)
+                continue
+
+        # --------------------------------------------------
+        # Default handling
+        # --------------------------------------------------
+        if entity["label"] in OTHER_LABELS:
+            entities_by_label[entity["label"]].append(raw_text)
+
+        
     # Remove duplicates while preserving order
     for label in entities_by_label:
         entities_by_label[label] = list(dict.fromkeys(entities_by_label[label]))

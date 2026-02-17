@@ -4,7 +4,8 @@ End-to-end CV Processing Pipeline.
 Takes a PDF, converts it to images, identifies CV pages, extracts text,
 and performs entity extraction via both GLiNER and regex patterns.
 
-Returns combined results as a pandas DataFrame with an option to save as CSV.
+Returns combined results as a pandas DataFrame and optionally
+saves outputs inside a unique candidate folder.
 """
 
 # =========================================================
@@ -20,22 +21,23 @@ import sys
 # =========================================================
 import pandas as pd
 import numpy as np
+import re
 
 # =========================================================
 # Local imports (project modules)
 # NOTE: These imports assume your package layout is stable.
 # If you run this file directly, prefer "python -m ..." to keep imports consistent.
 # =========================================================
-from backend.pipeline.input.pdf_to_image import convert_pdf_to_images
-from backend.pipeline.vision.cv_filter import CVFilter
+from backend.pipeline.input.pdf_to_image import convert_pdf_to_images #type: ignore
+from backend.pipeline.vision.cv_filter import CVFilter #type: ignore
 
-from backend.pipeline.vision.yolo_coord_mem import detect_and_segment_cv, MODEL_PATH as YOLO_MODEL_PATH
-from backend.pipeline.OCR.ocr_image_mem import process_image_with_bbox
+from backend.pipeline.vision.yolo_coord_mem import detect_and_segment_cv, MODEL_PATH as YOLO_MODEL_PATH #type: ignore
+from backend.pipeline.OCR.ocr_image_mem import process_image_with_bbox #type: ignore
 
-from backend.pipeline.NLP.text_GliNER_preprocessing import preprocess_ocr_for_gliner
-from backend.pipeline.NLP.entities_from_text_mem import process_texts_gliner
+from backend.pipeline.NLP.text_GliNER_preprocessing import preprocess_ocr_for_gliner #type: ignore
+from backend.pipeline.NLP.entities_from_text_mem import process_texts_gliner #type: ignore
 
-from backend.pipeline.NLP.contact_info_extraction_mem import extract_contact_info
+from backend.pipeline.NLP.contact_info_extraction_mem import extract_contact_info #type: ignore
 
 
 # =========================================================
@@ -51,10 +53,43 @@ from backend.pipeline.NLP.contact_info_extraction_mem import extract_contact_inf
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
+# =========================================================
+# Support functions
+# =========================================================
+
+def _create_unique_person_folder(base_path: Path, person_name: str) -> Path:
+    """
+    Create a unique folder for a candidate inside base_path.
+
+    Example:
+        Daniel_Ribeiro/
+        Daniel_Ribeiro_1/
+        Daniel_Ribeiro_2/
+    """
+
+    safe_name = re.sub(r"[^a-zA-Z0-9_]", "", person_name.replace(" ", "_"))
+    if not safe_name:
+        safe_name = "unknown_person"
+
+    folder = base_path / safe_name
+
+    counter = 1
+    while folder.exists():
+        folder = base_path / f"{safe_name}_{counter}"
+        counter += 1
+
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder
+
+
+
+# =========================================================
+# Main function
+# =========================================================
+
 def process_single_cv(
     pdf_input: Union[str, Path, bytes],
-    save_csv: Optional[Union[str, Path]] = None,
-    save_json_path: Optional[Union[str, Path]] = None,
+    save_path: Optional[Union[str, Path]] = None,
     cv_confidence_threshold: float = 0.3,
     cv_min_detections: int = 5,
     yolo_confidence: float = 0.25,
@@ -66,7 +101,7 @@ def process_single_cv(
 
     Args:
         pdf_input: Path to a PDF file, or bytes of PDF content.
-        save_csv: Optional path (filename) to save results as CSV.
+        save_path: Base directory where a unique folder per candidate will be created.
         cv_confidence_threshold: YOLO confidence threshold for CV detection.
         cv_min_detections: Minimum detections to consider a page as a CV.
         yolo_confidence: YOLO confidence threshold for bbox detection.
@@ -77,12 +112,11 @@ def process_single_cv(
         DataFrame combining GLiNER entities and regex-extracted contact info.
 
     Example:
-        >>> df = process_single_cv("resume.pdf", save_csv="results.csv")
+        >>> df = process_single_cv("resume.pdf", save_path="output/test")
         >>> print(df[['person_name', 'job_title', 'skills', 'email']])
     """
 
     if verbose:
-        print("JSON PATH:", save_json_path)
         print("USING NEW PIPELINE FILE")
         print("=" * 60)
         print("CV PROCESSING PIPELINE")
@@ -156,19 +190,12 @@ def process_single_cv(
         if verbose:
             print("     [5/7] Detecting text regions...")
 
-
-        page_json_path = None
-
-        if save_json_path is not None:
-            base = Path(save_json_path)
-            page_json_path = base.with_name(f"{base.stem}_page{page_num+1}.json")
-
         detections = detect_and_segment_cv(
             image_data=image_bytes,
             model_path=YOLO_MODEL_PATH,
             conf_thres=yolo_confidence,
             return_crops=True,
-            save_json_path=page_json_path,)
+            save_json_path=None,)
 
 
         if not detections:
@@ -190,7 +217,7 @@ def process_single_cv(
             verbose=False
         )
 
-        ocr_text = ocr_result["text"]
+        ocr_text = ocr_result.get("text", "")
 
 
         if not ocr_text.strip():
@@ -220,21 +247,25 @@ def process_single_cv(
 
         # Combine results
         # Start with GLiNER DataFrame
-        result_row = gliner_df.iloc[0].to_dict()
+        if gliner_df.empty:
+            result_row = {}
+        else:
+            result_row = gliner_df.iloc[0].to_dict()
 
         # Add contact info (regex-extracted)
         emails = contact_info.get("all_emails") or []
         phones = contact_info.get("all_phones") or []
         result_row.update({
-            "email_regex": contact_info["email"],
-            "all_emails_regex": ", ".join(emails),
-            "phone_regex": contact_info["phone"],
-            "all_phones_regex": ", ".join(phones),
-            "linkedin_regex": contact_info["linkedin"],
-            "github_regex": contact_info["github"],
-            "address_regex": contact_info["address"],
-            "experience_years_regex": contact_info["experience_years"],
+            "email": contact_info.get("email"),
+            "all_emails": ", ".join(emails),
+            "phone": contact_info.get("phone"),
+            "all_phones": ", ".join(phones),
+            "linkedin": contact_info.get("linkedin"),
+            "github": contact_info.get("github"),
+            "address": contact_info.get("address"),
+            "experience_years": contact_info.get("experience_years"),
         })
+
 
         # Add metadata
         result_row["page_num"] = page_num + 1
@@ -253,21 +284,34 @@ def process_single_cv(
 
     df = pd.DataFrame(all_results)
 
+    person_folder = None
+
+    if save_path is not None:
+        base_path = Path(save_path).resolve()
+        base_path.mkdir(parents=True, exist_ok=True)
+
+        # obter nome do candidato (fallback caso vazio)
+        person_name = (
+            df.iloc[0].get("person_name")
+            or df.iloc[0].get("person_name_regex")
+            or "unknown_person")
+
+        person_folder = _create_unique_person_folder(base_path, person_name)
+
+
     if verbose:
         print("\n" + "=" * 60)
         print(f"✓ PIPELINE COMPLETE: {len(df)} CV(s) processed")
         print("=" * 60)
 
-    # Optional: Save to CSV
-    # NOTE: Kept consistent with your original behavior (semicolon delimiter).
-    if save_csv is not None:
-        out_path = Path(save_csv).resolve()
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-
-        df.to_csv(out_path, index=False, encoding="utf-8", sep=";")
+    # Save to CSV
+    if person_folder is not None:
+        csv_path = person_folder / "results.csv"
+        df.to_csv(csv_path, index=False, encoding="utf-8", sep=";")
 
         if verbose:
-            print(f"\n✓ Results saved to: {out_path}")
+            print(f"\n✓ CSV saved to: {csv_path}")
+
 
     return df
 
@@ -315,11 +359,12 @@ if __name__ == "__main__":
         pdf_path = sys.argv[1]
         save_path = sys.argv[2] if len(sys.argv) > 2 else None
 
-        df = process_single_cv(pdf_path, save_csv=save_path, verbose=True)
+        df = process_single_cv(pdf_path, save_path=save_path, verbose=True)
 
         print("\n" + "=" * 60)
         print("RESULTS")
         print("=" * 60)
         print(df.to_string())
     else:
-        print("Usage: python process_single_cv.py <pdf_path> [output_csv_path]")
+        print("Usage: python process_single_cv.py <pdf_path> [save_folder]")
+

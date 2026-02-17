@@ -42,12 +42,12 @@ cv_analyser_website/
 Inside **backend/** run:
 
 ```bash
-pip install fastapi uvicorn python-multipart \
-pandas numpy scikit-learn \
-pymupdf \
-ultralytics opencv-python pillow \
-gliner transformers sentence-transformers \
-pytesseract
+pip install fastapi uvicorn python-multipart
+pip install pandas numpy scikit-learn
+pip install pymupdf
+pip install ultralytics opencv-python pillow
+pip install gliner transformers sentence-transformers
+pip install pytesseract
 ```
 
 Extra libraries used internally:
@@ -91,10 +91,8 @@ python pipeline/fast_analysis/modules/install_stop_words.py
 Run from project root:
 
 ```bash
-python -m backend.pipeline.pipelines.run_test_process_single_cv \
-backend/uploads/test.pdf \
-outputs/out.csv \
-outputs/out.json
+python -m backend.pipeline.pipelines.run_test_process_single_cv backend/uploads/test.pdf outputs/
+python -m backend.pipeline.pipelines.run_test_process_single_cv backend/uploads/test2.pdf outputs/
 ```
 
 Output:
