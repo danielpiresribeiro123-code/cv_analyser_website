@@ -43,7 +43,7 @@ pip install pandas numpy scikit-learn
 pip install pymupdf
 pip install ultralytics opencv-python pillow
 pip install gliner transformers sentence-transformers
-pip install pytesseract
+pip install pytesseract pycountry
 ```
 
 Extra libraries used internally:
@@ -87,8 +87,7 @@ python pipeline/fast_analysis/modules/install_stop_words.py
 Run from project root:
 
 ```bash
-python -m backend.pipeline.pipelines.run_test_process_single_cv backend/uploads/test.pdf outputs/
-python -m backend.pipeline.pipelines.run_test_process_single_cv backend/uploads/test2.pdf outputs/
+python -m backend.services.process_cvs_pipeline
 ```
 
 Output:

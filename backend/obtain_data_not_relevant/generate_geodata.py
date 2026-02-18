@@ -53,7 +53,43 @@ if __name__ == "__main__":
     print("✓ Geodata generated successfully")
 """
 
+from Countrydetails import countries, country
+
+country = countries.all_countries()
+# print(country.capitals()) 
+# print(country.languages())
+
 from Countrydetails import countries
 
 country = countries.all_countries()
-print(country.capitals()) 
+data = country.languages()
+
+# obter todos os códigos de língua
+lang_codes = set()
+
+for _, (_, langs) in data.items():
+    lang_codes.update(langs)
+
+print(sorted(lang_codes))
+
+
+import pycountry
+from Countrydetails import countries
+
+country = countries.all_countries()
+data = country.languages()
+
+lang_codes = set()
+
+for _, (_, langs) in data.items():
+    lang_codes.update(langs)
+
+# converter para nomes completos
+lang_names = []
+
+for code in lang_codes:
+    lang = pycountry.languages.get(alpha_2=code)
+    if lang:
+        lang_names.append(lang.name)
+
+print(sorted(lang_names))

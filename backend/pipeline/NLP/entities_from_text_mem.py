@@ -44,7 +44,7 @@ SKILL_LABELS = [
     "soft skill",
     "leadership skill",
     "personal attribute",
-    "spoken language",
+    "language",
 ]
 
 SOFTWARE_AS_SKILL = {
@@ -69,9 +69,23 @@ OTHER_LABELS = [
 
 ALL_LABELS = SKILL_LABELS + OTHER_LABELS
 
+
+INVALID_ENTITIES = {
+    "person name": {
+        "person", "first name", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "education", "experience", "hobbies"
+    },
+    "job title": {
+        "person","first name", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "education", "experience", "hobbies"
+    },
+    "skills": {
+        "person","first name", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "education", "experience", "hobbies"
+    },
+}
+
+
 def extract_entities_from_text(
     text: str,
-    model: GLiNER = None,
+    model: GLiNER|None = None,
     threshold: float = 0.3
 ) -> Dict[str, List[str]]:
     """
@@ -86,10 +100,15 @@ def extract_entities_from_text(
         Dictionary with entity labels as keys and lists of extracted entities as values
     """
     if model is None:
-        model = GLiNER.from_pretrained("backend/models/gliner")
+        try:
+            model = GLiNER.from_pretrained("backend/models/gliner")
+        
+        except Exception as e:
+            print(e)
+    
     
     # Predict entities
-    entities = model.predict_entities(text, ALL_LABELS, threshold=threshold)
+    entities = model.predict_entities(text, ALL_LABELS, threshold=threshold) 
     
     # Organize entities by label
     result_labels = OTHER_LABELS + ["skills"]
@@ -98,8 +117,17 @@ def extract_entities_from_text(
     for entity in entities:
         raw_text = entity["text"]
         text_norm = raw_text.lower().strip()
+        # ----------------------------------------------
+        # Heuristic 0 — remove invalid generic tokens
+        # ----------------------------------------------
+        invalid_set = INVALID_ENTITIES.get(entity["label"], set())
+        if text_norm in invalid_set:
+            continue
 
-        # --------------------------------------------------
+        if len(text_norm) <= 2:
+            continue
+
+                # --------------------------------------------------
         # Heuristic 1 — software dictionary (partial match)
         # --------------------------------------------------
         if any(sw in text_norm for sw in SOFTWARE_AS_SKILL):
@@ -138,7 +166,7 @@ def extract_entities_from_text(
 
 def process_texts_gliner(
     texts: Union[List[str], Dict[str, str]],
-    model: GLiNER = None,
+    model: GLiNER|None = None,
     threshold: float = 0.3
 ) -> pd.DataFrame:
     """
@@ -162,8 +190,12 @@ def process_texts_gliner(
         >>> df = process_texts_gliner(texts)
     """
     if model is None:
-        model = GLiNER.from_pretrained("backend/models/gliner")
-    
+        try:
+            model = GLiNER.from_pretrained("backend/models/gliner")
+        
+        except Exception as e:
+            print(e)
+
     # Normalize input
     if isinstance(texts, list):
         text_items = [(i, text) for i, text in enumerate(texts)]

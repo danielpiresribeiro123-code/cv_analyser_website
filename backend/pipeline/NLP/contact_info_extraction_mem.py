@@ -13,6 +13,42 @@ CURRENT_YEAR = datetime.now().year
 import pycountry
 CAPITALS = {'Afghanistan': 'Kabul', 'Aland Islands': 'Mariehamn', 'Albania': 'Tirana', 'Algeria': 'Algiers', 'American Samoa': 'Pago Pago', 'Andorra': 'Andorra la Vella', 'Angola': 'Luanda', 'Anguilla': 'The Valley', 'Antarctica': '', 'Antigua And Barbuda': "St. John's", 'Argentina': 'Buenos Aires', 'Armenia': 'Yerevan', 'Aruba': 'Oranjestad', 'Australia': 'Canberra', 'Austria': 'Vienna', 'Azerbaijan': 'Baku', 'Bahamas The': 'Nassau', 'Bahrain': 'Manama', 'Bangladesh': 'Dhaka', 'Barbados': 'Bridgetown', 'Belarus': 'Minsk', 'Belgium': 'Brussels', 'Belize': 'Belmopan', 'Benin': 'Porto-Novo', 'Bermuda': 'Hamilton', 'Bhutan': 'Thimphu', 'Bolivia': 'Sucre', 'Bosnia and Herzegovina': 'Sarajevo', 'Botswana': 'Gaborone', 'Bouvet Island': '', 'Brazil': 'Brasilia', 'British Indian Ocean Territory': 'Diego Garcia', 'Brunei': 'Bandar Seri Begawan', 'Bulgaria': 'Sofia', 'Burkina Faso': 'Ouagadougou', 'Burundi': 'Bujumbura', 'Cambodia': 'Phnom Penh', 'Cameroon': 'Yaounde', 'Canada': 'Ottawa', 'Cape Verde': 'Praia', 'Cayman Islands': 'George Town', 'Central African Republic': 'Bangui', 'Chad': "N'Djamena", 'Chile': 'Santiago', 'China': 'Beijing', 'Christmas Island': 'Flying Fish Cove', 'Cocos (Keeling) Islands': 'West Island', 'Colombia': 'Bogota', 'Comoros': 'Moroni', 'Congo': 'Brazzaville', 'Congo The Democratic Republic Of The': 'Kinshasa', 'Cook Islands': 'Avarua', 'Costa Rica': 'San Jose', "Cote D'Ivoire (Ivory Coast)": 'Yamoussoukro', 'Croatia': 'Zagreb', 'Cuba': 'Havana', 'Cyprus': 'Nicosia', 'Czech Republic': 'Prague', 'Denmark': 'Copenhagen', 'Djibouti': 'Djibouti', 'Dominica': 'Roseau', 'Dominican Republic': 'Santo Domingo', 'East Timor': 'Dili', 'Ecuador': 'Quito', 'Egypt': 'Cairo', 'El Salvador': 'San Salvador', 'Equatorial Guinea': 'Malabo', 'Eritrea': 'Asmara', 'Estonia': 'Tallinn', 'Ethiopia': 'Addis Ababa', 'Falkland Islands': 'Stanley', 'Faroe Islands': 'Torshavn', 'Fiji Islands': 'Suva', 'Finland': 'Helsinki', 'France': 'Paris', 'French Guiana': 'Cayenne', 'French Polynesia': 'Papeete', 'French Southern Territories': 'Port-aux-Francais', 'Gabon': 'Libreville', 'Gambia The': 'Banjul', 'Georgia': 'Tbilisi', 'Germany': 'Berlin', 'Ghana': 'Accra', 'Gibraltar': 'Gibraltar', 'Greece': 'Athens', 'Greenland': 'Nuuk', 'Grenada': "St. George's", 'Guadeloupe': 'Basse-Terre', 'Guam': 'Hagatna', 'Guatemala': 'Guatemala City', 'Guernsey and Alderney': 'St Peter Port', 'Guinea': 'Conakry', 'Guinea-Bissau': 'Bissau', 'Guyana': 'Georgetown', 'Haiti': 'Port-au-Prince', 'Heard and McDonald Islands': '', 'Honduras': 'Tegucigalpa', 'Hong Kong S.A.R.': 'Hong Kong', 'Hungary': 'Budapest', 'Iceland': 'Reykjavik', 'India': 'New Delhi', 'Indonesia': 'Jakarta', 'Iran': 'Tehran', 'Iraq': 'Baghdad', 'Ireland': 'Dublin', 'Israel': 'Jerusalem', 'Italy': 'Rome', 'Jamaica': 'Kingston', 'Japan': 'Tokyo', 'Jersey': 'Saint Helier', 'Jordan': 'Amman', 'Kazakhstan': 'Astana', 'Kenya': 'Nairobi', 'Kiribati': 'Tarawa', 'Korea North': 'Pyongyang', 'Korea South': 'Seoul', 'Kuwait': 'Kuwait City', 'Kyrgyzstan': 'Bishkek', 'Laos': 'Vientiane', 'Latvia': 'Riga', 'Lebanon': 'Beirut', 'Lesotho': 'Maseru', 'Liberia': 'Monrovia', 'Libya': 'Tripolis', 'Liechtenstein': 'Vaduz', 'Lithuania': 'Vilnius', 'Luxembourg': 'Luxembourg', 'Macau S.A.R.': 'Macao', 'Macedonia': 'Skopje', 'Madagascar': 'Antananarivo', 'Malawi': 'Lilongwe', 'Malaysia': 'Kuala Lumpur', 'Maldives': 'Male', 'Mali': 'Bamako', 'Malta': 'Valletta', 'Man (Isle of)': 'Douglas, Isle of Man', 'Marshall Islands': 'Majuro', 'Martinique': 'Fort-de-France', 'Mauritania': 'Nouakchott', 'Mauritius': 'Port Louis', 'Mayotte': 'Mamoudzou', 'Mexico': 'Mexico City', 'Micronesia': 'Palikir', 'Moldova': 'Chisinau', 'Monaco': 'Monaco', 'Mongolia': 'Ulan Bator', 'Montenegro': 'Podgorica', 'Montserrat': 'Plymouth', 'Morocco': 'Rabat', 'Mozambique': 'Maputo', 'Myanmar': 'Nay Pyi Taw', 'Namibia': 'Windhoek', 'Nauru': 'Yaren', 'Nepal': 'Kathmandu', 'Netherlands Antilles': '', 'Netherlands The': 'Amsterdam', 'New Caledonia': 'Noumea', 'New Zealand': 'Wellington', 'Nicaragua': 'Managua', 'Niger': 'Niamey', 'Nigeria': 'Abuja', 'Niue': 'Alofi', 'Norfolk Island': 'Kingston', 'Northern Mariana Islands': 'Saipan', 'Norway': 'Oslo', 'Oman': 'Muscat', 'Pakistan': 'Islamabad', 'Palau': 'Melekeok', 'Palestinian Territory Occupied': 'East Jerusalem', 'Panama': 'Panama City', 'Papua new Guinea': 'Port Moresby', 'Paraguay': 'Asuncion', 'Peru': 'Lima', 'Philippines': 'Manila', 'Pitcairn Island': 'Adamstown', 'Poland': 'Warsaw', 'Portugal': 'Lisbon', 'Puerto Rico': 'San Juan', 'Qatar': 'Doha', 'Reunion': 'Saint-Denis', 'Romania': 'Bucharest', 'Russia': 'Moscow', 'Rwanda': 'Kigali', 'Saint Helena': 'Jamestown', 'Saint Kitts And Nevis': 'Basseterre', 'Saint Lucia': 'Castries', 'Saint Pierre and Miquelon': 'Saint-Pierre', 'Saint Vincent And The Grenadines': 'Kingstown', 'Saint-Barthelemy': 'Gustavia', 'Saint-Martin (French part)': 'Marigot', 'Samoa': 'Apia', 'San Marino': 'San Marino', 'Sao Tome and Principe': 'Sao Tome', 'Saudi Arabia': 'Riyadh', 'Senegal': 'Dakar', 'Serbia': 'Belgrade', 'Seychelles': 'Victoria', 'Sierra Leone': 'Freetown', 'Singapore': 'Singapur', 'Slovakia': 'Bratislava', 'Slovenia': 'Ljubljana', 'Solomon Islands': 'Honiara', 'Somalia': 'Mogadishu', 'South Africa': 'Pretoria', 'South Georgia': 'Grytviken', 'South Sudan': 'Juba', 'Spain': 'Madrid', 'Sri Lanka': 'Colombo', 'Sudan': 'Khartoum', 'Suriname': 'Paramaribo', 'Svalbard And Jan Mayen Islands': 'Longyearbyen', 'Swaziland': 'Mbabane', 'Sweden': 'Stockholm', 'Switzerland': 'Berne', 'Syria': 'Damascus', 'Taiwan': 'Taipei', 'Tajikistan': 'Dushanbe', 'Tanzania': 'Dodoma', 'Thailand': 'Bangkok', 'Togo': 'Lome', 'Tokelau': '', 'Tonga': "Nuku'alofa", 'Trinidad And Tobago': 'Port of Spain', 'Tunisia': 'Tunis', 'Turkey': 'Ankara', 'Turkmenistan': 'Ashgabat', 'Turks And Caicos Islands': 'Cockburn Town', 'Tuvalu': 'Funafuti', 'Uganda': 'Kampala', 'Ukraine': 'Kiev', 'United Arab Emirates': 'Abu Dhabi', 'United Kingdom': 'London', 'United States': 'Washington', 'United States Minor Outlying Islands': '', 'Uruguay': 'Montevideo', 'Uzbekistan': 'Tashkent', 'Vanuatu': 'Port Vila', 'Vatican City State (Holy See)': 'Vatican City', 'Venezuela': 'Caracas', 'Vietnam': 'Hanoi', 'British Virgin Islands': 'Road Town', 'U.S. Virgin Islands': 'Charlotte Amalie', 'USA Virgin Islands': 'Charlotte Amalie', 'Wallis And Futuna Islands': 'Mata Utu', 'Western Sahara': 'El-Aaiun', 'Yemen': 'Sanaa', 'Zambia': 'Lusaka', 'Zimbabwe': 'Harare'}
 
+# ----------------------------------------------------------
+# Language and language level vocabularies
+# ----------------------------------------------------------
+
+LANGUAGES = ['Afrikaans', 'Albanian', 'Amharic', 'Arabic', 'Armenian', 'Aymara', 'Azerbaijani', 'Basque', 'Belarusian', 'Bengali', 'Bislama', 'Bosnian', 'Bulgarian', 'Burmese', 'Catalan', 'Chamorro', 'Chichewa', 'Chinese', 'Croatian', 'Czech', 'Danish', 'Divehi', 'Dutch', 'Dzongkha', 'English', 'Estonian', 'Faroese', 'Fijian', 'Finnish', 'French', 'Fulah', 'Galician', 'Georgian', 'German', 'Guarani', 'Haitian', 'Hebrew', 'Hindi', 'Hungarian', 'Icelandic', 'Indonesian', 'Irish', 'Italian', 'Japanese', 'Kalaallisut', 'Kazakh', 'Khmer', 'Kinyarwanda', 'Kirghiz', 'Kongo', 'Korean', 'Kurdish', 'Lao', 'Latin', 'Latvian', 'Lingala', 'Lithuanian', 'Luba-Katanga', 'Luxembourgish', 'Macedonian', 'Malagasy', 'Malay (macrolanguage)', 'Maltese', 'Manx', 'Maori', 'Marshallese', 'Modern Greek (1453-)', 'Mongolian', 'Nauru', 'Nepali (macrolanguage)', 'North Ndebele', 'Norwegian', 'Norwegian Bokmål', 'Norwegian Nynorsk', 'Occitan (post 1500)', 'Panjabi', 'Persian', 'Polish', 'Portuguese', 'Pushto', 'Quechua', 'Romanian', 'Rundi', 'Russian', 'Samoan', 'Sango', 'Serbian', 'Shona', 'Sinhala', 'Slovak', 'Slovenian', 'Somali', 'South Ndebele', 'Southern Sotho', 'Spanish', 'Swahili (macrolanguage)', 'Swati', 'Swedish', 'Tajik', 'Tamil', 'Thai', 'Tigrinya', 'Tonga (Tonga Islands)', 'Tsonga', 'Tswana', 'Turkish', 'Turkmen', 'Ukrainian', 'Urdu', 'Uzbek', 'Venda', 'Vietnamese', 'Xhosa', 'Zulu']
+
+LANG_PATTERN = re.compile(
+    r"\b(" + "|".join(re.escape(l.lower()) for l in LANGUAGES) + r")\b"
+)
+
+LANG_LEVEL_MAP = {
+    "Beginner": {
+        "a1", "a2", "beginner", "basic", "basics", "elementary", "noob"
+    },
+    "Intermediate": {
+        "b1", "b2", "intermediate", "conversational", "working knowledge"
+    },
+    "Advanced": {
+        "c1", "c2", "advanced", "fluent", "proficient", "professional"
+    },
+    "Native": {
+        "native", "mother tongue", "mother-tongue", "bilingual"
+    },}
+
+# Depois no futuro criar mais restrições com o a1, a2, b2, etc
+
+
+LANG_LOOKUP = {l.lower(): l for l in LANGUAGES}
+
+LEVEL_LOOKUP = {
+    term: level
+    for level, terms in LANG_LEVEL_MAP.items()
+    for term in terms
+}
+
+
 # ==========================================================
 # Regex patterns
 # ==========================================================
@@ -38,6 +74,9 @@ PHONE_REGEX = re.compile(
     re.VERBOSE,
 )
 
+# ==========================================================
+# Regex Sites
+# ==========================================================
 
 LINKEDIN_REGEX = re.compile(
     r"(https?://)?(www\.)?linkedin\.com/[^\s]+",
@@ -49,8 +88,14 @@ GITHUB_REGEX = re.compile(
     re.IGNORECASE,
 )
 
+URL_REGEX = re.compile(
+    r"\b(?:https?://)?(?:www\.)?[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?:/[^\s,]*)?",
+    re.IGNORECASE,
+)
+
+
 # ==========================================================
-# Additional regex patterns
+# Regex Adress
 # ==========================================================
 
 ADDRESS_LINE_REGEX = re.compile(
@@ -248,6 +293,39 @@ def _fallback_geo(text: str) -> Optional[str]:
 
     return None
 
+# ----------------------------------------------------------
+# Helpers for Language
+# ----------------------------------------------------------
+def _find_level_near_language(
+    text: str,
+    lang_span: tuple[int, int],
+    window: int = 40,
+):
+    """
+    Detecta o nível da língua apenas à direita,
+    parando na primeira quebra semântica.
+    """
+
+    _, end = lang_span
+
+    # contexto bruto à direita
+    right = min(len(text), end + window)
+    context = text[end:right].lower()
+
+    # remover separadores iniciais
+    context = re.sub(r"^[\s:,\-–()\[\]]+", "", context)
+
+    # cortar no primeiro separador forte (nova linha, ponto, etc.)
+    stop_match = re.search(r"[\n\r.;]", context)
+    if stop_match:
+        context = context[:stop_match.start()]
+
+    # procurar nível — PARAR no primeiro match
+    for raw_term, normalized_level in LEVEL_LOOKUP.items():
+        if re.search(rf"\b{re.escape(raw_term)}\b", context):
+            return normalized_level, raw_term
+
+    return None, None
 
 
 # ----------------------------------------------------------
@@ -397,6 +475,74 @@ def extract_address(text: str) -> Optional[str]:
 
 
 
+class LanguageInfo(TypedDict):
+    language: str
+    level: Optional[str]          # Beginner / Intermediate / Advanced / Native
+    level_raw: Optional[str]      # A1, fluent, native, etc.
+
+
+def _extract_languages_full(text: str) -> List[LanguageInfo]:
+    """
+    Extração completa de línguas com níveis.
+    Função interna usada para gerar:
+      - lista simples de línguas
+      - detalhes de níveis
+    """
+
+    if not text:
+        return []
+
+    results: List[LanguageInfo] = []
+    text_lower = text.lower()
+
+    for match in LANG_PATTERN.finditer(text_lower):
+        lang = LANG_LOOKUP[match.group(1)]
+        level, raw = _find_level_near_language(text, match.span())
+
+        results.append({
+            "language": lang,
+            "level": level,
+            "level_raw": raw,
+        })
+
+    # --------------------------------------------------
+    # Remover duplicados mantendo melhor nível
+    # --------------------------------------------------
+    unique: Dict[str, LanguageInfo] = {}
+
+    priority = ["Beginner", "Intermediate", "Advanced", "Native"]
+    LEVEL_RANK = {lvl: i for i, lvl in enumerate(priority)}
+
+    for item in results:
+        lang = item["language"]
+
+        if lang not in unique:
+            unique[lang] = item
+            continue
+
+        old_level = unique[lang]["level"]
+        new_level = item["level"]
+
+
+        if new_level and (
+            not old_level
+            or LEVEL_RANK.get(new_level, -1) > LEVEL_RANK.get(old_level, -1)
+        ):
+
+            unique[lang] = item
+
+    return sorted(unique.values(), key=lambda x: x["language"])
+
+def extract_languages(text: str) -> List[str]:
+    """Retorna apenas a lista de línguas únicas."""
+    return [item["language"] for item in _extract_languages_full(text)]
+
+
+def extract_languages_details(text: str) -> List[LanguageInfo]:
+    """Retorna detalhes completos das línguas."""
+    return _extract_languages_full(text)
+
+
 def extract_experience_years(text: str) -> Optional[int]:
     """
     Estimate the total number of professional experience years from CV text.
@@ -534,6 +680,21 @@ def extract_experience_years(text: str) -> Optional[int]:
     else:
         return total_years
 
+def extract_all_websites(text: str) -> List[str]:
+    if not text:
+        return []
+
+    urls = set()
+
+    # específicos primeiro
+    for pattern in (LINKEDIN_REGEX, GITHUB_REGEX, URL_REGEX):
+        for match in extract_all(pattern, text):
+            url = match.strip()
+            if not url.startswith(("http://", "https://")):
+                url = "https://" + url
+            urls.add(url)
+
+    return sorted(urls)
 
 
     
@@ -545,18 +706,17 @@ class ContactInfo(TypedDict):
     all_emails: List[str]
     phone: Optional[str]
     all_phones: List[str]
-    linkedin: Optional[str]
-    github: Optional[str]
     address: Optional[str]
     experience_years: Optional[int]
+    languages: List[str]
+    languages_details: List[LanguageInfo]
+    linkedin: Optional[str]
+    github: Optional[str]
+    all_websites: List[str]
 
 def extract_contact_info(text: str) -> ContactInfo:
-
-    """
-    Extract info of the contacts and others of the text OCR of the CV.
-    """
-
     emails = [normalize_email(e) for e in extract_all(EMAIL_REGEX, text)]
+
     raw_phones = extract_all(PHONE_REGEX, text)
     phones = []
     for p in raw_phones:
@@ -569,16 +729,27 @@ def extract_contact_info(text: str) -> ContactInfo:
     address = extract_address(text)
     experience_years = extract_experience_years(text)
 
+    languages_details = extract_languages_details(text)
+    languages = [l["language"] for l in languages_details]
+
+    all_websites = extract_all_websites(text)
+
     return {
         "email": emails[0] if emails else None,
         "all_emails": emails,
         "phone": phones[0] if phones else None,
         "all_phones": phones,
-        "linkedin": linkedin,
-        "github": github,
         "address": address,
         "experience_years": experience_years,
+        "languages": languages,
+        "languages_details": languages_details,
+        "linkedin": linkedin,
+        "github": github,
+        "all_websites": all_websites,
     }
+
+
+
 
 
 # ==========================================================

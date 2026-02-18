@@ -14,7 +14,7 @@ from ultralytics import YOLO  # type: ignore
 # =========================================================
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 TEXT_PHOTO_MODEL_PATH = PROJECT_ROOT / "models" / "yolo" / "yolo11s-text-photo-150e4b.pt"
-SKILL_TABLE_MODEL_PATH = PROJECT_ROOT / "models" / "yolo" / "yolo11s-text-photo-150e4b.pt"
+SKILL_TABLE_MODEL_PATH = PROJECT_ROOT / "models" / "yolo" / "yolo11s-skill_table-150e4b.pt"
 
 # =========================================================
 # Core detection

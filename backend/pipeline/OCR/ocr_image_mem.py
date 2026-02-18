@@ -76,7 +76,10 @@ def _preprocess_crop(crop: Image.Image) -> Image.Image:
     Light preprocessing improves Tesseract accuracy.
     """
     gray = crop.convert("L")
-    sharp = gray.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+
+    # sharpen muito leve
+    sharp = gray.filter(ImageFilter.UnsharpMask(radius=1.5, percent=120, threshold=2))
+
     return sharp
 
 
@@ -166,3 +169,5 @@ def process_image_with_bbox(
             print(f"Text saved to: {path}")
 
     return result
+
+
