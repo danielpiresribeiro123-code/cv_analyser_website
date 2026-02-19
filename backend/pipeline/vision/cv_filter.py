@@ -1,145 +1,158 @@
 """
-Module for filtering and identifying CV (Curriculum Vitae) images.
-Uses a trained YOLO model to detect text patterns and identify CV documents.
+CV detection module using YOLO.
+
+This module provides:
+• A reusable CVFilter class
+• Support for cached YOLO model injection
+• Robust image handling (path, numpy array)
+• Clean production-ready API
 """
 
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
+
 import cv2
 import numpy as np
-from ultralytics import YOLO #type: ignore
+from ultralytics import YOLO  # type: ignore
+
+# Centralized model loader
+from services.paths_models_and_data import get_filter_yolo_model
+
 
 # =========================================================
-# Project root resolution (no path_loader required)
-#
-# Current file path:
-# backend\pipeline\pipelines\process_single_cv.py
-#
-# parents[0] -> pipelines
-# parents[1] -> pipeline
-# parents[2] -> backend
+# CV FILTER CLASS
 # =========================================================
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-FILTER_MODEL_PATH = PROJECT_ROOT / "models" / "yolo"/"yolo11n-text.pt"
 
 class CVFilter:
-    """Class for identifying whether an image is a CV using YOLO text detection."""
-    
-    def __init__(self, model_path: Union[str, Path] | None= None):
-        """
-        Initialize the CV Filter with a trained YOLO model.
-        
-        Args:
-            model_path: Path to the trained YOLO model. If None, uses default path.
-        """
-        if model_path is None:
-            # Default path to the trained YOLO model
-            model_path = FILTER_MODEL_PATH
-        
-        self.model_path = Path(model_path)
-        
-        if not self.model_path.exists():
-            raise FileNotFoundError(f"Model not found at {self.model_path}")
-        
-        # Load the trained YOLO model
-        self.model = YOLO(str(self.model_path))
-    
-    def is_cv(
-        self, 
-        image_path: Union[str, Path],
-        confidence_threshold: float = 0.3,
-        min_detections: int = 5
-    ) -> bool:
-        """
-        Determine if an image is a CV based on text detection.
-        
-        Args:
-            image_path: Path to the image file to analyze.
-            confidence_threshold: Minimum confidence score for detections (0-1).
-            min_detections: Minimum number of text detections to consider it a CV.
-        
-        Returns:
-            Boolean indicating if image is likely a CV.
-        """
-        image_path = Path(image_path)
-        
-        if not image_path.exists():
-            raise FileNotFoundError(f"Image not found at {image_path}")
-        
-        # Read the image
-        image = cv2.imread(str(image_path))
-        if image is None:
-            raise ValueError(f"Could not read image from {image_path}")
-        
-        # Run inference
-        results = self.model(image, conf=confidence_threshold)
-        
-        # Extract detections
-        detections = results[0]
-        
-        # Count detections
-        num_detections = 0
-        if detections.boxes is not None:
-            num_detections = len(detections.boxes)
-        
-        # A CV typically has multiple text regions detected
-        return num_detections >= min_detections
-    
-    def is_cv_simple(
-        self,
-        image_path: Union[str, Path],
-        confidence_threshold: float = 0.3,
-        min_detections: int = 5
-    ) -> bool:
-        """
-        Check if image is a CV. Alias for is_cv() for consistency.
-        
-        Args:
-            image_path: Path to the image file to analyze.
-            confidence_threshold: Minimum confidence score for detections (0-1).
-            min_detections: Minimum number of text detections to consider it a CV.
-        
-        Returns:
-            Boolean indicating if image is likely a CV.
-        """
-        return self.is_cv(image_path, confidence_threshold, min_detections)
+    """
+    Detect whether an image corresponds to a CV document.
 
+    Uses a YOLO model trained to detect dense text regions
+    typical of CV layouts.
+    """
+
+    def __init__(self, model: Optional[YOLO] = None) -> None:
+        """
+        Initialize CVFilter.
+
+        Args:
+            model:
+                Preloaded YOLO model instance.
+                If None → loads cached model via central loader.
+        """
+        self.model: YOLO = model if model is not None else get_filter_yolo_model()
+
+    # -----------------------------------------------------
+    # Core detection
+    # -----------------------------------------------------
+
+    def _run_inference(
+        self,
+        image: np.ndarray,
+        confidence_threshold: float,
+    ):
+        """Run YOLO inference safely."""
+        return self.model(image, conf=confidence_threshold)
+
+    # -----------------------------------------------------
+    # Public API
+    # -----------------------------------------------------
+
+    def is_cv(
+        self,
+        image: Union[str, Path, np.ndarray],
+        confidence_threshold: float = 0.3,
+        min_detections: int = 5,
+    ) -> bool:
+        """
+        Determine whether an image is likely a CV.
+
+        Args:
+            image:
+                Can be:
+                • file path
+                • numpy BGR image
+            confidence_threshold:
+                YOLO confidence threshold.
+            min_detections:
+                Minimum number of detected text boxes to classify as CV.
+
+        Returns:
+            True if image resembles a CV layout.
+        """
+
+        # -------------------------------------------------
+        # Load image if path provided
+        # -------------------------------------------------
+        if isinstance(image, (str, Path)):
+            image_path = Path(image)
+
+            if not image_path.exists():
+                raise FileNotFoundError(f"Image not found: {image_path}")
+
+            img = cv2.imread(str(image_path))
+            if img is None:
+                raise ValueError(f"Could not read image: {image_path}")
+
+        elif isinstance(image, np.ndarray):
+            img = image
+
+        else:
+            raise TypeError("image must be a path or numpy.ndarray")
+
+        # -------------------------------------------------
+        # Run YOLO inference
+        # -------------------------------------------------
+        results = self._run_inference(img, confidence_threshold)
+
+        if not results:
+            return False
+
+        boxes = getattr(results[0], "boxes", None)
+
+        num_detections = len(boxes) if boxes is not None else 0
+
+        # -------------------------------------------------
+        # CV heuristic:
+        # Dense text regions → many detections
+        # -------------------------------------------------
+        return num_detections >= min_detections
+
+
+# =========================================================
+# FUNCTIONAL HELPERS (LIGHTWEIGHT API)
+# =========================================================
 
 def identify_cv(
-    image_path: Union[str, Path],
-    model_path: Union[str, Path] | None= None,
+    image: Union[str, Path, np.ndarray],
+    model: Optional[YOLO] = None,
     confidence_threshold: float = 0.3,
-    min_detections: int = 5
+    min_detections: int = 5,
 ) -> bool:
     """
-    Identify whether an image is a CV.
-    
-    Standalone function that creates a CVFilter instance and analyzes the image.
-    
-    Args:
-        image_path: Path to the image file to analyze.
-        model_path: Path to the trained YOLO model. If None, uses default path.
-        confidence_threshold: Minimum confidence score for detections (0-1).
-        min_detections: Minimum number of text detections to consider it a CV.
-    
-    Returns:
-        Boolean indicating if image is likely a CV.
-    
-    Example:
-        >>> if identify_cv('path/to/image.jpg'):
-        ...     print("This is a CV")
+    Standalone helper to check if image is a CV.
+
+    Useful for quick scripts without instantiating CVFilter.
     """
-    cv_filter = CVFilter(model_path=model_path)
-    return cv_filter.is_cv(image_path, confidence_threshold, min_detections)
+    return CVFilter(model=model).is_cv(
+        image=image,
+        confidence_threshold=confidence_threshold,
+        min_detections=min_detections,
+    )
 
 
 def is_cv_image(
-    image_path: Union[str, Path],
-    model_path: Union[str, Path] | None = None,
+    image: Union[str, Path, np.ndarray],
+    model: Optional[YOLO] = None,
     confidence_threshold: float = 0.3,
-    min_detections: int = 5
+    min_detections: int = 5,
 ) -> bool:
     """
-    Simple boolean check if image is a CV.
+    Alias for identify_cv (semantic readability).
     """
-    return identify_cv(image_path, model_path, confidence_threshold, min_detections)
+    return identify_cv(
+        image=image,
+        model=model,
+        confidence_threshold=confidence_threshold,
+        min_detections=min_detections,
+    )

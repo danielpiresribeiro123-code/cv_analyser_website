@@ -1,50 +1,22 @@
 from pathlib import Path
-import json
 from gliner import GLiNER
 import pandas as pd
-from typing import Union, List, Dict, Optional
+from typing import Union, List, Dict, Optional, Any
+
+from services.paths_models_and_data import get_gliner_model
+
 
 # Define label sets globally for reuse
 SKILL_LABELS = [
-
-    # ---------------------------
-    # Core generic category
-    # ---------------------------
-    "skill",
-
-    # ---------------------------
-    # Technical skills
-    # ---------------------------
-    "programming language",
-    "software framework",
-    "library",
-    "database",
-    "cloud platform",
-    "devops tool",
-    "operating system",
-    "web technology",
-    "data analysis tool",
-    "machine learning algorithm",
-    "version control system",
-    "software tool",
-    "office suite",
-    "creative software",
-
-    # ---------------------------
-    # Professional / domain skills
-    # ---------------------------
-    "methodology",
-    "project management tool",
-    "management skill",
-    "domain knowledge",
-
-    # ---------------------------
-    # Soft skills
-    # ---------------------------
-    "soft skill",
-    "leadership skill",
-    "personal attribute",
-    "language",
+"skill", "technical expertise", "software and tools", "programming language",
+    "software framework", "library", "database", "cloud platform", "devops tool",
+    "operating system", "web technology", "machine learning algorithm",
+    "data analysis tool", "big data tool", "version control system",
+    "creative software", "project management tool", "office suite",
+    "crm software", "erp software", "methodology", "development practice",
+    "soft skill", "leadership skill", "personal attribute", "management skill",
+    "competency", "interpersonal strength", "hard skill",
+    "standard or protocol", "area of specialization"
 ]
 
 SOFTWARE_AS_SKILL = {
@@ -62,12 +34,9 @@ SOFTWARE_AS_SKILL = {
 }
 
 
-OTHER_LABELS = [
-    "person name", "address", "years of experience", 
-    "job title", "company", "university", "degree",
-]
+OTHER_LABELS = ["person name", "address", "job title", "company", "university", "degree",]
 
-ALL_LABELS = SKILL_LABELS + OTHER_LABELS
+ALL_LABELS = list(dict.fromkeys(SKILL_LABELS + OTHER_LABELS))
 
 
 INVALID_ENTITIES = {
@@ -78,14 +47,14 @@ INVALID_ENTITIES = {
         "person","first name", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "education", "experience", "hobbies"
     },
     "skills": {
-        "person","first name", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "education", "experience", "hobbies"
+        "person","first name", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "education", "experience", "hobbies", "C1", "First Certificate"
     },
 }
 
 
 def extract_entities_from_text(
     text: str,
-    model: GLiNER|None = None,
+    model: Optional[GLiNER] = None,
     threshold: float = 0.3
 ) -> Dict[str, List[str]]:
     """
@@ -99,16 +68,20 @@ def extract_entities_from_text(
     Returns:
         Dictionary with entity labels as keys and lists of extracted entities as values
     """
+    if not text or not text.strip():
+        return {label: [] for label in OTHER_LABELS + ["skills"]}
+
+    # Load default model only if not provided
     if model is None:
-        try:
-            model = GLiNER.from_pretrained("backend/models/gliner")
-        
-        except Exception as e:
-            print(e)
-    
-    
-    # Predict entities
-    entities = model.predict_entities(text, ALL_LABELS, threshold=threshold) 
+        model = get_gliner_model()
+
+    # Predict entities (robust to model/runtime errors)
+    try:
+        entities = model.predict_entities(text, ALL_LABELS, threshold=threshold)
+    except Exception:
+        # Return empty structure instead of crashing the whole pipeline
+        return {label: [] for label in OTHER_LABELS + ["skills"]}
+
     
     # Organize entities by label
     result_labels = OTHER_LABELS + ["skills"]
@@ -190,11 +163,8 @@ def process_texts_gliner(
         >>> df = process_texts_gliner(texts)
     """
     if model is None:
-        try:
-            model = GLiNER.from_pretrained("backend/models/gliner")
-        
-        except Exception as e:
-            print(e)
+        model = get_gliner_model()
+
 
     # Normalize input
     if isinstance(texts, list):
@@ -216,7 +186,7 @@ def process_texts_gliner(
             )
             
             # Flatten lists into comma-separated strings for DataFrame
-            row = {"id": text_id}
+            row: Dict[str, Any] = {"id": text_id}
             for label in OTHER_LABELS + ["skills"]:
                 entities = entities_dict.get(label, [])
                 row[label] = ", ".join(entities) if entities else None

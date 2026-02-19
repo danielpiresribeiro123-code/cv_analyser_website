@@ -1,20 +1,16 @@
 from pathlib import Path
-from typing import Union, Optional, List
+from typing import Union, Optional, List, Any
 import pandas as pd
 import shutil
+from ultralytics import YOLO  # type: ignore
 
 # =========================================================
 # Local imports
 # =========================================================
-from backend.pipeline.pipelines.process_single_cv import process_single_cv #type: ignore
+from pipeline.pipelines.process_single_cv import process_single_cv  # type: ignore
 
 # =========================================================
 # Project backend root resolution
-# Current file path:
-# backend\services\process_cvs_pipeline.py
-#
-# parents[0] -> services
-# parents[1] -> backend
 # =========================================================
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,43 +21,82 @@ def process_folder_cvs(
     scan_subfolders: bool = False,
     verbose: bool = True,
     clear_output_folder: bool = False,
-    crop_text_block:bool= False,
+    crop_text_block: bool = False,
     crop_photo: bool = True,
     crop_skill_table: bool = False,
     save_ocr_txt: bool = False,
-    **kwargs,) -> pd.DataFrame:
+    analyse_individual_pages: bool = False,
+    cv_confidence_threshold: float = 0.3,
+    cv_min_detections: int = 5,
+    yolo_confidence: float = 0.25,
+    gliner_threshold: float = 0.3,
+    save_csv: bool = False,
+    gliner_model: Any | None = None,
+    filter_yolo_model: YOLO | None = None,
+    text_photo_yolo_model: YOLO | None = None,
+    skill_table_yolo_model: YOLO | None = None,) -> pd.DataFrame:
     """
-    Process all CV files (PDF or image) inside a folder and return a single DataFrame.
+    Batch processing of Curriculum Vitae (CV) files stored in a directory.
 
-    This function:
-        • scans a directory for PDFs/images
-        • runs process_single_cv() on each file
-        • concatenates all results
-        • optionally saves ONE global CSV
+    This function orchestrates the automated analysis of multiple CV documents
+    (PDF or image formats) by sequentially invoking the single-document
+    processing pipeline. The extracted structured information from each CV is
+    aggregated into a unified pandas DataFrame and can optionally be persisted
+    to a global CSV file for incremental dataset construction.
 
-    Args:
-        input_folder:
-            Folder containing CV files.
+    Core capabilities
+    -----------------
+    • Supports both PDF and common image-based CV formats.
+    • Recursively scans subdirectories when enabled.
+    • Performs incremental processing by skipping files that were already
+      analyzed in previous executions, preventing redundant computation.
+    • Safely appends new results to an existing CSV without overwriting
+      historical data.
+    • Optionally clears previous outputs to ensure a clean execution context.
+    • Preserves traceability by storing source filename and absolute path
+      for each processed CV.
+    • Compatible with both document-level and page-level analysis modes.
 
-        output_folder:
-            Path to save the merged CSV.
-            If None → does not save.
+    Parameters
+    ----------
+    input_folder : str or Path
+        Path to a directory containing CV files or to a single CV file.
 
-        scan_subfolders:
-            If True, scans subfolders scan_subfoldersly.
+    output_folder : str or Path, optional
+        Directory where intermediate artifacts and the aggregated CSV file
+        will be stored. If None, results are returned only in memory.
 
-        verbose:
-            Prints progress.
+    scan_subfolders : bool, default False
+        If True, the function searches recursively for CV files inside all
+        nested subdirectories.
 
-        **kwargs:
-            Extra parameters forwarded to process_single_cv()
-            (confidence thresholds, cropping flags, etc.)
+    verbose : bool, default True
+        Enables detailed console logging describing each processing step.
 
-    Returns:
-        pandas.DataFrame with all processed CV pages.
+    clear_output_folder : bool, default False
+        When enabled, removes previous output files before starting a new run,
+        effectively resetting incremental history.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A DataFrame containing the merged structured results from all newly
+        processed CV files, or the previously stored CSV data if no new files
+        were analyzed.
+
+    Notes
+    -----
+    This function acts as the batch-level coordination layer of the CV
+    processing system. Heavy document analysis (layout detection, OCR,
+    entity extraction, and contact parsing) is delegated to the
+    `process_single_cv` pipeline, ensuring modularity, maintainability,
+    and scalability for large-scale recruitment or research workflows.
     """
-    print("Input folder:", input_folder)
-    print("Output folder:", output_folder)
+
+    if verbose:
+        print("Input folder:", input_folder)
+        print("Output folder:", output_folder)
+
     input_path = Path(input_folder)
 
     if not input_path.exists():
@@ -70,16 +105,17 @@ def process_folder_cvs(
     # -----------------------------------------------------
     # Prepare output folder
     # -----------------------------------------------------
+    csv_path: Optional[Path] = None
+
     if output_folder is not None:
         output_folder = Path(output_folder)
-
-        # Create if missing
         output_folder.mkdir(parents=True, exist_ok=True)
 
-        # Optional cleaning
+        csv_path = output_folder / "all_results.csv"
+
         if clear_output_folder:
             if verbose:
-                print("Clearing output folder...")
+                print("Output folder cleared. Previous results removed.")
 
             for item in output_folder.iterdir():
                 try:
@@ -87,31 +123,31 @@ def process_folder_cvs(
                         item.unlink()
                     elif item.is_dir():
                         shutil.rmtree(item)
-                except Exception as e:
-                    print(f"⚠️ Could not delete {item}: {e}")
+                except Exception as exc:
+                    print(f"Warning: could not delete {item}: {exc}")
 
     # -----------------------------------------------------
-    # Determine files to process
+    # Discover CV files
     # -----------------------------------------------------
-    patterns = ["*.pdf", "*.png", "*.jpg", "*.jpeg"]
+    patterns = ["*.pdf", "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.tiff", "*.webp"]
 
-    files: List[Path] = []
-
-    # CASE 1 — single file
     if input_path.is_file():
-        files = [input_path]
-
-    # CASE 2 — folder
+        files: List[Path] = [input_path.resolve()]
     else:
+        discovered: List[Path] = []
+
         for pattern in patterns:
             if scan_subfolders:
-                files.extend(input_path.rglob(pattern))
+                discovered.extend(input_path.rglob(pattern))
             else:
-                files.extend(input_path.glob(pattern))
+                discovered.extend(input_path.glob(pattern))
+
+        # remove duplicates + enforce deterministic order
+        files = sorted({f.resolve() for f in discovered})
 
         if not files:
             if verbose:
-                print("⚠️ No CV files found.")
+                print("No CV files found.")
             return pd.DataFrame()
 
     if verbose:
@@ -119,73 +155,157 @@ def process_folder_cvs(
         print(f"FOUND {len(files)} FILE(S) TO PROCESS")
         print("=" * 60)
 
-    # -----------------------------------------------------
-    # Process each file
-    # -----------------------------------------------------
-    all_dfs = []
 
-    for idx, file_path in enumerate(files, 1):
+    # -----------------------------------------------------
+    # Load already processed CVs (incremental mode)
+    # -----------------------------------------------------
+    already_processed: set[str] = set()
+
+    if csv_path and csv_path.exists():
+        try:
+            old_df = pd.read_csv(csv_path, sep=";")
+
+            if "source_path" in old_df.columns:
+                already_processed = set(old_df["source_path"].dropna().astype(str))
+
+            elif "source_file" in old_df.columns:
+                # fallback compatível com CSV antigo
+                already_processed = set(old_df["source_file"].dropna().astype(str))
+
+            if verbose:
+                print(f"Previously processed CVs found: {len(already_processed)}")
+
+        except Exception as exc:
+            print(f"Warning: could not read existing CSV: {exc}")
+
+    # -----------------------------------------------------
+    # Skip previously processed files
+    # -----------------------------------------------------
+    original_count = len(files)
+    files = [
+    f for f in files
+    if str(f.resolve()) not in already_processed]
+
+    if verbose:
+        skipped = original_count - len(files)
+        print(f"Files skipped (already processed): {skipped}")
+
+    # -----------------------------------------------------
+    # Process remaining files
+    # -----------------------------------------------------
+    all_dfs: List[pd.DataFrame] = []
+
+    for idx, file_path in enumerate(files, start=1):
 
         if verbose:
             print(f"\n[{idx}/{len(files)}] Processing: {file_path.name}")
 
         try:
             df = process_single_cv(
-                pdf_input=file_path,
+                cv_input=file_path,
                 save_path=output_folder,
+                cv_confidence_threshold=cv_confidence_threshold,
+                cv_min_detections=cv_min_detections,
+                yolo_confidence=yolo_confidence,
+                gliner_threshold=gliner_threshold,
                 crop_text_block=crop_text_block,
                 crop_photo=crop_photo,
-                crop_skill_table = crop_skill_table,
-                save_ocr_txt = save_ocr_txt,
-                verbose=verbose,
-                **kwargs,)
+                crop_skill_table=crop_skill_table,
+                analyse_individual_pages=analyse_individual_pages,
+                save_ocr_txt=save_ocr_txt,
+                save_csv=save_csv,
+                gliner_model=gliner_model,
+                filter_yolo_model=filter_yolo_model,
+                text_photo_yolo_model=text_photo_yolo_model,
+                skill_table_yolo_model=skill_table_yolo_model,
+                verbose=verbose,)
 
             if not df.empty:
-                df.insert(0, "source_file", file_path.name)
+                df.insert(0, "source_file", str(file_path.name))
+                df.insert(1, "source_path", str(file_path.resolve()))
                 all_dfs.append(df)
 
-        except Exception as e:
-            print(f"❌ Error processing {file_path.name}: {e}")
+        except Exception as exc:
+            print(f"Error processing {file_path.name}: {exc}")
 
     # -----------------------------------------------------
-    # Merge results
+    # If nothing new processed → return existing CSV
     # -----------------------------------------------------
     if not all_dfs:
         if verbose:
-            print("\n⚠️ No valid CV data extracted.")
+            print("\nNo new CVs processed.")
+
+        if csv_path and csv_path.exists():
+            return pd.read_csv(csv_path, sep=";")
+
         return pd.DataFrame()
 
+    # -----------------------------------------------------
+    # Merge new results
+    # -----------------------------------------------------
     final_df = pd.concat(all_dfs, ignore_index=True)
 
     # -----------------------------------------------------
-    # Save global CSV
+    # Save / append global CSV
     # -----------------------------------------------------
-    if output_folder is not None:
-        csv_path = output_folder / "all_results.csv"
-        final_df.to_csv(csv_path, index=False, encoding="utf-8", sep=";")
+    merged_df: Optional[pd.DataFrame] = None
 
-        if verbose:
-            print(f"\n✓ Global CSV saved to: {csv_path}")
+    if csv_path is not None:
 
+        if csv_path.exists():
+            old_df = pd.read_csv(csv_path, sep=";")
+            merged_df = pd.concat([old_df, final_df], ignore_index=True)
 
+            # Safety check for legacy CSVs without page_num
+            if analyse_individual_pages and "page_num" not in merged_df.columns:
+                analyse_individual_pages = False
+
+            subset_cols = (
+                ["source_path", "page_num"]
+                if analyse_individual_pages
+                else ["source_path"]
+            )
+
+            merged_df = merged_df.drop_duplicates(subset=subset_cols, keep="last")
+            merged_df.to_csv(csv_path, index=False, encoding="utf-8", sep=";")
+
+            if verbose:
+                print(f"\nCSV updated: {csv_path}")
+
+        else:
+            final_df.to_csv(csv_path, index=False, encoding="utf-8", sep=";")
+
+            if verbose:
+                print(f"\nCSV created: {csv_path}")
+
+    # -----------------------------------------------------
+    # Final summary
+    # -----------------------------------------------------
     if verbose:
         print("\n" + "=" * 60)
-        print(f"✓ BATCH COMPLETE: {len(final_df)} CV page(s)")
+        unit = "page(s)" if analyse_individual_pages else "CV(s)"
+        print(f"BATCH COMPLETE: {len(final_df)} new {unit}")
         print("=" * 60)
 
+    if csv_path:
+        return merged_df if merged_df is not None else final_df
     return final_df
 
-
+# =========================================================
+# Standalone execution
+# =========================================================
 if __name__ == "__main__":
     df = process_folder_cvs(
-        input_folder=BACKEND_ROOT /"uploads",
-        output_folder=BACKEND_ROOT/"outputs",
+        input_folder=BACKEND_ROOT / "uploads",
+        output_folder=BACKEND_ROOT / "outputs",
         scan_subfolders=True,
-        clear_output_folder= True,
-        crop_text_block= True,
-        crop_photo= True,
-        crop_skill_table = True,
-        save_ocr_txt = True,
+        crop_text_block=True,
+        crop_photo=True,
+        crop_skill_table=True,
+        save_ocr_txt=True,
+        analyse_individual_pages=False,
         cv_confidence_threshold=0.3,
         yolo_confidence=0.25,
     )
+
+    print("\nFinal DataFrame shape:", df.shape)

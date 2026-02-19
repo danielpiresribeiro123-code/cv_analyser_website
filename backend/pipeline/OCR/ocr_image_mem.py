@@ -1,10 +1,12 @@
 """
 In-memory OCR utilities using Tesseract.
 
-Design goals:
-- No external model downloads
-- Deterministic OCR for clean digital CVs
-- Fully compatible with existing pipeline
+Design principles
+-----------------
+• No external model downloads
+• Deterministic OCR for clean digital CVs
+• Fully compatible with modular CV pipeline
+• Centralized Tesseract configuration via services.paths_models_and_data
 """
 
 # =========================================================
@@ -19,13 +21,12 @@ from typing import List, Dict, Any, TypedDict, Union, Optional
 # =========================================================
 import numpy as np
 from PIL import Image, ImageFilter
-import pytesseract
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe" # You have to download tesseract e put here the path
+import cv2  # type: ignore
 
 # =========================================================
-# Project root
+# Project services
 # =========================================================
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+from services.paths_models_and_data import run_tesseract_ocr
 
 
 # =========================================================
@@ -49,14 +50,15 @@ BBOX_BUFFER = 18
 # Image helpers
 # =========================================================
 def _to_pil(image: Union[Image.Image, np.ndarray, bytes]) -> Image.Image:
-    """Convert numpy/bytes → PIL.Image safely."""
+    """
+    Convert numpy array or raw bytes into a PIL.Image safely.
+    """
     if isinstance(image, Image.Image):
         return image
 
     if isinstance(image, bytes):
-        import cv2
         arr = np.frombuffer(image, np.uint8)
-        img = cv2.imdecode(arr, 1)
+        img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
         if img is None:
             raise ValueError("Invalid image bytes")
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -64,33 +66,54 @@ def _to_pil(image: Union[Image.Image, np.ndarray, bytes]) -> Image.Image:
 
     if isinstance(image, np.ndarray):
         if image.ndim == 3 and image.shape[2] == 3:
-            import cv2
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         return Image.fromarray(image.astype(np.uint8))
 
-    raise TypeError("Unsupported image type")
+    raise TypeError("Unsupported image type for OCR")
 
 
 def _preprocess_crop(crop: Image.Image) -> Image.Image:
     """
-    Light preprocessing improves Tesseract accuracy.
+    Apply lightweight preprocessing to improve OCR accuracy.
+
+    Steps:
+    • Convert to grayscale
+    • Apply mild sharpening
     """
     gray = crop.convert("L")
 
-    # sharpen muito leve
-    sharp = gray.filter(ImageFilter.UnsharpMask(radius=1.5, percent=120, threshold=2))
+    sharp = gray.filter(
+        ImageFilter.UnsharpMask(radius=1.5, percent=120, threshold=2)
+    )
 
     return sharp
 
 
 # =========================================================
-# Core OCR (Tesseract)
+# Core OCR extraction
 # =========================================================
 def extract_text_from_bboxes(
     image_data: Union[Image.Image, np.ndarray, bytes],
     detections: List[Dict[str, Any]],
     verbose: bool = False,
 ) -> List[OCRResult]:
+    """
+    Extract OCR text from detected bounding boxes.
+
+    Parameters
+    ----------
+    image_data
+        Source image in memory.
+    detections
+        YOLO detections containing bbox, class, confidence, and optional crop.
+    verbose
+        If True, prints partial OCR output for debugging.
+
+    Returns
+    -------
+    List[OCRResult]
+        Structured OCR results per detection.
+    """
 
     image = _to_pil(image_data)
     img_w, img_h = image.size
@@ -101,29 +124,36 @@ def extract_text_from_bboxes(
 
         label = det.get("label") or det.get("class") or ""
 
-        # Skip photos
+        # Skip non-textual regions
         if label == "photo":
             continue
 
-        # Get crop
+        # -------------------------------------------------
+        # Determine crop region
+        # -------------------------------------------------
         if "crop" in det and det["crop"] is not None:
             crop = det["crop"]
         else:
             x1, y1, x2, y2 = det.get("bbox", [0, 0, 0, 0])
+
             x1 = max(0, x1 - BBOX_BUFFER)
             y1 = max(0, y1 - BBOX_BUFFER)
             x2 = min(img_w, x2 + BBOX_BUFFER)
             y2 = min(img_h, y2 + BBOX_BUFFER)
+
             crop = image.crop((x1, y1, x2, y2))
 
         crop = _preprocess_crop(crop)
 
+        # -------------------------------------------------
+        # Run Tesseract OCR (centralized config)
+        # -------------------------------------------------
         try:
-            text = pytesseract.image_to_string(
+            text = run_tesseract_ocr(
                 crop,
                 lang="eng",
-                config="--oem 3 --psm 6"
-            ).strip()
+                config="--oem 3 --psm 6",
+            )
         except Exception:
             text = ""
 
@@ -144,7 +174,7 @@ def extract_text_from_bboxes(
 
 
 # =========================================================
-# Public helper
+# Public pipeline helper
 # =========================================================
 def process_image_with_bbox(
     image_data: Union[Image.Image, np.ndarray, bytes],
@@ -152,22 +182,36 @@ def process_image_with_bbox(
     output_path: Optional[Union[str, Path]] = None,
     verbose: bool = False,
 ) -> Dict[str, Any]:
+    """
+    High-level OCR processing wrapper.
+
+    Returns:
+        {
+            "text": full_text,
+            "results": structured_ocr_results
+        }
+    """
 
     ocr_results = extract_text_from_bboxes(image_data, detections, verbose)
 
-    text = "\n\n".join(r["text"] for r in ocr_results)
+    full_text = "\n\n".join(r["text"] for r in ocr_results)
 
-    result = {"text": text, "results": ocr_results}
+    result = {
+        "text": full_text,
+        "results": ocr_results,
+    }
 
+    # -----------------------------------------------------
+    # Optional JSON export
+    # -----------------------------------------------------
     if output_path:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
+
         with open(path, "w", encoding="utf-8") as f:
-            json.dump({"text": text}, f, ensure_ascii=False, indent=2)
+            json.dump({"text": full_text}, f, ensure_ascii=False, indent=2)
 
         if verbose:
-            print(f"Text saved to: {path}")
+            print(f"OCR text saved to: {path}")
 
     return result
-
-

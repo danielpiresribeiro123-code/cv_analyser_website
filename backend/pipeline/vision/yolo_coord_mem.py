@@ -1,4 +1,13 @@
-import sys
+"""
+YOLO-based CV layout detection in memory.
+
+Supports:
+• Cached YOLO models (no reload per call)
+• Bytes or numpy image input
+• Optional crop + JSON export
+• Clean production-ready structure
+"""
+
 import json
 from typing import Union, List, Dict, Any, Optional
 from pathlib import Path
@@ -8,67 +17,72 @@ import cv2
 from PIL import Image
 from ultralytics import YOLO  # type: ignore
 
+# Centralized model loaders
+from services.paths_models_and_data import (
+    get_text_photo_yolo_model,
+    get_skill_table_yolo_model,
+)
 
-# =========================================================
-# Project root resolution
-# =========================================================
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-TEXT_PHOTO_MODEL_PATH = PROJECT_ROOT / "models" / "yolo" / "yolo11s-text-photo-150e4b.pt"
-SKILL_TABLE_MODEL_PATH = PROJECT_ROOT / "models" / "yolo" / "yolo11s-skill_table-150e4b.pt"
 
 # =========================================================
 # Core detection
 # =========================================================
 def detect_and_segment_cv(
     image_data: Union[np.ndarray, bytes],
-    text_photo_model_path: Union[str, Path],
-    skill_table_model_path: Optional[Union[str, Path]] = None,
+    text_photo_model: Optional[YOLO] = None,
+    skill_table_model: Optional[YOLO] = None,
     conf_thres: float = 0.20,
     save_path: Optional[Union[str, Path]] = None,
-    return_crops: Optional[List[str]] = ["photo"],
+    return_crops: Optional[List[str]] = None,
     return_json: bool = False,
 ) -> List[Dict[str, Any]]:
     """
-    Detect text_blocks, photos and optionally skill_tables in a CV image.
+    Detect layout elements in a CV image.
 
-    Features
-    --------
-    - Supports two YOLO models:
-        1) text/photo detector (mandatory)
-        2) skill table detector (optional)
-    - Returns structured detections sorted top→bottom.
-    - Optionally exports:
-        • JSON with bounding boxes
-        • Cropped images per detection class
+    Detection classes:
+        • text_block
+        • photo
+        • skill_table (optional second model)
 
     Parameters
     ----------
-    image_data : np.ndarray | bytes
-        Image in memory.
-    text_photo_model_path : str | Path
-        Path to YOLO model detecting text/photo.
-    skill_table_model_path : str | Path | None
-        Optional YOLO model detecting skill tables.
-    conf_thres : float
-        Confidence threshold.
-    save_path : str | Path | None
-        Base path for JSON/crops.
-    return_crops : list[str] | None
-        Classes to crop. None disables cropping.
-    return_json : bool
-        Whether to export JSON.
+    image_data:
+        Image in memory (bytes or numpy array).
+
+    text_photo_model:
+        Preloaded YOLO model.
+        If None → loads cached global model.
+
+    skill_table_model:
+        Optional preloaded YOLO model for skill tables.
+        If None → loads cached global model only if needed.
+
+    conf_thres:
+        YOLO confidence threshold.
+
+    save_path:
+        Optional base path for JSON/crop export.
+
+    return_crops:
+        List of classes to crop.
+        None → disables cropping.
+
+    return_json:
+        Whether to export detections as JSON.
 
     Returns
     -------
-    List[Dict]
-        Filtered detections.
+    List of filtered detections sorted top→bottom.
     """
 
     # -----------------------------------------------------
-    # Load models
+    # Load cached models if not provided
     # -----------------------------------------------------
-    text_photo_model = YOLO(text_photo_model_path)
-    skill_table_model = YOLO(skill_table_model_path) if skill_table_model_path else None
+    if text_photo_model is None:
+        text_photo_model = get_text_photo_yolo_model()
+
+    if skill_table_model is None and return_crops and "skill_table" in return_crops:
+        skill_table_model = get_skill_table_yolo_model()
 
     # -----------------------------------------------------
     # Decode image
@@ -93,7 +107,7 @@ def detect_and_segment_cv(
     # -----------------------------------------------------
     # Helper to parse YOLO results
     # -----------------------------------------------------
-    def _collect_detections(results, model):
+    def _collect(results, model: YOLO) -> None:
         for r in results:
             if r.boxes is None:
                 continue
@@ -117,7 +131,7 @@ def detect_and_segment_cv(
                     "x": x1,
                 }
 
-                # Add crop only if requested
+                # Optional crop
                 if return_crops and cls_name in return_crops:
                     det["crop"] = Image.fromarray(img_rgb[y1:y2, x1:x2])
 
@@ -129,10 +143,9 @@ def detect_and_segment_cv(
     results_text = text_photo_model.predict(
         source=img_rgb,
         conf=conf_thres,
-        device="cpu",
         verbose=False,
     )
-    _collect_detections(results_text, text_photo_model)
+    _collect(results_text, text_photo_model)
 
     # -----------------------------------------------------
     # Run inference — skill table (optional)
@@ -141,18 +154,17 @@ def detect_and_segment_cv(
         results_skill = skill_table_model.predict(
             source=img_rgb,
             conf=conf_thres,
-            device="cpu",
             verbose=False,
         )
-        _collect_detections(results_skill, skill_table_model)
+        _collect(results_skill, skill_table_model)
 
     # -----------------------------------------------------
-    # Sort detections top→bottom, left→right
+    # Sort detections (top→bottom, left→right)
     # -----------------------------------------------------
     detections.sort(key=lambda d: (d["y"], d["x"]))
 
     # -----------------------------------------------------
-    # Remove contained boxes (same class)
+    # Remove contained boxes of same class
     # -----------------------------------------------------
     filtered: List[Dict[str, Any]] = []
 
@@ -180,13 +192,13 @@ def detect_and_segment_cv(
             filtered.append(det_i)
 
     # -----------------------------------------------------
-    # Optional JSON + crop export
+    # Optional export
     # -----------------------------------------------------
     if save_path is not None:
         save_path = Path(save_path)
         save_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # ---- Save JSON ----
+        # ---- JSON ----
         if return_json:
             serializable = [
                 {
@@ -200,7 +212,7 @@ def detect_and_segment_cv(
             with open(save_path, "w", encoding="utf-8") as f:
                 json.dump(serializable, f, indent=2, ensure_ascii=False)
 
-        # ---- Save crops ----
+        # ---- Crops ----
         if return_crops:
             base_name = save_path.stem
             crops_dir = save_path.parent / f"{base_name}_crops"

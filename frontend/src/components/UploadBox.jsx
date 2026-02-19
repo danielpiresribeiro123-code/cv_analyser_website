@@ -6,7 +6,7 @@ export default function UploadBox() {
     const formData = new FormData()
     for (let f of files) formData.append("files", f)
 
-    await fetch("http://127.0.0.1:8000/upload-cvs", {
+    await fetch("http://127.0.0.1:8000/upload", {
       method: "POST",
       body: formData,
     })

@@ -1,37 +1,46 @@
-export default function RankingTable({ ranking }) {
+function downloadCSV() {
+  window.open("http://127.0.0.1:8000/download", "_blank")
+}
+
+export default function ResultsTable({ results }) {
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 mt-10">
+    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6">
       <h2 className="text-2xl font-semibold mb-4 text-center">
-        Top Candidates ({ranking.num_cvs})
+        Results ({results.num_cvs} CVs)
       </h2>
 
-      <table className="w-full text-left border-collapse">
-        <thead>
-          <tr className="border-b border-gray-700 text-gray-400">
-            <th className="py-2">Rank</th>
-            <th className="py-2">File</th>
-            <th className="py-2">Semantic</th>
-            <th className="py-2">Experience (years)</th>
-            <th className="py-2">Final Score</th>
-          </tr>
-        </thead>
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={downloadCSV}
+          className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm font-semibold"
+        >
+          Download CSV
+        </button>
+      </div>
 
-        <tbody>
-          {ranking.ranking.map((r, i) => (
-            <tr key={i} className="border-b border-gray-800">
-              <td className="py-2 font-semibold text-purple-400">#{i + 1}</td>
-              <td className="py-2">{r.file}</td>
-              <td className="py-2">
-                {(r.semantic_score * 100).toFixed(1)}%
-              </td>
-              <td className="py-2">{r.experience_years.toFixed(1)}</td>
-              <td className="py-2 font-semibold text-green-400">
-                {(r.final_score * 100).toFixed(1)}%
-              </td>
+      <div className="overflow-auto">
+        <table className="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr className="border-b border-gray-700 text-gray-400">
+              <th className="py-2">Name</th>
+              <th className="py-2">Email</th>
+              <th className="py-2">Experience</th>
+              <th className="py-2">Languages</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {results.results.map((r, i) => (
+              <tr key={i} className="border-b border-gray-800">
+                <td className="py-2">{r["person name"]}</td>
+                <td className="py-2">{r.email}</td>
+                <td className="py-2">{r.experience_years ?? "-"}</td>
+                <td className="py-2">{r.languages}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

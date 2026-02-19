@@ -1,5 +1,5 @@
 function downloadCSV() {
-  window.open("http://127.0.0.1:8000/download-results", "_blank")
+  window.open("http://127.0.0.1:8000/download", "_blank")
 }
 
 export default function ResultsTable({ results }) {
@@ -8,6 +8,7 @@ export default function ResultsTable({ results }) {
       <h2 className="text-2xl font-semibold mb-4 text-center">
         Results ({results.num_cvs} CVs)
       </h2>
+
       <div className="flex justify-end mb-4">
         <button
           onClick={downloadCSV}
@@ -17,27 +18,29 @@ export default function ResultsTable({ results }) {
         </button>
       </div>
 
-      <table className="w-full text-left border-collapse">
-        <thead>
-          <tr className="border-b border-gray-700 text-gray-400">
-            <th className="py-2">File</th>
-            <th className="py-2">Predicted Role</th>
-            <th className="py-2">Score</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {results.results.map((r, i) => (
-            <tr key={i} className="border-b border-gray-800">
-              <td className="py-2">{r.file}</td>
-              <td className="py-2">{r.label}</td>
-              <td className="py-2 text-blue-400 font-semibold">
-                {(r.score * 100).toFixed(1)}%
-              </td>
+      <div className="overflow-auto">
+        <table className="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr className="border-b border-gray-700 text-gray-400">
+              <th className="py-2">Name</th>
+              <th className="py-2">Email</th>
+              <th className="py-2">Experience</th>
+              <th className="py-2">Languages</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {results.results.map((r, i) => (
+              <tr key={i} className="border-b border-gray-800">
+                <td className="py-2">{r["person name"]}</td>
+                <td className="py-2">{r.email}</td>
+                <td className="py-2">{r.experience_years ?? "-"}</td>
+                <td className="py-2">{r.languages}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
