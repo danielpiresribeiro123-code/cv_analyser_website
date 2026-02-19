@@ -1,0 +1,158 @@
+JESSICA
+CLAIRE
+
+SUMMARY
+
+Dedicated Information Assurance Professional well-versed in analyzing and mitigating risk and finding
+cost-effective solutions. Excels at boosting performance and productivity by establishing realistic
+goals and enforcing deadlines. Versatile IT professional with 37 years of Enterprise design and
+engineering methodology.
+
+= resurnesample@example.com
+
+%& (555) 432-1000
+
+g Montgomery Street, San
+Francisco, CA 94105
+
+SKILLS
+
++ Enterprise platforms
+
++ Knowledge of Product Lifecycle
+‘Management (PLM)
+
++ Project tracking
+
++ Hardware and software upgrade
+planning
+
++ Product requirements,
+documentation
+
++ Self-directed
+
++ NS Visio
+
++ Decisive
+
++ Collaborative
+
++ Domain Active Directory Layout
+
++ Data storage engineering
+
++ Information Assurance
+
++ Risk Management Framework
+(RMF)
+
++ Active Directory design and
+deployment.
+
++ Workstation build and
+deployment
+
++ Systems Accreditation Packages
+
++ Red Hat Enterprise Linux
+installation and hardening
+
++ Network Design &
+Troubleshooting
+
++ High Performance Computing
+
+EXPERIENCE
+
+Year Up - Information Technology
+
+Lincoln, RI + 01/2044 - Current
+
+Iwas hired to manage accreditation efforts for a major department modernization project involving 3
+accreditation packages each leading to successful Authorization To Operate decisions. Responsibilities
+then increased to include all departmental accreditation efforts leading to another 3 successful ATOs.
+Now, working on 4 new accreditation including re-authorization for an existing project. Succeeded in
+writing and implementing vulnerability management for existing accredited systems. Success of the
+accreditation hinged on coordination with ONI Enterprise in critical design decisions and to help the,
+program integrate smoothly into the Enterprise thru many meetings, analyzing the Enterprise business
+model to understand the best fit for the program. The different projects required careful management
+of specific STIG compliance and hardening for the different configurations and services required for
+the specific domain to be integrated. Analyzed complex computer systems to assess vulnerability and
+risk. Supervised 5 external computer consultants and vendors. Managed application patches, data
+backup, security changes and network configuration.
+
+Noblis, Inc. - Systems Engineer
+
+Reston, VA + 07/2006 - 01/2011
+
+was Hired to initiate processing strategies in fulfilling department analyst requirements.
+Requirements were fulfilled thru identifying product problerns and strengths and collected data on
+customer experience and review of Enterprise compliance to transition to new technology for
+‘supporting new processing needs thru proper processing power. The next challenge came as storage
+requirements for better performance and more controlled uses. After careful study of local
+infrastructure design, a local storage with off the shelf solutions was adopted to grow local storage to
+‘over 20078. In using this solution, the department saved just over a million dollars in purchasing and
+maintenance costs compared to the alternative. Next came requirements to improve processing of,
+future big data formats fulfilled in a Red Hat Linux high compute cluster | designed, purchased and
+accredited for operation in the Enterprise. Improvement on big data analytical processing reduced
+time from 30 hours to 30 minutes as well as allow for more robust data thru higher selections of
+sensors, frequencies and range than allowed thru the traditional process.
+
+Con Edison Solutions - Senior Systems Analyst
+
+Boulder City, NV » 01/1999 - 01/2006
+
+Iwas hired to improve corporate and client communications and processing requirements which
+resulted in the design, build and deployment of 3 Enterprise network solutions. One solution resulted
+in expanding capabilities to supporting Washington Navy Yard, Norfolk Virginia and Hawaii support
+facilities. Fulfilled requirements for detecting crucial network software/hardware weaknesses and
+developing preventive strategies and solutions for avoiding interruptions and increasing system
+security thru documenting system layouts, wiring diagrams and addressing schema to understand
+layouts and make informed solutions to upper management.
+
+EDUCATION AND
+TRAINING
+
+Florence Darlington Technical
+School
+
+Florence, SC + 1980
+
+Associate of Science: Electronic
+Engineering
+
+Electronic Engineering.
+
+Dean's list for high GPA.
+
+Class President for second year
+
+SKILLS
+
++ Active Directory
+
++ Hardware Engineering
+
++ Information Technology
+
++ Red Hat Enterprise Linux Servers
++ MS Windows Servers
+
++ MS Windows Desktop
+
++ Network Design & Troubleshooting
++ Architectural Diagrams
+
++ Accreditation Boundarys
+
++ Risk Management
+
++ Enterprise Strategies
+
++ Vendor Relations
+
++ Desktop Publishing Software: Photoshop, illustrator, HTML
++ Team Work
+
++ Collaboration

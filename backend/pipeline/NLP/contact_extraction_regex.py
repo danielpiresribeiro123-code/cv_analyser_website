@@ -62,6 +62,14 @@ EMAIL_REGEX = re.compile(
     re.VERBOSE | re.IGNORECASE,
 )
 
+EMAIL_PROVIDERS = {
+    "gmail.com",
+    "outlook.com",
+    "hotmail.com",
+    "yahoo.com",
+    "icloud.com",
+    "live.com",
+}
 
 PHONE_REGEX = re.compile(
     r"""
@@ -89,9 +97,19 @@ GITHUB_REGEX = re.compile(
 )
 
 URL_REGEX = re.compile(
-    r"\b(?:https?://)?(?:www\.)?[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?:/[^\s,]*)?",
-    re.IGNORECASE,
-)
+    r"""
+    \b
+    (?:
+        https?://
+        |
+        www\.
+    )
+    [A-Za-z0-9-]+
+    (?:\.[A-Za-z0-9-]+)+
+    (?:/[^\s]*)?
+    """,
+    re.VERBOSE | re.IGNORECASE,)
+
 
 
 # ==========================================================
@@ -172,7 +190,7 @@ DATE_RANGE_REGEX = re.compile(
     )
 
     \s*
-    (?:-|–|—|\bto\b|\buntil\b|\btill\b|\bthrough\b|→|~)
+    (?:-|–|—|~|\bto\b|\buntil\b|\btill\b|\bthrough\b|→|~)
     \s*
 
     # ---------------- END DATE ----------------
@@ -196,7 +214,7 @@ SINCE_REGEX = re.compile(
 )
 
 
-EDU_KEYWORDS = {"education", "university", "school", "bachelor", "master","degree", "course", "student", "academic"}
+EDU_KEYWORDS = {"education", "bachelor", "master","degree", "course", "student", "academic"}
 
 WORK_KEYWORDS = {"experience", "work", "employment", "career", "history", "intern", "job", "company"}
 
@@ -686,16 +704,39 @@ def extract_all_websites(text: str) -> List[str]:
 
     urls = set()
 
-    # específicos primeiro
-    for pattern in (LINKEDIN_REGEX, GITHUB_REGEX, URL_REGEX):
-        for match in extract_all(pattern, text):
-            url = match.strip()
-            if not url.startswith(("http://", "https://")):
-                url = "https://" + url
-            urls.add(url)
+    # Extrair emails primeiro para remover depois
+    emails = extract_all(EMAIL_REGEX, text)
+    email_domains = {
+        e.split("@")[1].lower()
+        for e in emails
+        if "@" in e
+    }
+
+    for match in URL_REGEX.finditer(text):
+        url = match.group(0).strip()
+
+        # Normalizar
+        if not url.startswith(("http://", "https://")):
+            url = "https://" + url
+
+        domain = re.sub(r"https?://(www\.)?", "", url)
+        domain = domain.split("/")[0].lower()
+
+        # Ignorar se for domínio de email extraído
+        if domain in email_domains:
+            continue
+
+        # Ignorar se for provider genérico
+        if domain in EMAIL_PROVIDERS:
+            continue
+
+        # Ignorar domínios muito curtos (ex: www.)
+        if len(domain.split(".")) < 2:
+            continue
+
+        urls.add(url)
 
     return sorted(urls)
-
 
     
 # ==========================================================

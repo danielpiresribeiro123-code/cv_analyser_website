@@ -1,0 +1,49 @@
+Tomás Fialho
+
+tr.fialho@protonmail.com • tr.fialho@campus.fct.unl.pt • (+351) 968 736 666
+
+About Me 
+Final year Industrial Engineering and Management student at FCT NOVA, with experience in inventory analysis. 
+Eager to get familiarized with the industry. Interested in applying Machine Learning and other digital tools to 
+optimize production systems and business processes.
+
+Education 
+Bachelor’s Degree in Industrial Engineering and Management 
+NOVA School of Science and Technology 
+September 2023 – June 2026 (Projected) 
+• 120 ECTS 
+• Learned to apply lean manufacturing principles, gaining insight into efficiency improvement and waste 
+reduction. 
+• Studied project management methodologies: how to plan, execute, and monitor engineering projects.
+
+CS50P: CS50's Introduction to Programming with Python 
+HarvardX 
+September 2025 – October 2025 
+ 
+Samsung Innovation Campus: Artificial Intelligence Course, 9th Ed. 
+NOVA School of Science and Technology: Executive Education 
+October 2025 – March 2026 (Projected) 
+• 
+Developed skills in statistical modeling and predictive analysis. 
+• Applied machine learning concepts and pattern identification. 
+• Developed practical projects in a team-based environment. 
+Master’s Degree in Data Science 
+September 2026 – June 2028 (Projected) 
+• 
+Planning to enroll in a Master’s Degree in Data Science.
+
+CS50P: CS50's Introduction to Programming with Python 
+HarvardX 
+September 2025 – October 2025
+
+Experience
+Logistics and Inventory Analysis Intern 
+Sandometal 
+January 2026 – February 2026 (Projected) 
+• EDA on years of historical data, identifying trends, outliers, seasonality, and demand variability. 
+• Statistical stock modeling and inventory segmentation. 
+• Gained appreciation for process efficiency and client-focused operations.
+
+Skills 
+Software: Microsoft Office, Python (Pandas, NumPy, Scikit-learn), AI/ML Algorithms, SQL 
+Languages: Portuguese (Native), English (Advanced)
