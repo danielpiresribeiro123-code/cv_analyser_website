@@ -8,17 +8,17 @@ import pandas as pd
 # Internal services
 # =========================================================
 from services.process_cvs_pipeline import process_folder_cvs
-from services.storage_cleanup import clear_uploads, clear_outputs, clean_df_for_json
+from services.storage_cleanup import clear_uploads, clear_all_storage, clean_df_for_json
 
 # Centralized model + path loaders
 from services.paths_models_and_data import (
+    BACKEND_ROOT,
     UPLOADS_DIR,
     OUTPUTS_DIR,
     get_gliner_model,
     get_filter_yolo_model,
     get_text_photo_yolo_model,
-    get_skill_table_yolo_model,
-)
+    get_skill_table_yolo_model,)
 
 router = APIRouter()
 
@@ -153,14 +153,14 @@ def download_csv():
 @router.post("/reset")
 def reset_system():
     """
-    Clear both uploads and outputs directories.
+    Clear uploads, outputs, and YOLO temporary run folders.
 
     Useful for:
     • Restarting frontend demo sessions
     • Cleaning incremental processing history
     """
 
-    clear_uploads(UPLOADS_DIR)
-    clear_outputs(OUTPUTS_DIR)
+    clear_all_storage(UPLOADS_DIR, OUTPUTS_DIR, BACKEND_ROOT)
 
     return {"message": "System reset successfully"}
+

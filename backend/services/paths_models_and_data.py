@@ -20,8 +20,10 @@ import pytesseract
 # PATHS
 # =========================================================
 
-# Backend root
+# Projects root
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
+FRONTEND_ROOT = PROJECT_ROOT / "frontend"
 
 # Data folders
 UPLOADS_DIR = BACKEND_ROOT / "uploads"
