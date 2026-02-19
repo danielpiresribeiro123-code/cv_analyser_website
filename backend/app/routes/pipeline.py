@@ -76,7 +76,7 @@ def run_pipeline():
         input_folder=UPLOADS_DIR,
         output_folder=OUTPUTS_DIR,
         scan_subfolders=False,
-        clear_output_folder=False,   # preserve incremental history
+        clear_output_folder=False,   # preserve incremental history, we have a bottum that removes the data from the outputs
         crop_text_block=True,
         crop_photo=True,
         crop_skill_table=True,

@@ -24,17 +24,19 @@ import numpy as np
 from ultralytics import YOLO #type:ignore
 from PIL import Image
 import cv2
+import csv
 
 # =========================================================
 # Local pipeline modules
 # =========================================================
-from pipeline.input.pdf_to_image import convert_pdf_to_images  # type: ignore
-from pipeline.vision.cv_filter import CVFilter  # type: ignore
-from pipeline.vision.yolo_coord_mem import detect_and_segment_cv  # type: ignore
-from pipeline.OCR.ocr_image_mem import process_image_with_bbox  # type: ignore
-from pipeline.NLP.text_GliNER_preprocessing import preprocess_ocr_for_gliner  # type: ignore
-from pipeline.NLP.entities_from_text_mem import process_texts_gliner  # type: ignore
-from pipeline.NLP.contact_info_extraction_mem import extract_contact_info  # type: ignore
+from pipeline.transform.pdf_to_image import convert_pdf_to_images
+from pipeline.vision.cv_filter_yolo import CVFilter
+from pipeline.vision.layout_detection_yolo import detect_and_segment_cv 
+from pipeline.text_reader.ocr_engine_tesseract import process_image_with_bbox
+from pipeline.text_reader.pdf_parser import process_pdf_with_bboxes
+from pipeline.NLP.gliner_preprocessing import preprocess_ocr_for_gliner
+from pipeline.NLP.entity_extraction_gliner import process_texts_gliner
+from pipeline.NLP.contact_extraction_regex import extract_contact_info
 
 # =========================================================
 # Support functions
@@ -148,6 +150,16 @@ def _save_detection_crops(
 
 
 
+def _merge_address_priority(address_gliner: Optional[str],
+                            address_regex: Optional[str]) -> Optional[str]:
+    """
+    GLiNER has priority.
+    If GLiNER address is None or shorter than 4 characters,
+    fallback to regex-based address.
+    """
+    if address_gliner and len(address_gliner.strip()) >= 4:
+        return address_gliner.strip()
+    return address_regex
 
 
 # =========================================================
@@ -200,6 +212,10 @@ def process_single_cv(
     # -----------------------------------------------------
     # Case 1 — Path input
     # -----------------------------------------------------
+    input_path: Optional[Path] = None
+    suffix: Optional[str] = None
+    pdf_bytes: Optional[bytes] = None
+
     if isinstance(cv_input, (str, Path)):
         input_path = Path(cv_input)
 
@@ -232,11 +248,12 @@ def process_single_cv(
     # Case 2 — Bytes input
     # -----------------------------------------------------
     elif isinstance(cv_input, bytes):
-
         pdf_stem = "cv"
 
-        # PDF magic bytes
         if cv_input.startswith(b"%PDF"):
+            suffix = ".pdf"
+            pdf_bytes = cv_input
+
             if verbose:
                 print("     Detected PDF bytes")
 
@@ -263,6 +280,8 @@ def process_single_cv(
     # -----------------------------------------------------
     if not images:
         raise ValueError("No images could be extracted from input")
+
+    assert suffix is not None
 
     if verbose:
         print(f"\n[2/7] Loaded {len(images)} page(s)/image(s)")
@@ -296,7 +315,7 @@ def process_single_cv(
     # Prepare accumulators
     # -----------------------------------------------------
     all_results: list[dict[str, Any]] = []
-    all_ocr_texts: list[str] = []
+    all_texts: list[str] = []
 
     total_text_blocks = 0
     total_photos = 0
@@ -384,30 +403,83 @@ def process_single_cv(
         # -------------------------------------------------
         # [6] OCR extraction
         # -------------------------------------------------
-        if verbose:
-            print("\n[6/7] Extracting text via OCR...")
-
-        ocr_result = process_image_with_bbox(
-            image_data=image_bytes,
-            detections=detections,
-            output_path=None,
-            verbose=False,
-        )
-
-        ocr_text = ocr_result.get("text", "")
-
-        if not ocr_text.strip():
+        raw_text: str = ""
+        
+        # ---------- Image ----------
+        if suffix == ".pdf":
             if verbose:
-                print(f"     No text extracted on page {page_num}")
-            continue
+                print("\n[6/7] Extracting text via PDF parser...")
+            if input_path is not None:
+                pdf_source: Union[str, Path, bytes] = input_path
+            else:
+                assert pdf_bytes is not None
+                pdf_source = pdf_bytes
+
+            # -------------------------------------------------
+            # Try PDF vector text extraction
+            # -------------------------------------------------
+            try:
+                pdf_result = process_pdf_with_bboxes(
+                    pdf_input=pdf_source,
+                    detections=detections,
+                    page_index=page_num - 1,
+                    img_size=image.size,
+                    verbose=verbose,
+                )
+
+                raw_text = pdf_result.get("text", "").strip()
+
+            except Exception as e:
+                if verbose:
+                    print(f"     PDF parsing failed → OCR fallback ({e})")
+                raw_text = ""
+
+            # -------------------------------------------------
+            # OCR fallback if:
+            # 1) PDF has no vector text
+            # 2) Extracted text is too short / corrupted
+            # -------------------------------------------------
+            if len(raw_text) < 20:
+                if verbose:
+                    print("     Weak/empty PDF text → running OCR fallback...")
+
+                ocr_result = process_image_with_bbox(
+                    image_data=image_bytes,
+                    detections=detections,
+                    output_path=None,
+                    verbose=False,
+                )
+
+                raw_text = ocr_result.get("text", "").strip()
+
+
+
+        # ---------- Image ----------
+        elif suffix in {".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".webp"}:
+            if verbose:
+                print("\n[6/7] Extracting text via OCR...")
+
+            ocr_result = process_image_with_bbox(
+                image_data=image_bytes,
+                detections=detections,
+                output_path=None,
+                verbose=False,
+            )
+
+            raw_text = ocr_result.get("text", "")
+
+            if not raw_text.strip():
+                if verbose:
+                    print(f"     No text extracted on page {page_num}")
+                continue
 
         if verbose:
-            print(f"     Extracted {len(ocr_text)} characters")
+            print(f"     Extracted {len(raw_text)} characters")
 
         # -------------------------------------------------
         # Accumulate
         # -------------------------------------------------
-        all_ocr_texts.append(ocr_text)
+        all_texts.append(raw_text)
         total_text_blocks += num_text_blocks
         total_photos += num_photos
         total_skill_tables += num_skill_tables
@@ -420,7 +492,7 @@ def process_single_cv(
         if analyse_individual_pages:
 
             # ---- GLiNER ----
-            preprocessed_text = preprocess_ocr_for_gliner(ocr_text)
+            preprocessed_text = preprocess_ocr_for_gliner(raw_text)
 
             gliner_df = process_texts_gliner(
                 texts=[preprocessed_text],
@@ -429,12 +501,14 @@ def process_single_cv(
             )
 
             # ---- Regex contacts ----
-            contact_info = extract_contact_info(ocr_text)
+            contact_info = extract_contact_info(raw_text)
 
             result_row = {} if gliner_df.empty else gliner_df.iloc[0].to_dict()
 
             emails = contact_info.get("all_emails") or []
             phones = contact_info.get("all_phones") or []
+            address_gliner = result_row.get("address")
+            address_regex = contact_info.get("address")
 
             result_row.update({
                 "email": contact_info.get("email"),
@@ -443,7 +517,7 @@ def process_single_cv(
                 "phone": contact_info.get("phone"),
                 "all_phones": ", ".join(phones),
 
-                "address": contact_info.get("address"),
+                "address": _merge_address_priority(address_gliner,address_regex),
                 "experience_years": contact_info.get("experience_years"),
 
                 "languages": ", ".join(contact_info.get("languages", [])),
@@ -453,6 +527,9 @@ def process_single_cv(
                 "github": contact_info.get("github"),
                 "all_websites": ", ".join(contact_info.get("all_websites", [])),
             })
+
+            result_row = {str(k): v for k, v in result_row.items()}
+
 
             all_results.append(result_row)
 
@@ -469,7 +546,7 @@ def process_single_cv(
     # If we are NOT analysing per-page, build a single row
     # -----------------------------------------------------
     if not analyse_individual_pages and valid_pages > 0:
-        full_text = "\n".join(all_ocr_texts)
+        full_text = "\n".join(all_texts)
         preprocessed_text = preprocess_ocr_for_gliner(full_text)
 
         gliner_df = process_texts_gliner(
@@ -484,6 +561,8 @@ def process_single_cv(
 
         emails = contact_info.get("all_emails") or []
         phones = contact_info.get("all_phones") or []
+        address_gliner = result_row.get("address")
+        address_regex = contact_info.get("address")
 
         result_row.update({
             "email": contact_info.get("email"),
@@ -492,7 +571,7 @@ def process_single_cv(
             "phone": contact_info.get("phone"),
             "all_phones": ", ".join(phones),
 
-            "address": contact_info.get("address"),
+            "address": _merge_address_priority(address_gliner,address_regex),
             "experience_years": contact_info.get("experience_years"),
 
             "languages": ", ".join(contact_info.get("languages", [])),
@@ -504,7 +583,6 @@ def process_single_cv(
 
             "page_num": "all",
             "page_num_total": valid_pages,
-
             "ocr_text_length": len(full_text),
 
             "num_text_blocks": total_text_blocks,
@@ -514,6 +592,9 @@ def process_single_cv(
             "cv_output_folder": str(cv_folder) if cv_folder else None,
         })
 
+        # garantir chaves string (sem destruir dados)
+        result_row = {str(k): v for k, v in result_row.items()}
+
         all_results = [result_row]
 
     # -----------------------------------------------------
@@ -521,7 +602,7 @@ def process_single_cv(
     # -----------------------------------------------------
     if save_ocr_txt and cv_folder is not None and valid_pages > 0:
         raw_text_path = cv_folder / "ocr_raw.txt"
-        full_raw_text = "\n\n".join(all_ocr_texts)
+        full_raw_text = "\n\n".join(all_texts)
         raw_text_path.write_text(full_raw_text, encoding="utf-8")
 
         if verbose:
@@ -548,7 +629,7 @@ def process_single_cv(
     # -----------------------------------------------------
     if save_csv and cv_folder is not None:
         csv_path = cv_folder / "results.csv"
-        df.to_csv(csv_path, index=False, encoding="utf-8", sep=";")
+        df.to_csv(csv_path, index=False, encoding="utf-8", sep=";", quoting=csv.QUOTE_MINIMAL)
 
         if verbose:
             print(f"     CSV saved to: {csv_path}")

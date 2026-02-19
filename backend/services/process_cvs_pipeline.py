@@ -3,11 +3,12 @@ from typing import Union, Optional, List, Any
 import pandas as pd
 import shutil
 from ultralytics import YOLO  # type: ignore
+import csv
 
 # =========================================================
 # Local imports
 # =========================================================
-from pipeline.pipelines.process_single_cv import process_single_cv  # type: ignore
+from pipeline.pipelines.process_single_cv import process_single_cv
 
 # =========================================================
 # Project backend root resolution
@@ -19,7 +20,7 @@ def process_folder_cvs(
     input_folder: Union[str, Path],
     output_folder: Optional[Union[str, Path]] = None,
     scan_subfolders: bool = False,
-    verbose: bool = True,
+    verbose: bool = False,
     clear_output_folder: bool = False,
     crop_text_block: bool = False,
     crop_photo: bool = True,
@@ -267,13 +268,13 @@ def process_folder_cvs(
             )
 
             merged_df = merged_df.drop_duplicates(subset=subset_cols, keep="last")
-            merged_df.to_csv(csv_path, index=False, encoding="utf-8", sep=";")
+            merged_df.to_csv(csv_path, index=False, encoding="utf-8", sep=";", quoting=csv.QUOTE_MINIMAL)
 
             if verbose:
                 print(f"\nCSV updated: {csv_path}")
 
         else:
-            final_df.to_csv(csv_path, index=False, encoding="utf-8", sep=";")
+            final_df.to_csv(csv_path, index=False, encoding="utf-8", sep=";", quoting=csv.QUOTE_MINIMAL)
 
             if verbose:
                 print(f"\nCSV created: {csv_path}")
@@ -299,6 +300,8 @@ if __name__ == "__main__":
         input_folder=BACKEND_ROOT / "uploads",
         output_folder=BACKEND_ROOT / "outputs",
         scan_subfolders=True,
+        verbose=True,
+        clear_output_folder=True,
         crop_text_block=True,
         crop_photo=True,
         crop_skill_table=True,

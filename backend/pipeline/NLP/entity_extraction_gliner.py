@@ -154,7 +154,7 @@ def process_texts_gliner(
         threshold: Entity detection threshold
     
     Returns:
-        DataFrame with columns: id, skills, person_name, job_title, company, 
+        DataFrame with columns: skills, person_name, job_title, company, 
                                university, degree, address, years_of_experience
     
     Example:
@@ -186,18 +186,39 @@ def process_texts_gliner(
             )
             
             # Flatten lists into comma-separated strings for DataFrame
-            row: Dict[str, Any] = {"id": text_id}
+            row: Dict[str, Any] = {}
             for label in OTHER_LABELS + ["skills"]:
                 entities = entities_dict.get(label, [])
-                row[label] = ", ".join(entities) if entities else None
-            
+
+                # --- limpeza robusta para CSV ---
+                clean_entities = []
+                for e in entities:
+                    if not isinstance(e, str):
+                        continue
+
+                    # remover quebras de linha internas e espaços duplicados
+                    e_clean = " ".join(e.replace("\n", " ").replace("\r", " ").split())
+
+                    if e_clean:
+                        e_norm = e_clean.strip()
+                        clean_entities.append(e_norm)
+
+                # remover duplicados ignorando maiúsculas
+                unique = {}
+                for e in clean_entities:
+                    key = e.lower()
+                    if key not in unique:
+                        unique[key] = e
+
+                clean_entities = list(unique.values())
+
+                row[label] = ", ".join(clean_entities) if clean_entities else None
+
+                            
             rows.append(row)
         
         except Exception as e:
-            rows.append({
-                "id": text_id,
-                "error": str(e)
-            })
+            rows.append({"error": str(e)})
     
     df = pd.DataFrame(rows)
     return df
