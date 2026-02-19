@@ -22,29 +22,25 @@ export default function JobDescriptionBox({ setRanking }) {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 mt-10">
-      <h2 className="text-xl font-semibold mb-4 text-center">
-        Job Description
-      </h2>
-
+    <div className="space-y-4">
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Paste the job description here..."
-        className="w-full h-32 p-3 rounded-lg bg-gray-800 border border-gray-600 text-sm"
+        className="w-full h-32 p-3 rounded-lg bg-white/5 border border-white/10 text-sm text-white"
       />
 
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center">
         <button
           onClick={runRanking}
-          className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-xl font-semibold"
+          className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-xl font-semibold text-white"
         >
           Rank Candidates
         </button>
       </div>
 
       {loading && (
-        <p className="text-center mt-3 text-purple-400 animate-pulse">
+        <p className="text-center text-purple-400 animate-pulse">
           Computing semantic ranking...
         </p>
       )}

@@ -1,46 +1,31 @@
-function downloadCSV() {
-  window.open("http://127.0.0.1:8000/download", "_blank")
-}
-
-export default function ResultsTable({ results }) {
+export default function RankingTable({ ranking }) {
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6">
-      <h2 className="text-2xl font-semibold mb-4 text-center">
-        Results ({results.num_cvs} CVs)
-      </h2>
-
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={downloadCSV}
-          className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm font-semibold"
+    <div className="space-y-3">
+      {ranking.map((r, i) => (
+        <div
+          key={i}
+          className="flex justify-between items-center
+                     bg-white/5 border border-white/10
+                     rounded-xl px-4 py-3"
         >
-          Download CSV
-        </button>
-      </div>
+          <div>
+            <p className="font-semibold text-white">{r.name}</p>
+            <p className="text-sm text-gray-400">{r.email}</p>
+          </div>
 
-      <div className="overflow-auto">
-        <table className="w-full text-left border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-gray-700 text-gray-400">
-              <th className="py-2">Name</th>
-              <th className="py-2">Email</th>
-              <th className="py-2">Experience</th>
-              <th className="py-2">Languages</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {results.results.map((r, i) => (
-              <tr key={i} className="border-b border-gray-800">
-                <td className="py-2">{r["person name"]}</td>
-                <td className="py-2">{r.email}</td>
-                <td className="py-2">{r.experience_years ?? "-"}</td>
-                <td className="py-2">{r.languages}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          <div className="w-40">
+            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-emerald-500"
+                style={{ width: `${r.score}%` }}
+              />
+            </div>
+            <p className="text-xs text-right mt-1 text-gray-400">
+              {r.score}%
+            </p>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

@@ -10,20 +10,25 @@ export default function UploadBox() {
       method: "POST",
       body: formData,
     })
-
-    alert("CVs uploaded successfully!")
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 text-center">
+    <div className="w-full flex flex-col items-center gap-3">
       <input
         type="file"
         multiple
-        accept=".pdf"
+        accept=".pdf",".png", ".jpg", ".jpeg", ".bmp", ".tiff", "*.webp"
         onChange={handleUpload}
-        className="block mx-auto text-sm"
+        className="text-sm text-gray-300
+                   file:mr-4 file:py-2 file:px-4
+                   file:rounded-lg file:border-0
+                   file:text-sm file:font-semibold
+                   file:bg-blue-600 file:text-white
+                   hover:file:bg-blue-700"
       />
-      <p className="text-gray-400 mt-3">Upload one or more PDF CVs</p>
+      <p className="text-gray-400 text-sm">
+        Upload one or more PDF CVs
+      </p>
     </div>
   )
 }

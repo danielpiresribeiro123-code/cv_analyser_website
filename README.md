@@ -64,11 +64,13 @@ npm install
 npx tailwindcss init -p   # if config does not exist
 npm install react react-dom
 npm install -D @vitejs/plugin-react
+npx shadcn@latest init
+npm install framer-motion
 ```
 
 ---
 
-# 2 Download NLTK Stopwords (one time)
+# 2 Download NLTK Stopwords (not relevante)
 
 ```bash
 python -m nltk.downloader stopwords
@@ -87,43 +89,31 @@ python pipeline/fast_analysis/modules/install_stop_words.py
 Run from project root:
 
 ```bash
-python -m backend.services.process_cvs_pipeline
+cd backend
+python -m services.process_cvs_pipeline
 ```
 
 Output:
 
 * **CSV** → structured candidate data
 * **JSON** → detected bounding boxes
+* **PNG** → images of the detected bounding boxes divided by text_block, photo and skill_table
 
----
 
-# 4 Run the API
-
-Inside **backend/**:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Open in browser:
-
-```
-http://127.0.0.1:8000/docs
-```
-
-Interactive Swagger UI will appear.
-
----
-
-# 5 Run the Frontend
+# 4 Run the program
 
 ## Backend (terminal 1)
-
 ```bash
 cd backend
 uvicorn app.main:app --reload
 ```
 
+
+Open in browser:
+```
+http://127.0.0.1:8000/docs
+```
+Interactive Swagger UI will appear.
 ## Frontend (terminal 2)
 
 ```bash
@@ -139,7 +129,7 @@ http://localhost:5173
 
 ---
 
-# 6 Features
+# 5 Features
 
 * PDF → image conversion
 * CV page detection
@@ -151,6 +141,6 @@ http://localhost:5173
 
 ---
 
-# 7 License
+# 6 License
 
 Educational and research use.
