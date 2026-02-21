@@ -42,47 +42,61 @@ def preprocess_ocr_for_gliner(ocr_json_output):
         if not block.strip():
             continue
 
-        # Split block into constituent lines
-        lines = [line.strip() for line in block.split('\n') if line.strip()]
-        
+        # Remove linhas extremamente curtas (ruído OCR)
+        raw_lines = block.split('\n')
+        lines = []
+        for line in raw_lines:
+            clean_line = line.strip()
+            if not clean_line:
+                continue
+
+            # Remove linhas muito pequenas (ex: caracteres soltos)
+            if len(clean_line) <= 1:
+                continue
+
+            lines.append(clean_line)
+
         if not lines:
             continue
 
-        # --- HEURISTIC CLASSIFICATION ---
-        
-        # Metric 1: Average Line Length (in words)
-        # Short lines (< 5 words) usually indicate a List (Skills, Dates).
-        # Long lines (> 5 words) usually indicate Prose (Summary, Experience).
-        total_words = sum(len(line.split()) for line in lines)
-        avg_words = total_words / len(lines)
-
-        # Metric 2: Explicit Header Detection (Strict Targeting)
-        # If a block starts with "Skills", it is almost certainly a list.
         first_line_lower = lines[0].lower()
-        is_skill_header = bool(re.match(r'^(skills|technologies|stack|competencies|tools)', first_line_lower))
 
-        # --- RECONSTRUCTION LOGIC ---
+        # ===============================
+        # 1 Detect skill blocks only by header
+        # ===============================
+        is_skill_header = bool(
+            re.match(r'^(skills|technologies|stack|competencies|tools)', first_line_lower)
+        )
 
-        if is_skill_header or avg_words < 6:
-            # === LIST MODE ===
-            # Action: Join with COMMAS to create a dense semantic list.
-            # Example: "Skills\nJava\nPython" -> "Skills: Java, Python"
-            
-            # If it's a header, ensure a colon exists for better NLP context
-            if is_skill_header and not lines[0].endswith(':'):
+        # ===============================
+        # 2 Detect address-like blocks
+        # ===============================
+        is_address_block = bool(
+            re.search(r'\b\d{4}-\d{3}\b', block) or  # Portuguese postal code
+            re.search(r'\b(Rua|Avenida|Av\.|Travessa|Praça)\b', block, re.IGNORECASE)
+        )
+
+        # ===============================
+        # 3 Reconstruction logic
+        # ===============================
+
+        if is_skill_header:
+            # LIST MODE (only real skills section)
+
+            if not lines[0].endswith(':'):
                 lines[0] += ":"
-            
-            # Join remaining items with commas
-            # We treat the first line (Header) separately if it was a skill header
-            if is_skill_header and len(lines) > 1:
+
+            if len(lines) > 1:
                 reconstructed = lines[0] + " " + ", ".join(lines[1:])
             else:
-                reconstructed = ", ".join(lines)
+                reconstructed = lines[0]
+
+        elif is_address_block:
+            # Always treat address as prose
+            reconstructed = " ".join(lines)
 
         else:
-            # === PROSE MODE ===
-            # Action: Join with SPACES to fix broken sentences.
-            # Example: "Senior Project\nManager" -> "Senior Project Manager"
+            # Default → prose
             reconstructed = " ".join(lines)
 
         cleaned_blocks.append(reconstructed)

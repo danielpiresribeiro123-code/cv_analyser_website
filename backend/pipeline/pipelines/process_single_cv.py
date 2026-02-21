@@ -598,10 +598,10 @@ def process_single_cv(
         all_results = [result_row]
 
     # -----------------------------------------------------
-    # Optional: save RAW OCR text
+    # Optional: save RAW text
     # -----------------------------------------------------
     if save_ocr_txt and cv_folder is not None and valid_pages > 0:
-        raw_text_path = cv_folder / "ocr_raw.txt"
+        raw_text_path = cv_folder / "raw_text.txt"
         full_raw_text = "\n\n".join(all_texts)
         raw_text_path.write_text(full_raw_text, encoding="utf-8")
 
