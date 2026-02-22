@@ -1,13 +1,22 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
+function display(value) {
+  if (value && value !== "null") return value
+
+  return (
+    <span className="text-gray-500 italic">
+      Not detected
+    </span>
+  )
+}
 
 function PhotoBlock({ photoUrl }) {
   const [hasError, setHasError] = useState(false)
 
   if (!photoUrl || hasError) {
     return (
-      <div className="w-44 h-44 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-gray-500 text-xs">
+      <div className="w-44 h-48 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-gray-500 text-xs">
         No Photo
       </div>
     )
@@ -17,11 +26,36 @@ function PhotoBlock({ photoUrl }) {
     <img
       src={photoUrl}
       alt="CV Photo"
-      className="w-44 h-44 object-cover rounded-xl border border-white/20"
+      className="w-44 h-48 object-cover rounded-xl border border-white/20"
       onError={() => setHasError(true)}
     />
   )
 }
+
+
+function DownloadButton({ url, label }) {
+  const isActive = Boolean(url)
+
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation()
+        if (isActive) window.open(url, "_blank")
+      }}
+      disabled={!isActive}
+      className={`px-4 py-2 rounded-lg text-sm font-semibold transition
+        ${
+          isActive
+            ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+            : "bg-white/10 text-gray-500 cursor-not-allowed"
+        }`}
+    >
+      {label}
+    </button>
+  )
+}
+
+
 
 function downloadCSV() {
   window.open("http://127.0.0.1:8000/download", "_blank")
@@ -85,24 +119,34 @@ export default function ResultsTable({ results }) {
 
               {/* Expanded content */}
               {isOpen && (
-                <div className="mt-4 grid md:grid-cols-3 gap-6 text-sm text-gray-300">
+              <div className="mt-4 text-sm text-gray-300">
+                {/* Top content in 3 columns */}
+                <div className="grid md:grid-cols-3 gap-6">
                   {/* Left column */}
                   <div className="space-y-2">
                     <p>
-                      <span className="text-white">Degree:</span>{" "}
-                      {r.degree || "-"}
+                      <span className="text-white">Job Title:</span>{" "}
+                      {display(r.job_title)}
                     </p>
                     <p>
                       <span className="text-white">Company:</span>{" "}
-                      {r.company || "-"}
+                      {display(r.company)}
+                    </p>
+                    <p>
+                      <span className="text-white">Degree:</span>{" "}
+                      {display(r.degree)}
                     </p>
                     <p>
                       <span className="text-white">University:</span>{" "}
-                      {r.university || "-"}
+                      {display(r.university)}
                     </p>
                     <p>
                       <span className="text-white">Languages:</span>{" "}
-                      {r.languages}
+                      {display(r.languages)}
+                    </p>
+                    <p>
+                      <span className="text-white">Websites:</span>{" "}
+                      {display(r.all_websites)}
                     </p>
                   </div>
 
@@ -112,7 +156,7 @@ export default function ResultsTable({ results }) {
                     <div className="flex flex-wrap gap-2">
                       {r.skills
                         ?.split(",")
-                        .slice(0, 10)
+                        .slice(0, 15)
                         .map((skill, idx) => (
                           <span
                             key={idx}
@@ -125,11 +169,19 @@ export default function ResultsTable({ results }) {
                   </div>
 
                   {/* Photo */}
-                  <div className="flex justify-center items-start pt-0 -mt-1">
+                  <div className="flex justify-center items-start pt-1 -mt-1">
                     <PhotoBlock photoUrl={r.photo_url} />
                   </div>
                 </div>
-              )}
+
+                {/* Downloads (full width, buttons side-by-side) */}
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <DownloadButton url={r.download_raw_url} label="Download Raw Text" />
+                  <DownloadButton url={r.download_photo_url} label="Download Photo" />
+                  <DownloadButton url={r.download_skill_tables_url} label="Download Skill Tables" />
+                </div>
+              </div>
+            )}
             </div>
           )
         })}

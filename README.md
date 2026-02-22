@@ -115,6 +115,8 @@ Open in browser:
 http://127.0.0.1:8000/docs
 ```
 Interactive Swagger UI will appear.
+
+
 ## Frontend (terminal 2)
 
 ```bash

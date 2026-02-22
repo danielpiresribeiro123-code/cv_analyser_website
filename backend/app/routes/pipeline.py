@@ -131,10 +131,54 @@ def get_results():
 
     for r in records:
         folder = r.get("cv_output_folder")
-        if folder:
-            r["photo_url"] = f"http://127.0.0.1:8000/photo?folder={folder}"
-        else:
+
+        if not folder:
             r["photo_url"] = None
+            r["download_raw_url"] = None
+            r["download_photo_url"] = None
+            r["download_skill_tables_url"] = None
+            continue
+
+        folder_path = Path(folder)
+
+        # RAW TEXT
+        raw_path = folder_path / "raw_text.txt"
+        r["download_raw_url"] = (
+            f"http://127.0.0.1:8000/download-raw?folder={folder}"
+            if raw_path.exists()
+            else None
+        )
+
+        # PHOTO
+        photos_dir = folder_path / "photos"
+        photo_exists = False
+        if photos_dir.exists():
+            for f in photos_dir.iterdir():
+                if f.suffix.lower() in [".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff"]:
+                    photo_exists = True
+                    break
+
+        r["photo_url"] = (
+            f"http://127.0.0.1:8000/photo?folder={folder}"
+            if photo_exists
+            else None
+        )
+
+        r["download_photo_url"] = (
+            f"http://127.0.0.1:8000/download-photo?folder={folder}"
+            if photo_exists
+            else None
+        )
+
+        # SKILL TABLES
+        tables_dir = folder_path / "skill_tables"
+        tables_exist = tables_dir.exists() and any(tables_dir.iterdir())
+
+        r["download_skill_tables_url"] = (
+            f"http://127.0.0.1:8000/download-skill-tables?folder={folder}"
+            if tables_exist
+            else None
+        )
 
     return {
         "num_cvs": len(records),

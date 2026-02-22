@@ -24,8 +24,8 @@ SOFTWARE_AS_SKILL = {
 
 ENTITY_GROUPS = {
     "skills": SKILL_LABELS,
-    "person name": ["person name"],
-    "job title": ["job title"],
+    "person_name": ["person name"],
+    "job_title": ["job title"],
     "company": ["company", "corporation"],
     "university": ["university","school", "college", "faculty"],
     "degree": ["degree", "bachelor", "master", "doctorate"],
@@ -38,9 +38,9 @@ ALL_LABELS = list(dict.fromkeys(
 ))
 
 INVALID_ENTITIES = {
-    "person name": {
+    "person_name": {
         "person", "first name", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "academic background","academic","background","education", "experience", "hobbies"},
-    "job title": {
+    "job_title": {
         "person","first name", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "academic background", "background","education", "experience", "hobbies"},
     "skills": {
         "person","first name", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "academic background","academic","background","education", "experience", "hobbies", "C1", "First Certificate"},
@@ -245,8 +245,8 @@ def extract_entities_from_text(
 ) -> Dict[str, List[str]]:
 
     result_labels = [
-                "person name",
-                "job title",
+                "person_name",
+                "job_title",
                 "company",
                 "university",
                 "degree",
@@ -337,8 +337,8 @@ def process_texts_gliner(
             row: Dict[str, Any] = {}
 
             for label in [
-                "person name",
-                "job title",
+                "person_name",
+                "job_title",
                 "company",
                 "university",
                 "degree",
@@ -357,7 +357,7 @@ def process_texts_gliner(
                     if e_clean:
                         clean_entities.append(e_clean.strip())
 
-                if label == "person name":
+                if label == "person_name":
                     clean_entities = _clean_person_name(clean_entities)
 
                 if label == "address":
