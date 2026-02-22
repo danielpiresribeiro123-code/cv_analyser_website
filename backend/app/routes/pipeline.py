@@ -3,12 +3,17 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 import shutil
 import pandas as pd
+from pydantic import BaseModel
+import numpy as np
+import os
+from fastapi.responses import FileResponse
 
 # =========================================================
 # Internal services
 # =========================================================
 from services.process_cvs_pipeline import process_folder_cvs
 from services.storage_cleanup import clear_uploads, clear_all_storage, clean_df_for_json
+from services.ranking_pipeline import rank_cvs
 
 # Centralized model + path loaders
 from services.paths_models_and_data import (
@@ -26,6 +31,11 @@ router = APIRouter()
 UPLOADS_DIR.mkdir(exist_ok=True)
 OUTPUTS_DIR.mkdir(exist_ok=True)
 
+
+# =========================================================
+# Models
+# =========================================================
+gliner = get_gliner_model()
 
 # ---------------------------------------------------------
 # Upload CVs
@@ -87,7 +97,7 @@ def run_pipeline():
         yolo_confidence=0.25,
         gliner_threshold=0.3,
         save_csv=False,
-        gliner_model=get_gliner_model(),
+        gliner_model=gliner,
         filter_yolo_model=get_filter_yolo_model(),
         text_photo_yolo_model=get_text_photo_yolo_model(),
         skill_table_yolo_model=get_skill_table_yolo_model(),
@@ -108,9 +118,6 @@ def run_pipeline():
 # ---------------------------------------------------------
 @router.get("/results")
 def get_results():
-    """
-    Return previously processed CV results stored in CSV.
-    """
 
     csv_path = OUTPUTS_DIR / "all_results.csv"
 
@@ -120,9 +127,18 @@ def get_results():
     df = pd.read_csv(csv_path, sep=";")
     df = clean_df_for_json(df)
 
+    records = df.to_dict(orient="records")
+
+    for r in records:
+        folder = r.get("cv_output_folder")
+        if folder:
+            r["photo_url"] = f"http://127.0.0.1:8000/photo?folder={folder}"
+        else:
+            r["photo_url"] = None
+
     return {
-        "num_cvs": len(df),
-        "results": df.to_dict(orient="records"),
+        "num_cvs": len(records),
+        "results": records,
     }
 
 
@@ -164,3 +180,69 @@ def reset_system():
 
     return {"message": "System reset successfully"}
 
+
+
+# ---------------------------------------------------------
+# Serve CV photo
+# ---------------------------------------------------------
+@router.get("/photo")
+def get_cv_photo(folder: str):
+    """
+    Returns first available photo inside CV output folder.
+    """
+
+    folder_path = Path(folder)
+
+    photos_dir = folder_path / "photos"
+
+    if not photos_dir.exists():
+        return {"error": "No photo folder"}
+
+    for file in photos_dir.iterdir():
+        if file.suffix.lower() in [".png", ".jpg", ".jpeg"]:
+            return FileResponse(file)
+
+    return {"error": "No photo found"}
+
+
+
+# ---------------------------------------------------------
+# Job description and ranking of the results
+# ---------------------------------------------------------
+class RankingRequest(BaseModel):
+    job_description: str
+
+
+@router.post("/rank-candidates")
+def rank_candidates(request: RankingRequest):
+    """
+    Run semantic ranking over processed CVs.
+    """
+
+    ranking_df = rank_cvs(request.job_description, gliner_model=gliner)
+
+    # Converter para JSON-friendly
+    ranking_df = ranking_df.replace({np.nan: None})
+
+    return ranking_df.to_dict(orient="records")
+
+
+# ---------------------------------------------------------
+# Download Ranking CSV
+# ---------------------------------------------------------
+@router.get("/download-ranking")
+def download_ranking_csv():
+    """
+    Download the generated ranking CSV.
+    """
+
+    csv_path = OUTPUTS_DIR / "ranking.csv"
+
+    if not csv_path.exists():
+        return {"error": "Ranking CSV not found"}
+
+    return FileResponse(
+        csv_path,
+        media_type="text/csv",
+        filename="ranking.csv",
+    )

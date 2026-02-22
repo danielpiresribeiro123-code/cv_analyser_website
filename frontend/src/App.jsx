@@ -46,20 +46,46 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white flex flex-col items-center p-6 gap-10">
-      {/* Title */}
-      <motion.h1
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-4xl md:text-5xl font-bold tracking-tight text-center text-white"
-      >
-        Gyro · CV Analyzer
-      </motion.h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white flex flex-col items-center px-6 pt-16 pb-10 gap-10">
+      {/* Hero Section */}
+      <div className="relative text-center space-y-6 max-w-3xl">
 
+        {/* Glow background */}
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-blue-600/20 blur-[120px] rounded-full pointer-events-none" />
+
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-5xl md:text-6xl font-bold tracking-tight text-white relative"
+        >
+          Gyro •
+          <span className="text-blue-400"> Smart Hiring Recipe</span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-gray-400 text-lg md:text-xl leading-relaxed"
+        >
+          Upload candidate CVs and instantly extract structured insights,
+          analyze experience, and rank candidates using semantic AI matching.
+        </motion.p>
+
+        <div className="flex justify-center gap-6 text-sm text-gray-500 pt-2">
+          <span>AI-powered extraction</span>
+          <span>•</span>
+          <span>Semantic ranking</span>
+          <span>•</span>
+          <span>Structured outputs</span>
+        </div>
+
+      </div>
       {/* Upload Card */}
-      <Card className="w-full max-w-2xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl">
+      <Card className="w-full max-w-5xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl">
         <CardHeader>
-          <CardTitle className="text-center text-lg text-white">
+          <CardTitle className="text-2xl font-semibold text-center text-white">
             Upload CVs
           </CardTitle>
         </CardHeader>
@@ -70,16 +96,7 @@ export default function App() {
 
           {/* Buttons together like design */}
           <div className="flex gap-3">
-            <RunAnalysis setResults={setResults} setLoading={setLoading}>
-              <Button
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700 flex gap-2 text-white"
-              >
-                <Play className="w-4 h-4" />
-                Run Analysis
-              </Button>
-            </RunAnalysis>
-
+            <RunAnalysis setResults={setResults} setLoading={setLoading} />
             <SystemControl onReset={handleSystemReset} />
           </div>
         </CardContent>
@@ -97,8 +114,8 @@ export default function App() {
 
       {/* Results Card */}
       {results && (
-        <Card className="w-full max-w-4xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl text-white">
-          <CardContent>
+        <Card className="w-full max-w-5xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl text-white">
+          <CardContent className="pt-7 pb-8 px-8">
             <ResultsTable results={results} />
           </CardContent>
         </Card>
@@ -106,12 +123,9 @@ export default function App() {
 
       {/* Job Description */}
       {results && (
-        <Card className="w-full max-w-3xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl text-white">
-          <CardHeader>
-            <CardTitle className="text-white">Job Description</CardTitle>
-          </CardHeader>
+        <Card className="w-full max-w-5xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl text-white">
 
-          <CardContent>
+          <CardContent className="pt-7 pb-8 px-8">
             <JobDescriptionBox setRanking={setRanking} />
           </CardContent>
         </Card>
@@ -119,12 +133,9 @@ export default function App() {
 
       {/* Ranking */}
       {ranking && (
-        <Card className="w-full max-w-4xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl text-white">
-          <CardHeader>
-            <CardTitle className="text-white">Ranking</CardTitle>
-          </CardHeader>
+        <Card className="w-full max-w-5xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl text-white">
 
-          <CardContent>
+          <CardContent className="pt-7 pb-8 px-8">
             <RankingTable ranking={ranking} />
           </CardContent>
         </Card>

@@ -3,20 +3,10 @@ from gliner import GLiNER
 import pandas as pd
 from typing import Union, List, Dict, Optional, Any, cast
 
-from services.paths_models_and_data import get_gliner_model
+from services.paths_models_and_data import get_gliner_model, SKILL_LABELS, COUNTRIES_AND_CAPITALS, COUNTRIES_NAMES, CAPITALS_NAMES, LANGUAGES
 
 
 # Define label sets globally for reuse
-SKILL_LABELS = [
-"skill", "technical expertise", "software and tools", "programming language",
-    "software framework", "library", "database", "cloud platform", "devops tool",
-    "operating system", "web technology", "machine learning algorithm",
-    "data analysis tool", "big data tool", "version control system",
-    "creative software", "project management tool", "office suite",
-    "crm software", "erp software", "methodology", "development practice",
-    "soft skill", "leadership skill", "personal attribute", "management skill",
-    "competency", "interpersonal strength", "hard skill", "artistic skill",
-    "physical skills", "mental skills","standard or protocol", "area of specialization"]
 
 SOFTWARE_AS_SKILL = {
     "canva",
@@ -58,14 +48,60 @@ INVALID_ENTITIES = {
     "company": {"company", "organization"},
     "address": {"address", "location"}}
 
-COUNTRIES_AND_CAPITALS = {'Afghanistan': 'Kabul', 'Aland Islands': 'Mariehamn', 'Albania': 'Tirana', 'Algeria': 'Algiers', 'American Samoa': 'Pago Pago', 'Andorra': 'Andorra la Vella', 'Angola': 'Luanda', 'Anguilla': 'The Valley', 'Antarctica': '', 'Antigua And Barbuda': "St. John's", 'Argentina': 'Buenos Aires', 'Armenia': 'Yerevan', 'Aruba': 'Oranjestad', 'Australia': 'Canberra', 'Austria': 'Vienna', 'Azerbaijan': 'Baku', 'Bahamas The': 'Nassau', 'Bahrain': 'Manama', 'Bangladesh': 'Dhaka', 'Barbados': 'Bridgetown', 'Belarus': 'Minsk', 'Belgium': 'Brussels', 'Belize': 'Belmopan', 'Benin': 'Porto-Novo', 'Bermuda': 'Hamilton', 'Bhutan': 'Thimphu', 'Bolivia': 'Sucre', 'Bosnia and Herzegovina': 'Sarajevo', 'Botswana': 'Gaborone', 'Bouvet Island': '', 'Brazil': 'Brasilia', 'British Indian Ocean Territory': 'Diego Garcia', 'Brunei': 'Bandar Seri Begawan', 'Bulgaria': 'Sofia', 'Burkina Faso': 'Ouagadougou', 'Burundi': 'Bujumbura', 'Cambodia': 'Phnom Penh', 'Cameroon': 'Yaounde', 'Canada': 'Ottawa', 'Cape Verde': 'Praia', 'Cayman Islands': 'George Town', 'Central African Republic': 'Bangui', 'Chad': "N'Djamena", 'Chile': 'Santiago', 'China': 'Beijing', 'Christmas Island': 'Flying Fish Cove', 'Cocos (Keeling) Islands': 'West Island', 'Colombia': 'Bogota', 'Comoros': 'Moroni', 'Congo': 'Brazzaville', 'Congo The Democratic Republic Of The': 'Kinshasa', 'Cook Islands': 'Avarua', 'Costa Rica': 'San Jose', "Cote D'Ivoire (Ivory Coast)": 'Yamoussoukro', 'Croatia': 'Zagreb', 'Cuba': 'Havana', 'Cyprus': 'Nicosia', 'Czech Republic': 'Prague', 'Denmark': 'Copenhagen', 'Djibouti': 'Djibouti', 'Dominica': 'Roseau', 'Dominican Republic': 'Santo Domingo', 'East Timor': 'Dili', 'Ecuador': 'Quito', 'Egypt': 'Cairo', 'El Salvador': 'San Salvador', 'Equatorial Guinea': 'Malabo', 'Eritrea': 'Asmara', 'Estonia': 'Tallinn', 'Ethiopia': 'Addis Ababa', 'Falkland Islands': 'Stanley', 'Faroe Islands': 'Torshavn', 'Fiji Islands': 'Suva', 'Finland': 'Helsinki', 'France': 'Paris', 'French Guiana': 'Cayenne', 'French Polynesia': 'Papeete', 'French Southern Territories': 'Port-aux-Francais', 'Gabon': 'Libreville', 'Gambia The': 'Banjul', 'Georgia': 'Tbilisi', 'Germany': 'Berlin', 'Ghana': 'Accra', 'Gibraltar': 'Gibraltar', 'Greece': 'Athens', 'Greenland': 'Nuuk', 'Grenada': "St. George's", 'Guadeloupe': 'Basse-Terre', 'Guam': 'Hagatna', 'Guatemala': 'Guatemala City', 'Guernsey and Alderney': 'St Peter Port', 'Guinea': 'Conakry', 'Guinea-Bissau': 'Bissau', 'Guyana': 'Georgetown', 'Haiti': 'Port-au-Prince', 'Heard and McDonald Islands': '', 'Honduras': 'Tegucigalpa', 'Hong Kong S.A.R.': 'Hong Kong', 'Hungary': 'Budapest', 'Iceland': 'Reykjavik', 'India': 'New Delhi', 'Indonesia': 'Jakarta', 'Iran': 'Tehran', 'Iraq': 'Baghdad', 'Ireland': 'Dublin', 'Israel': 'Jerusalem', 'Italy': 'Rome', 'Jamaica': 'Kingston', 'Japan': 'Tokyo', 'Jersey': 'Saint Helier', 'Jordan': 'Amman', 'Kazakhstan': 'Astana', 'Kenya': 'Nairobi', 'Kiribati': 'Tarawa', 'Korea North': 'Pyongyang', 'Korea South': 'Seoul', 'Kuwait': 'Kuwait City', 'Kyrgyzstan': 'Bishkek', 'Laos': 'Vientiane', 'Latvia': 'Riga', 'Lebanon': 'Beirut', 'Lesotho': 'Maseru', 'Liberia': 'Monrovia', 'Libya': 'Tripolis', 'Liechtenstein': 'Vaduz', 'Lithuania': 'Vilnius', 'Luxembourg': 'Luxembourg', 'Macau S.A.R.': 'Macao', 'Macedonia': 'Skopje', 'Madagascar': 'Antananarivo', 'Malawi': 'Lilongwe', 'Malaysia': 'Kuala Lumpur', 'Maldives': 'Male', 'Mali': 'Bamako', 'Malta': 'Valletta', 'Man (Isle of)': 'Douglas, Isle of Man', 'Marshall Islands': 'Majuro', 'Martinique': 'Fort-de-France', 'Mauritania': 'Nouakchott', 'Mauritius': 'Port Louis', 'Mayotte': 'Mamoudzou', 'Mexico': 'Mexico City', 'Micronesia': 'Palikir', 'Moldova': 'Chisinau', 'Monaco': 'Monaco', 'Mongolia': 'Ulan Bator', 'Montenegro': 'Podgorica', 'Montserrat': 'Plymouth', 'Morocco': 'Rabat', 'Mozambique': 'Maputo', 'Myanmar': 'Nay Pyi Taw', 'Namibia': 'Windhoek', 'Nauru': 'Yaren', 'Nepal': 'Kathmandu', 'Netherlands Antilles': '', 'Netherlands The': 'Amsterdam', 'New Caledonia': 'Noumea', 'New Zealand': 'Wellington', 'Nicaragua': 'Managua', 'Niger': 'Niamey', 'Nigeria': 'Abuja', 'Niue': 'Alofi', 'Norfolk Island': 'Kingston', 'Northern Mariana Islands': 'Saipan', 'Norway': 'Oslo', 'Oman': 'Muscat', 'Pakistan': 'Islamabad', 'Palau': 'Melekeok', 'Palestinian Territory Occupied': 'East Jerusalem', 'Panama': 'Panama City', 'Papua new Guinea': 'Port Moresby', 'Paraguay': 'Asuncion', 'Peru': 'Lima', 'Philippines': 'Manila', 'Pitcairn Island': 'Adamstown', 'Poland': 'Warsaw', 'Portugal': 'Lisbon', 'Puerto Rico': 'San Juan', 'Qatar': 'Doha', 'Reunion': 'Saint-Denis', 'Romania': 'Bucharest', 'Russia': 'Moscow', 'Rwanda': 'Kigali', 'Saint Helena': 'Jamestown', 'Saint Kitts And Nevis': 'Basseterre', 'Saint Lucia': 'Castries', 'Saint Pierre and Miquelon': 'Saint-Pierre', 'Saint Vincent And The Grenadines': 'Kingstown', 'Saint-Barthelemy': 'Gustavia', 'Saint-Martin (French part)': 'Marigot', 'Samoa': 'Apia', 'San Marino': 'San Marino', 'Sao Tome and Principe': 'Sao Tome', 'Saudi Arabia': 'Riyadh', 'Senegal': 'Dakar', 'Serbia': 'Belgrade', 'Seychelles': 'Victoria', 'Sierra Leone': 'Freetown', 'Singapore': 'Singapur', 'Slovakia': 'Bratislava', 'Slovenia': 'Ljubljana', 'Solomon Islands': 'Honiara', 'Somalia': 'Mogadishu', 'South Africa': 'Pretoria', 'South Georgia': 'Grytviken', 'South Sudan': 'Juba', 'Spain': 'Madrid', 'Sri Lanka': 'Colombo', 'Sudan': 'Khartoum', 'Suriname': 'Paramaribo', 'Svalbard And Jan Mayen Islands': 'Longyearbyen', 'Swaziland': 'Mbabane', 'Sweden': 'Stockholm', 'Switzerland': 'Berne', 'Syria': 'Damascus', 'Taiwan': 'Taipei', 'Tajikistan': 'Dushanbe', 'Tanzania': 'Dodoma', 'Thailand': 'Bangkok', 'Togo': 'Lome', 'Tokelau': '', 'Tonga': "Nuku'alofa", 'Trinidad And Tobago': 'Port of Spain', 'Tunisia': 'Tunis', 'Turkey': 'Ankara', 'Turkmenistan': 'Ashgabat', 'Turks And Caicos Islands': 'Cockburn Town', 'Tuvalu': 'Funafuti', 'Uganda': 'Kampala', 'Ukraine': 'Kiev', 'United Arab Emirates': 'Abu Dhabi', 'United Kingdom': 'London', 'United States': 'Washington', 'United States Minor Outlying Islands': '', 'Uruguay': 'Montevideo', 'Uzbekistan': 'Tashkent', 'Vanuatu': 'Port Vila', 'Vatican City State (Holy See)': 'Vatican City', 'Venezuela': 'Caracas', 'Vietnam': 'Hanoi', 'British Virgin Islands': 'Road Town', 'U.S. Virgin Islands': 'Charlotte Amalie', 'USA Virgin Islands': 'Charlotte Amalie', 'Wallis And Futuna Islands': 'Mata Utu', 'Western Sahara': 'El-Aaiun', 'Yemen': 'Sanaa', 'Zambia': 'Lusaka', 'Zimbabwe': 'Harare'}
-
 POSTAL_PATTERN = re.compile(r"\b\d{4,6}[- ]?\d{2,4}\b")
 NUMBER_PATTERN = re.compile(r"\b(nº|no\.?|number)?\s?\d+\b", re.IGNORECASE)
 
 NAME_TOKEN_PATTERN = re.compile(r"^[A-Za-zÀ-ÖØ-öø-ÿ]+$")
 
+# Normalize language list once
+LANGUAGES_SET = {lang.lower().strip() for lang in LANGUAGES}
 
+def _is_valid_skill(text: str) -> bool:
+    """
+    Validate if a skill candidate is acceptable.
+
+    Removes:
+    - Languages (English, Portuguese, etc.)
+    - Generic placeholders (academic background, education, etc.)
+    - Very short meaningless tokens
+    """
+
+    if not text:
+        return False
+
+    t = text.lower().strip()
+
+    # Remove languages (exact match)
+    if t in LANGUAGES_SET:
+        return False
+
+    # Remove if contains language as full token
+    for lang in LANGUAGES_SET:
+        if re.search(rf"\b{re.escape(lang)}\b", t):
+            return False
+
+    # Remove generic non-skills
+    GENERIC_BAD_SKILLS = {
+        "academic background",
+        "academic",
+        "background",
+        "education",
+        "experience",
+        "hobbies",
+        "soft skills",
+        "hard skills",
+        "skills",
+        "skill"
+    }
+
+    if t in GENERIC_BAD_SKILLS:
+        return False
+
+    # Remove single character tokens
+    if len(t) <= 2:
+        return False
+
+    return True
 
 def _clean_person_name(entities: List[str]) -> List[str]:
     """
@@ -147,7 +183,7 @@ def _clean_degree_entities(values: List[str]) -> List[str]:
     """
     return list(dict.fromkeys(values))
 
-def _expand_address_smart(full_text: str, address_fragment: str, window: int = 80, capitals_names: set|None = None, countries_names: set|None=None) -> str:
+def _expand_address_smart(full_text: str, address_fragment: str, window: int = 80, capitals_names: set|None = COUNTRIES_NAMES, countries_names: set|None=CAPITALS_NAMES) -> str:
     """
     Expand an address fragment by searching nearby for:
         - Postal codes
@@ -157,8 +193,8 @@ def _expand_address_smart(full_text: str, address_fragment: str, window: int = 8
 
     Keeps the closest structural signals.
     """
-    COUNTRIES_NAMES = set(COUNTRIES_AND_CAPITALS .keys())
-    CAPITAL_NAMES = {v for v in COUNTRIES_AND_CAPITALS .values() if v}
+    COUNTRIES = set(COUNTRIES_AND_CAPITALS .keys())
+    CAPITALS = {v for v in COUNTRIES_AND_CAPITALS .values() if v}
     match = re.search(re.escape(address_fragment), full_text, re.IGNORECASE)
     if not match:
         return address_fragment
@@ -179,8 +215,8 @@ def _expand_address_smart(full_text: str, address_fragment: str, window: int = 8
     if postal:
         expanded_end = end + postal.end()
 
-    capitals = capitals_names if capitals_names is not None else CAPITAL_NAMES
-    countries = countries_names if countries_names is not None else COUNTRIES_NAMES
+    capitals = capitals_names if capitals_names is not None else CAPITALS
+    countries = countries_names if countries_names is not None else COUNTRIES
 
     for name in capitals.union(countries):
         name_lower = name.lower()
@@ -247,11 +283,13 @@ def extract_entities_from_text(
 
         # skills
         if label in ENTITY_GROUPS["skills"]:
-            entities_by_label["skills"].append(raw_text)
+            if _is_valid_skill(raw_text):
+                entities_by_label["skills"].append(raw_text)
             continue
 
         if any(re.search(rf"\b{re.escape(sw)}\b", text_norm) for sw in SOFTWARE_AS_SKILL):
-            entities_by_label["skills"].append(raw_text)
+            if _is_valid_skill(raw_text):
+                entities_by_label["skills"].append(raw_text)
             continue
         
         # address

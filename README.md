@@ -90,7 +90,8 @@ Run from project root:
 
 ```bash
 cd backend
-python -m services.process_cvs_pipeline
+python -m extras.tests.run_process_cvs
+python -m extras.tests.run_ranking
 ```
 
 Output:
