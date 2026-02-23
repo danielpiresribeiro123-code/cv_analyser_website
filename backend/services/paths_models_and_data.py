@@ -58,7 +58,7 @@ SKILL_LABELS = [
     "data analysis tool", "big data tool", "version control system",
     "creative software", "project management tool", "office suite",
     "crm software", "erp software", "methodology", "development practice",
-    "soft skill", "leadership skill", "personal attribute", "management skill",
+    "soft skill", "leadership skill", "management skill",
     "competency", "interpersonal strength", "hard skill", "artistic skill",
     "physical skills", "mental skills","standard or protocol", "area of specialization"]
 
