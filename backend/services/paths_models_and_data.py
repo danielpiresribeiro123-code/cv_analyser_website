@@ -33,8 +33,8 @@ OUTPUTS_DIR = BACKEND_ROOT / "outputs"
 # Model paths
 GLINER_MODEL_PATH = BACKEND_ROOT / "models" / "gliner"
 FILTER_YOLO_MODEL_PATH = BACKEND_ROOT / "models" / "yolo" / "yolo11n-text.pt"
-TEXT_PHOTO_YOLO_MODEL_PATH = BACKEND_ROOT / "models" / "yolo" / "yolo11s-text-photo-150e4b.pt"
-SKILL_TABLE_YOLO_MODEL_PATH = BACKEND_ROOT / "models" / "yolo" / "yolo11s-skill_table-150e4b.pt"
+TEXT_PHOTO_YOLO_MODEL_PATH = BACKEND_ROOT / "models" / "yolo" / "yolo11s-text-photo-150e20b.pt"
+SKILL_TABLE_YOLO_MODEL_PATH = BACKEND_ROOT / "models" / "yolo" / "yolo11s-skill_table-150e12b.pt"
 
 
 # =========================================================
