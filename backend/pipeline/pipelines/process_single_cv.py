@@ -34,6 +34,7 @@ from pipeline.vision.cv_filter_yolo import CVFilter
 from pipeline.vision.layout_detection_yolo import detect_and_segment_cv 
 from pipeline.text_reader.ocr_engine_tesseract import process_image_with_bbox
 from pipeline.text_reader.pdf_parser import process_pdf_with_bboxes
+from pipeline.NLP.raw_text_preprocessing import remove_exact_duplicate_lines
 from pipeline.NLP.gliner_preprocessing import preprocess_ocr_for_gliner
 from pipeline.NLP.entity_extraction_gliner import process_texts_gliner
 from pipeline.NLP.contact_extraction_regex import extract_contact_info
@@ -178,8 +179,9 @@ def process_single_cv(
     crop_skill_table: bool = False,
     analyse_individual_pages: bool = False,
     save_ocr_txt: bool = False,
-    save_csv: bool = False,
+    save_csv_single: bool = False,
     gliner_model: Any | None = None,
+    debug_save_json: bool = False,
     filter_yolo_model: YOLO | None = None,
     text_photo_yolo_model: YOLO | None = None,
     skill_table_yolo_model: YOLO | None = None,
@@ -476,6 +478,11 @@ def process_single_cv(
         if verbose:
             print(f"     Extracted {len(raw_text)} characters")
 
+        # ---------------------------------------------
+        # Raw text deduplication
+        # ---------------------------------------------
+        raw_text = remove_exact_duplicate_lines(raw_text)
+
         # -------------------------------------------------
         # Accumulate
         # -------------------------------------------------
@@ -493,12 +500,14 @@ def process_single_cv(
 
             # ---- GLiNER ----
             preprocessed_text = preprocess_ocr_for_gliner(raw_text)
+            debug_path = cv_folder if debug_save_json else None
 
             gliner_df = process_texts_gliner(
                 texts=[preprocessed_text],
                 model=gliner_model,
-                threshold=gliner_threshold,
-            )
+                gliner_threshold=gliner_threshold,
+                debug_save_json=debug_save_json,
+                debug_output_path=debug_path)
 
             # ---- Regex contacts ----
             contact_info = extract_contact_info(raw_text)
@@ -547,13 +556,19 @@ def process_single_cv(
     # -----------------------------------------------------
     if not analyse_individual_pages and valid_pages > 0:
         full_text = "\n".join(all_texts)
+
+        # Deduplicação global final (entre páginas)
+        full_text = remove_exact_duplicate_lines(full_text)
+        
         preprocessed_text = preprocess_ocr_for_gliner(full_text)
+        debug_path = cv_folder if debug_save_json else None
 
         gliner_df = process_texts_gliner(
             texts=[preprocessed_text],
             model=gliner_model,
-            threshold=gliner_threshold,
-        )
+            gliner_threshold=gliner_threshold,
+            debug_save_json=debug_save_json,
+            debug_output_path=debug_path)
 
         contact_info = extract_contact_info(full_text)
 
@@ -627,7 +642,7 @@ def process_single_cv(
     # -----------------------------------------------------
     # Optional: save CSV
     # -----------------------------------------------------
-    if save_csv and cv_folder is not None:
+    if save_csv_single and cv_folder is not None:
         csv_path = cv_folder / "results.csv"
         df.to_csv(csv_path, index=False, encoding="utf-8", sep=";", quoting=csv.QUOTE_MINIMAL)
 

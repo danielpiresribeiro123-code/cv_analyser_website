@@ -51,7 +51,7 @@ def safe_float(x: Any, default: float = 0.0) -> float:
 # -----------------------------
 DEGREE_LEVELS = {
     "none": 0,
-    "highschool": 1,
+    "high school": 1,
     "associate": 2,
     "bachelor": 3,
     "master": 4,
@@ -178,5 +178,43 @@ def extract_skills_from_query(
         key = s.lower()
         if key not in unique:
             unique[key] = s
+
+    return list(unique.values())
+
+
+
+
+
+
+
+def extract_job_titles_from_query(
+    query_text: str,
+    gliner_model: Optional[GLiNER] = None,
+    threshold: float = 0.3
+) -> List[str]:
+
+    if not query_text.strip():
+        return []
+
+    if gliner_model is None:
+        gliner_model = get_gliner_model()
+
+    try:
+        entities = gliner_model.predict_entities(query_text,["job title", "professional role", "occupation"],threshold=threshold) #type: ignore
+    except Exception:
+        return []
+
+    titles = []
+    for ent in entities:
+        text = ent["text"].strip()
+        if len(text) > 2:
+            titles.append(text)
+
+    # remove duplicates ignoring case
+    unique = {}
+    for t in titles:
+        key = t.lower()
+        if key not in unique:
+            unique[key] = t
 
     return list(unique.values())

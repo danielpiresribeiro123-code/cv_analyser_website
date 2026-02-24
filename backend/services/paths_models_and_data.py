@@ -26,7 +26,8 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_ROOT = PROJECT_ROOT / "frontend"
 
 # Data folders
-UPLOADS_DIR = BACKEND_ROOT / "uploads"
+UPLOADS_DIR_ORIGINAL =BACKEND_ROOT / "uploads"
+UPLOADS_DIR = Path("C:/Users/danie/Dropbox/CV GYRO - CV Parsing")
 OUTPUTS_DIR = BACKEND_ROOT / "outputs"
 
 # Model paths
@@ -41,6 +42,7 @@ SKILL_TABLE_YOLO_MODEL_PATH = BACKEND_ROOT / "models" / "yolo" / "yolo11s-skill_
 # =========================================================
 LANGUAGES = ['Afrikaans', 'Albanian', 'Amharic', 'Arabic', 'Armenian', 'Aymara', 'Azerbaijani', 'Basque', 'Belarusian', 'Bengali', 'Bislama', 'Bosnian', 'Bulgarian', 'Burmese', 'Castilian', 'Catalan', 'Cantonese','Chamorro', 'Chichewa', 'Chinese', 'Chinese (Simplified)','Croatian', 'Czech', 'Danish', 'Divehi', 'Dutch', 'Dzongkha', 'English', 'Estonian', 'Faroese', 'Fijian', 'Finnish', 'French', 'Fulah', 'Galician', 'Georgian', 'German', 'Guarani', 'Haitian', 'Hebrew', 'Hindi', 'Hungarian', 'Icelandic', 'Indonesian', 'Irish', 'Italian', 'Japanese', 'Kalaallisut', 'Kazakh', 'Khmer', 'Kinyarwanda', 'Kirghiz', 'Kongo', 'Korean', 'Kurdish', 'Lao', 'Latin', 'Latvian', 'Lingala', 'Lithuanian', 'Luba-Katanga', 'Luxembourgish', 'Macedonian', 'Malagasy', 'Malay', 'Maltese', 'Mandarin','Manx', 'Maori', 'Marshallese', 'Modern Greek', 'Greek', 'Mongolian', 'Nauru', 'Nepali', 'North Ndebele', 'Norwegian', 'Norwegian Bokmål', 'Norwegian Nynorsk', 'Occitan (post 1500)', 'Panjabi', 'Persian', 'Polish', 'Portuguese', 'Pushto', 'Quechua', 'Romanian', 'Rundi', 'Russian', 'Samoan', 'Sango', 'Serbian', 'Shona', 'Sinhala', 'Slovak', 'Slovenian', 'Somali', 'South Ndebele', 'Southern Sotho', 'Spanish', 'Swahili', 'Swati', 'Swedish', 'Tajik', 'Tamil', 'Thai', 'Tigrinya', 'Tonga (Tonga Islands)', 'Tsonga', 'Tswana', 'Turkish', 'Turkmen', 'Ukrainian', 'Urdu', 'Uzbek', 'Venda', 'Vietnamese', 'Xhosa', 'Zulu']
 LANGUAGES_SMALL=['af', 'am', 'ar', 'ay', 'az', 'be', 'bg', 'bi', 'bn', 'bs', 'ca', 'ch', 'cs', 'da', 'de', 'dv', 'dz', 'el', 'en', 'es', 'et', 'eu', 'fa', 'ff', 'fi', 'fj', 'fo', 'fr', 'ga', 'gl', 'gn', 'gv', 'he', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kg', 'kk', 'kl', 'km', 'ko', 'ku', 'ky', 'la', 'lb', 'ln', 'lo', 'lt', 'lu', 'lv', 'mg', 'mh', 'mi', 'mk', 'mn', 'ms', 'mt', 'my', 'na', 'nb', 'nd', 'ne', 'nl', 'nn', 'no', 'nr', 'ny', 'oc', 'pa', 'pl', 'ps', 'pt', 'qu', 'rn', 'ro', 'ru', 'rw', 'sg', 'si', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'sr', 'ss', 'st', 'sv', 'sw', 'ta', 'tg', 'th', 'ti', 'tk', 'tn', 'to', 'tr', 'ts', 'uk', 'ur', 'uz', 've', 'vi', 'xh', 'zh', 'zu']
+LANGUAGES_COMPLETE={'af': 'Afrikaans', 'am': 'Amharic', 'ar': 'Arabic', 'ay': 'Aymara', 'az': 'Azerbaijani', 'be': 'Belarusian', 'bg': 'Bulgarian', 'bi': 'Bislama', 'bn': 'Bengali', 'bs': 'Bosnian', 'ca': 'Catalan', 'ch': 'Chamorro', 'cs': 'Czech', 'da': 'Danish', 'de': 'German', 'dv': 'Divehi', 'dz': 'Dzongkha', 'el': 'Modern Greek (1453-)', 'en': 'English', 'es': 'Spanish', 'et': 'Estonian', 'eu': 'Basque', 'fa': 'Persian', 'ff': 'Fulah', 'fi': 'Finnish', 'fj': 'Fijian', 'fo': 'Faroese', 'fr': 'French', 'ga': 'Irish', 'gl': 'Galician', 'gn': 'Guarani', 'gv': 'Manx', 'he': 'Hebrew', 'hi': 'Hindi', 'hr': 'Croatian', 'ht': 'Haitian', 'hu': 'Hungarian', 'hy': 'Armenian', 'id': 'Indonesian', 'is': 'Icelandic', 'it': 'Italian', 'ja': 'Japanese', 'ka': 'Georgian', 'kg': 'Kongo', 'kk': 'Kazakh', 'kl': 'Kalaallisut', 'km': 'Khmer', 'ko': 'Korean', 'ku': 'Kurdish', 'ky': 'Kirghiz', 'la': 'Latin', 'lb': 'Luxembourgish', 'ln': 'Lingala', 'lo': 'Lao', 'lt': 'Lithuanian', 'lu': 'Luba-Katanga', 'lv': 'Latvian', 'mg': 'Malagasy', 'mh': 'Marshallese', 'mi': 'Maori', 'mk': 'Macedonian', 'mn': 'Mongolian', 'ms': 'Malay (macrolanguage)', 'mt': 'Maltese', 'my': 'Burmese', 'na': 'Nauru', 'nb': 'Norwegian Bokmål', 'nd': 'North Ndebele', 'ne': 'Nepali (macrolanguage)', 'nl': 'Dutch', 'nn': 'Norwegian Nynorsk', 'no': 'Norwegian', 'nr': 'South Ndebele', 'ny': 'Chichewa', 'oc': 'Occitan (post 1500)', 'pa': 'Panjabi', 'pl': 'Polish', 'ps': 'Pushto', 'pt': 'Portuguese', 'qu': 'Quechua', 'rn': 'Rundi', 'ro': 'Romanian', 'ru': 'Russian', 'rw': 'Kinyarwanda', 'sg': 'Sango', 'si': 'Sinhala', 'sk': 'Slovak', 'sl': 'Slovenian', 'sm': 'Samoan', 'sn': 'Shona', 'so': 'Somali', 'sq': 'Albanian', 'sr': 'Serbian', 'ss': 'Swati', 'st': 'Southern Sotho', 'sv': 'Swedish', 'sw': 'Swahili (macrolanguage)', 'ta': 'Tamil', 'tg': 'Tajik', 'th': 'Thai', 'ti': 'Tigrinya', 'tk': 'Turkmen', 'tn': 'Tswana', 'to': 'Tonga (Tonga Islands)', 'tr': 'Turkish', 'ts': 'Tsonga', 'uk': 'Ukrainian', 'ur': 'Urdu', 'uz': 'Uzbek', 've': 'Venda', 'vi': 'Vietnamese', 'xh': 'Xhosa', 'zh': 'Chinese', 'zu': 'Zulu'}
 
 COUNTRIES_AND_CAPITALS = {'Afghanistan': 'Kabul', 'Aland Islands': 'Mariehamn', 'Albania': 'Tirana', 'Algeria': 'Algiers', 'American Samoa': 'Pago Pago', 'Andorra': 'Andorra la Vella', 'Angola': 'Luanda', 'Anguilla': 'The Valley', 'Antarctica': '', 'Antigua And Barbuda': "St. John's", 'Argentina': 'Buenos Aires', 'Armenia': 'Yerevan', 'Aruba': 'Oranjestad', 'Australia': 'Canberra', 'Austria': 'Vienna', 'Azerbaijan': 'Baku', 'Bahamas The': 'Nassau', 'Bahrain': 'Manama', 'Bangladesh': 'Dhaka', 'Barbados': 'Bridgetown', 'Belarus': 'Minsk', 'Belgium': 'Brussels', 'Belize': 'Belmopan', 'Benin': 'Porto-Novo', 'Bermuda': 'Hamilton', 'Bhutan': 'Thimphu', 'Bolivia': 'Sucre', 'Bosnia and Herzegovina': 'Sarajevo', 'Botswana': 'Gaborone', 'Bouvet Island': '', 'Brazil': 'Brasilia', 'British Indian Ocean Territory': 'Diego Garcia', 'Brunei': 'Bandar Seri Begawan', 'Bulgaria': 'Sofia', 'Burkina Faso': 'Ouagadougou', 'Burundi': 'Bujumbura', 'Cambodia': 'Phnom Penh', 'Cameroon': 'Yaounde', 'Canada': 'Ottawa', 'Cape Verde': 'Praia', 'Cayman Islands': 'George Town', 'Central African Republic': 'Bangui', 'Chad': "N'Djamena", 'Chile': 'Santiago', 'China': 'Beijing', 'Christmas Island': 'Flying Fish Cove', 'Cocos (Keeling) Islands': 'West Island', 'Colombia': 'Bogota', 'Comoros': 'Moroni', 'Congo': 'Brazzaville', 'Congo The Democratic Republic Of The': 'Kinshasa', 'Cook Islands': 'Avarua', 'Costa Rica': 'San Jose', "Cote D'Ivoire (Ivory Coast)": 'Yamoussoukro', 'Croatia': 'Zagreb', 'Cuba': 'Havana', 'Cyprus': 'Nicosia', 'Czech Republic': 'Prague', 'Denmark': 'Copenhagen', 'Djibouti': 'Djibouti', 'Dominica': 'Roseau', 'Dominican Republic': 'Santo Domingo', 'East Timor': 'Dili', 'Ecuador': 'Quito', 'Egypt': 'Cairo', 'El Salvador': 'San Salvador', 'Equatorial Guinea': 'Malabo', 'Eritrea': 'Asmara', 'Estonia': 'Tallinn', 'Ethiopia': 'Addis Ababa', 'Falkland Islands': 'Stanley', 'Faroe Islands': 'Torshavn', 'Fiji Islands': 'Suva', 'Finland': 'Helsinki', 'France': 'Paris', 'French Guiana': 'Cayenne', 'French Polynesia': 'Papeete', 'French Southern Territories': 'Port-aux-Francais', 'Gabon': 'Libreville', 'Gambia The': 'Banjul', 'Georgia': 'Tbilisi', 'Germany': 'Berlin', 'Ghana': 'Accra', 'Gibraltar': 'Gibraltar', 'Greece': 'Athens', 'Greenland': 'Nuuk', 'Grenada': "St. George's", 'Guadeloupe': 'Basse-Terre', 'Guam': 'Hagatna', 'Guatemala': 'Guatemala City', 'Guernsey and Alderney': 'St Peter Port', 'Guinea': 'Conakry', 'Guinea-Bissau': 'Bissau', 'Guyana': 'Georgetown', 'Haiti': 'Port-au-Prince', 'Heard and McDonald Islands': '', 'Honduras': 'Tegucigalpa', 'Hong Kong S.A.R.': 'Hong Kong', 'Hungary': 'Budapest', 'Iceland': 'Reykjavik', 'India': 'New Delhi', 'Indonesia': 'Jakarta', 'Iran': 'Tehran', 'Iraq': 'Baghdad', 'Ireland': 'Dublin', 'Israel': 'Jerusalem', 'Italy': 'Rome', 'Jamaica': 'Kingston', 'Japan': 'Tokyo', 'Jersey': 'Saint Helier', 'Jordan': 'Amman', 'Kazakhstan': 'Astana', 'Kenya': 'Nairobi', 'Kiribati': 'Tarawa', 'Korea North': 'Pyongyang', 'Korea South': 'Seoul', 'Kuwait': 'Kuwait City', 'Kyrgyzstan': 'Bishkek', 'Laos': 'Vientiane', 'Latvia': 'Riga', 'Lebanon': 'Beirut', 'Lesotho': 'Maseru', 'Liberia': 'Monrovia', 'Libya': 'Tripolis', 'Liechtenstein': 'Vaduz', 'Lithuania': 'Vilnius', 'Luxembourg': 'Luxembourg', 'Macau S.A.R.': 'Macao', 'Macedonia': 'Skopje', 'Madagascar': 'Antananarivo', 'Malawi': 'Lilongwe', 'Malaysia': 'Kuala Lumpur', 'Maldives': 'Male', 'Mali': 'Bamako', 'Malta': 'Valletta', 'Man (Isle of)': 'Douglas, Isle of Man', 'Marshall Islands': 'Majuro', 'Martinique': 'Fort-de-France', 'Mauritania': 'Nouakchott', 'Mauritius': 'Port Louis', 'Mayotte': 'Mamoudzou', 'Mexico': 'Mexico City', 'Micronesia': 'Palikir', 'Moldova': 'Chisinau', 'Monaco': 'Monaco', 'Mongolia': 'Ulan Bator', 'Montenegro': 'Podgorica', 'Montserrat': 'Plymouth', 'Morocco': 'Rabat', 'Mozambique': 'Maputo', 'Myanmar': 'Nay Pyi Taw', 'Namibia': 'Windhoek', 'Nauru': 'Yaren', 'Nepal': 'Kathmandu', 'Netherlands Antilles': '', 'Netherlands The': 'Amsterdam', 'New Caledonia': 'Noumea', 'New Zealand': 'Wellington', 'Nicaragua': 'Managua', 'Niger': 'Niamey', 'Nigeria': 'Abuja', 'Niue': 'Alofi', 'Norfolk Island': 'Kingston', 'Northern Mariana Islands': 'Saipan', 'Norway': 'Oslo', 'Oman': 'Muscat', 'Pakistan': 'Islamabad', 'Palau': 'Melekeok', 'Palestinian Territory Occupied': 'East Jerusalem', 'Panama': 'Panama City', 'Papua new Guinea': 'Port Moresby', 'Paraguay': 'Asuncion', 'Peru': 'Lima', 'Philippines': 'Manila', 'Pitcairn Island': 'Adamstown', 'Poland': 'Warsaw', 'Portugal': 'Lisbon', 'Puerto Rico': 'San Juan', 'Qatar': 'Doha', 'Reunion': 'Saint-Denis', 'Romania': 'Bucharest', 'Russia': 'Moscow', 'Rwanda': 'Kigali', 'Saint Helena': 'Jamestown', 'Saint Kitts And Nevis': 'Basseterre', 'Saint Lucia': 'Castries', 'Saint Pierre and Miquelon': 'Saint-Pierre', 'Saint Vincent And The Grenadines': 'Kingstown', 'Saint-Barthelemy': 'Gustavia', 'Saint-Martin (French part)': 'Marigot', 'Samoa': 'Apia', 'San Marino': 'San Marino', 'Sao Tome and Principe': 'Sao Tome', 'Saudi Arabia': 'Riyadh', 'Senegal': 'Dakar', 'Serbia': 'Belgrade', 'Seychelles': 'Victoria', 'Sierra Leone': 'Freetown', 'Singapore': 'Singapur', 'Slovakia': 'Bratislava', 'Slovenia': 'Ljubljana', 'Solomon Islands': 'Honiara', 'Somalia': 'Mogadishu', 'South Africa': 'Pretoria', 'South Georgia': 'Grytviken', 'South Sudan': 'Juba', 'Spain': 'Madrid', 'Sri Lanka': 'Colombo', 'Sudan': 'Khartoum', 'Suriname': 'Paramaribo', 'Svalbard And Jan Mayen Islands': 'Longyearbyen', 'Swaziland': 'Mbabane', 'Sweden': 'Stockholm', 'Switzerland': 'Berne', 'Syria': 'Damascus', 'Taiwan': 'Taipei', 'Tajikistan': 'Dushanbe', 'Tanzania': 'Dodoma', 'Thailand': 'Bangkok', 'Togo': 'Lome', 'Tokelau': '', 'Tonga': "Nuku'alofa", 'Trinidad And Tobago': 'Port of Spain', 'Tunisia': 'Tunis', 'Turkey': 'Ankara', 'Turkmenistan': 'Ashgabat', 'Turks And Caicos Islands': 'Cockburn Town', 'Tuvalu': 'Funafuti', 'Uganda': 'Kampala', 'Ukraine': 'Kiev', 'United Arab Emirates': 'Abu Dhabi', 'United Kingdom': 'London', 'United States': 'Washington', 'United States Minor Outlying Islands': '', 'Uruguay': 'Montevideo', 'Uzbekistan': 'Tashkent', 'Vanuatu': 'Port Vila', 'Vatican City State (Holy See)': 'Vatican City', 'Venezuela': 'Caracas', 'Vietnam': 'Hanoi', 'British Virgin Islands': 'Road Town', 'U.S. Virgin Islands': 'Charlotte Amalie', 'USA Virgin Islands': 'Charlotte Amalie', 'Wallis And Futuna Islands': 'Mata Utu', 'Western Sahara': 'El-Aaiun', 'Yemen': 'Sanaa', 'Zambia': 'Lusaka', 'Zimbabwe': 'Harare'}
 
@@ -51,16 +53,110 @@ CITIES_USA = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Phila
 CITIES_PORTUGAL = ['Porto', 'Setubal', "Setúbal", "Castelo Branco"]
 
 
-SKILL_LABELS = [
+SKILL_LABELS_V0 = [
 "skill", "technical expertise", "software and tools", "programming language",
     "software framework", "library", "database", "cloud platform", "devops tool",
     "operating system", "web technology", "machine learning algorithm",
     "data analysis tool", "big data tool", "version control system",
     "creative software", "project management tool", "office suite",
     "crm software", "erp software", "methodology", "development practice",
-    "soft skill", "leadership skill", "personal attribute", "management skill",
+    "soft skill", "leadership skill", "management skill",
     "competency", "interpersonal strength", "hard skill", "artistic skill",
     "physical skills", "mental skills","standard or protocol", "area of specialization"]
+
+SKILL_LABELS_V1 = [
+    # General
+    "skill", "competency", "area of expertise", "area of specialization",
+    "professional skill", "technical skill", "soft skill", "hard skill",
+    "interpersonal skill", "leadership skill", "management skill",
+    "personal attribute", "competence",
+
+    # Technical / IT
+    "programming language", "software framework", "library", "database",
+    "cloud platform", "devops tool", "operating system", "web technology",
+    "machine learning algorithm", "data analysis tool", "big data tool",
+    "version control system", "software tool", "development practice",
+    "methodology", "technical expertise",
+
+    # Business / Management
+    "business skill", "financial skill", "accounting skill",
+    "marketing skill", "sales skill", "negotiation skill",
+    "project management tool", "office suite", "crm software",
+    "erp software", "strategic planning", "risk management",
+
+    # Law / Regulation
+    "legal knowledge", "legal expertise", "legislation knowledge",
+    "regulatory knowledge", "compliance skill",
+    "public policy knowledge", "contract law", "corporate law",
+
+    # Agriculture / Environment
+    "agricultural skill", "farming technique", "crop management",
+    "livestock management", "environmental management",
+    "sustainability practice", "forestry skill",
+
+    # Healthcare
+    "clinical skill", "medical expertise", "nursing skill",
+    "patient care skill", "healthcare knowledge",
+
+    # Engineering / Technical fields
+    "engineering skill", "mechanical skill", "electrical skill",
+    "civil engineering knowledge", "industrial process knowledge",
+    "quality control skill", "maintenance skill",
+
+    # Physical / Sports
+    "sport skill", "athletic ability", "physical ability",
+    "physical training", "fitness skill",
+    "coaching skill", "team sport", "individual sport",
+
+    # Creative / Arts
+    "artistic skill", "creative ability", "design skill",
+    "graphic design", "video editing", "music skill",
+
+    # Education
+    "teaching skill", "pedagogical skill", "training ability",
+
+    # Languages
+    "language proficiency", "translation skill", "multilingual ability"
+]
+
+SKILL_LABELS = [
+    # Core
+    "skill",
+    "technical skill",
+    "professional skill",
+    "soft skill",
+    "hard skill",
+    "competency",
+    "area of expertise",
+
+    # Technical / IT
+    "programming language",
+    "software framework",
+    "software library",
+    "software tool",
+    "database",
+    "cloud platform",
+    "devops tool",
+    "operating system",
+    "web technology",
+    "machine learning technique",
+    "data analysis tool",
+    "version control system",
+
+    # Business / Professional
+    "management skill",
+    "leadership skill",
+    "project management tool",
+    "business tool",
+    "methodology",
+    "development practice",
+
+    # Creative / Design
+    "design tool",
+    "creative software",
+
+    # Engineering
+    "engineering skill",]
 
 # =========================================================
 # GLOBAL MODEL CACHE (thread-safe singletons)

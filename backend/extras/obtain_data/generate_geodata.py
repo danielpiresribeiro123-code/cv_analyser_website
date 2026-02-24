@@ -93,3 +93,32 @@ for code in lang_codes:
         lang_names.append(lang.name)
 
 print(sorted(lang_names))
+
+
+import pycountry
+from Countrydetails import countries
+
+country = countries.all_countries()
+data = country.languages()
+
+lang_codes = set()
+
+# Recolher todos os códigos únicos
+for _, (_, langs) in data.items():
+    lang_codes.update(langs)
+
+# Criar dicionário código -> nome
+lang_dict = {}
+
+for code in lang_codes:
+    lang = pycountry.languages.get(alpha_2=code)
+    if lang:
+        lang_dict[code] = lang.name
+    else:
+        # Caso raro: código não encontrado no pycountry
+        lang_dict[code] = None
+
+# Ordenar por código
+lang_dict = dict(sorted(lang_dict.items()))
+
+print(lang_dict)

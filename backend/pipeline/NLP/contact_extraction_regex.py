@@ -1,12 +1,16 @@
 import re
 import pandas as pd
-from typing import Dict, List, Optional, Union, TypedDict, Tuple
+from typing import Dict, List, Optional, Union, TypedDict, Tuple, Mapping, Sequence, Any
+from re import Pattern
 
 from datetime import datetime
 CURRENT_YEAR = datetime.now().year
 
 import pycountry
 from services.paths_models_and_data import LANGUAGES, COUNTRIES_AND_CAPITALS 
+
+import phonenumbers
+from phonenumbers import NumberParseException
 
 # ----------------------------------------------------------
 # Regex language and language level vocabularies
@@ -1325,7 +1329,7 @@ def clean_text(text: str) -> str:
     text = re.sub(r'[\r\n\t\uf0b7\u2022*]+', ' ', text)
     return re.sub(r'\s{2,}', ' ', text).strip()
 
-def normalize_text_input(text_input: Union[str, Dict, List]) -> str:
+def normalize_text_input(text_input: Union[str, Mapping[str, Any], Sequence[Any]]) -> str:
     """
     Normalizes text input to a single string.
     
@@ -1350,29 +1354,36 @@ def normalize_text_input(text_input: Union[str, Dict, List]) -> str:
 def normalize_email(email: str) -> str:
     return email.lower().strip()
 
-def normalize_phone(phone: str) -> Optional[str]:
+def normalize_phone(phone: str, default_region: Optional[str] = None) -> Optional[str]:
     """
-    Normalize phone numbers to international compact format.
-    Example:
-        '+351 968 736 666' -> '+351968736666'
-    """
-    digits = re.sub(r"[^\d+]", "", phone)
+    Professional phone normalization using Google's phonenumbers library.
 
-    # garantir tamanho mínimo plausível
-    if len(re.sub(r"\D", "", digits)) < 9:
+    - Validates number structure
+    - Preserves international prefix
+    - Converts to E.164 format
+    - Does NOT blindly assume a country
+    """
+
+    if not phone:
         return None
 
-    # normalizar 00 → +
-    if digits.startswith("00"):
-        digits = "+" + digits[2:]
+    try:
+        # Parse with optional region (only used if no prefix exists)
+        parsed = phonenumbers.parse(phone, default_region if default_region else None)
 
-    # se não tiver código país, assume Portugal (+351)
-    if not digits.startswith("+"):
-        digits = "+351" + digits[-9:]
+        # Validate number
+        if not phonenumbers.is_valid_number(parsed):
+            return None
 
-    return digits
+        # Return international E.164 format
+        return phonenumbers.format_number(
+            parsed,
+            phonenumbers.PhoneNumberFormat.E164
+        )
 
-
+    except NumberParseException:
+        return None
+    
 # ==========================================================
 # General extraction helpers
 # ==========================================================
@@ -1381,7 +1392,7 @@ def extract_first(pattern: re.Pattern, text: str) -> Optional[str]:
     match = pattern.search(text)
     return match.group(0).strip() if match else None
 
-def extract_all(pattern: re.Pattern, text: str) -> List[str]:
+def extract_all(pattern: Pattern[str], text: str) -> List[str]:
     """Retorn all unique ocorrences of a patern."""
     matches = pattern.findall(text)
     cleaned = []
@@ -1415,17 +1426,43 @@ class ContactInfo(TypedDict):
 
 def extract_contact_info(text: str) -> ContactInfo:
     emails = [normalize_email(e) for e in extract_all(EMAIL_REGEX, text)]
+    address = extract_address(text)
 
     raw_phones = extract_all(PHONE_REGEX, text)
-    phones = []
+    normalized_phones = []
+
+    # Detect region from address if possible
+    region_code: Optional[str] = None
+    if address:
+        for country in pycountry.countries:
+            if country.name.lower() in address.lower():
+                region_code = country.alpha_2
+                break
+
+    international_found = False
+
     for p in raw_phones:
-        norm = normalize_phone(p)
-        if norm and norm not in phones:
-            phones.append(norm)
+        # If phone has + or 00 → parse without region assumption
+        if p.strip().startswith(("+", "00")):
+            norm = normalize_phone(p)
+            if norm:
+                international_found = True
+                normalized_phones.append(norm)
+        else:
+            # Try with detected region
+            norm = normalize_phone(p, default_region=region_code)
+            if norm:
+                normalized_phones.append(norm)
+
+    # If at least one international number exists → keep only international
+    if international_found:
+        phones = [p for p in normalized_phones if p.startswith("+")]
+    else:
+        phones = normalized_phones
 
     linkedin = extract_first(LINKEDIN_REGEX, text)
     github = extract_first(GITHUB_REGEX, text)
-    address = extract_address(text)
+    
     experience_years = extract_experience_years(text)
 
     languages_details = extract_languages_details(text)
@@ -1471,7 +1508,7 @@ def process_texts(
         >>> df = process_texts(texts)
     """
     
-    if isinstance(texts, dict) and not isinstance(texts.get("text"), str):
+    if isinstance(texts, dict) and not ("text" in texts and isinstance(texts["text"], str)):
         # Dict mapping identifiers to text
         text_items = texts.items()
     elif isinstance(texts, list):

@@ -45,7 +45,7 @@ def rank_cvs(
     exp_col: str = "experience_years",
     degree_col: str = "degree",
     id_col: str = "source_file",
-    name_col: str = "person name",
+    name_col: str = "person_name",
     batch_size: int = 64,
     top_k: int | None = None,
     weights: Dict[str, float] | None = None,
@@ -239,46 +239,83 @@ def rank_cvs(
     # Exact skill matching (symbolic)
     # -----------------------------------------------------
 
+    def _normalize_skill_token(s: str) -> str:
+        """
+        Normalize a skill token for matching.
+        Keeps symbols but normalizes whitespace and common spacing variants.
+        """
+        s = (s or "").strip().lower()
+        s = re.sub(r"\s+", " ", s)
+
+        # Common variants: "c ++" / "c + +" -> "c++"
+        s = s.replace("c + +", "c++").replace("c ++", "c++")
+
+        return s
+
+
+    def _compile_skill_pattern(skill: str) -> re.Pattern:
+        """
+        Build a robust regex for exact matching.
+        - If skill starts/ends with a word char, \b is usually safe.
+        - If skill starts/ends with a non-word char (e.g., C++, C#, .NET),
+        use alnum boundaries via lookarounds.
+        """
+        sk = _normalize_skill_token(skill)
+        esc = re.escape(sk)
+
+        # If the skill does NOT start and end with a word char, \b boundaries will be unreliable.
+        # Examples: "c++", "c#", ".net"
+        starts_word = bool(re.match(r"^\w", sk))
+        ends_word = bool(re.match(r".*\w$", sk))
+
+        if starts_word and ends_word:
+            return re.compile(rf"\b{esc}\b", re.IGNORECASE)
+
+        # Use "not alnum/underscore" boundaries instead of \b
+        return re.compile(rf"(?<![A-Za-z0-9_]){esc}(?![A-Za-z0-9_])", re.IGNORECASE)
+
+
     exact_skill_scores = []
 
-    # Lowercase query skills for exact matching
-    query_skills_lower = [s.lower() for s in query_skills_list]
+    # Lowercase/normalized query skills for exact matching
+    query_skills_norm = [_normalize_skill_token(s) for s in query_skills_list if isinstance(s, str) and s.strip()]
+
+    # Precompile patterns once (faster and consistent)
+    query_skill_patterns = [_compile_skill_pattern(s) for s in query_skills_norm]
 
     for text in raw_texts:
-        text_lower = text.lower()
+        text_lower = (text or "").lower()
 
         matches = 0
-
-        for skill in query_skills_lower:
-            # exact word / phrase match
-            if re.search(rf"\b{re.escape(skill)}\b", text_lower):
+        for pat in query_skill_patterns:
+            if pat.search(text_lower):
                 matches += 1
 
-        if query_skills_lower:
-            exact_score = matches / len(query_skills_lower)
-        else:
-            exact_score = 0.0
-
+        exact_score = matches / len(query_skill_patterns) if query_skill_patterns else 0.0
         exact_skill_scores.append(exact_score)
 
     exact_skill_scores = np.array(exact_skill_scores, dtype=float)
 
     # -----------------------------------------------------
-    # Semantic similarity (job title)
+    # Semantic similarity (job_title)
     # -----------------------------------------------------
-    job_titles = [
-        normalize_text(str(row.get("job title", "")))
-        for _, row in d.iterrows()]
+    DEFAULT_EMPTY_JOB_SCORE = 0.2
 
-    # Encode non-empty titles
-    job_embs = model.encode(
-        [jt if jt else "" for jt in job_titles],
-        batch_size=batch_size,
-        show_progress_bar=False,)
+    job_norm = []
 
-    job_sims = np.array(
-        [cosine_sim(job_embs[i], q_raw_emb) for i in range(len(job_embs))],
-        dtype=float,)
+    for _, row in d.iterrows():
+        value = row.get("job_title")
+
+        if pd.isna(value) or not str(value).strip():
+            job_norm.append(DEFAULT_EMPTY_JOB_SCORE)
+        else:
+            jt = normalize_text(str(value))
+            jt_emb = model.encode([jt], batch_size=batch_size, show_progress_bar=False)[0]
+            sim = cosine_sim(jt_emb, q_raw_emb)
+            norm_sim = (sim + 1.0) / 2.0
+            job_norm.append(norm_sim)
+
+    job_norm = np.array(job_norm, dtype=float)
 
     # -----------------------------------------------------
     # Experience normalization
@@ -369,18 +406,17 @@ def rank_cvs(
     # -----------------------------------------------------
     raw_norm = (raw_sims + 1.0) / 2.0
     skills_norm = (skill_sims + 1.0) / 2.0
-    job_norm = (job_sims + 1.0) / 2.0
-
+    job_sim = job_norm*2.0 -1.0
     # Normalize weights
     weight_sum = sum(max(v, 0.0) for v in weights.values()) or 1.0
     w = {k: max(v, 0.0) / weight_sum for k, v in weights.items()}
 
     # Final weighted score
     final_score = (
-        w.get("semantic_raw", 0) * raw_norm
-        + w.get("semantic_skills", 0) * skills_norm
+        w.get("semantic_raw", 0) * raw_sims
+        + w.get("semantic_skills", 0) * skill_sims
         + w.get("exact_skills", 0) * exact_skill_scores
-        + w.get("semantic_job_title", 0) * job_norm
+        + w.get("semantic_job_title", 0) * job_sim
         + w.get("experience", 0) * exp_norm
         + w.get("degree", 0) * degree_norm
         + w.get("language", 0) * language_scores)
@@ -394,18 +430,20 @@ def rank_cvs(
     ranking_df = pd.DataFrame({
         "source_file": col_or_empty(id_col),
         "person_name": col_or_empty(name_col),
-        "job_title": col_or_empty("job title"),
+        "job_title": col_or_empty("job_title"),
         "email": col_or_empty("email"),
         "linkedin": col_or_empty("linkedin"),
         "experience_years": exp_years,
+        "experience_score": exp_norm,
         "highest_degree": degree_labels,
+        "degree_score": degree_norm,
+        "language_score": language_scores,
         "semantic_raw_score": raw_sims,
         "semantic_skills_score": skill_sims,
         "exact_skill_score": exact_skill_scores,
-        "semantic_job_title_score": job_sims,
+        "semantic_job_title_score": job_sim,
         "final_score": final_score,
-        "cv_output_folder": d[folder_col].astype(str),
-        "language_score": language_scores,})
+        "cv_output_folder": d[folder_col].astype(str),})
 
     ranking_df = ranking_df.sort_values("final_score", ascending=False).reset_index(drop=True)
 
