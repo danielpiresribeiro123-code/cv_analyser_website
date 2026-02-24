@@ -12,10 +12,13 @@ import RankingTable from "./components/RankingTable"
 import SystemControl from "./components/SystemControl"
 
 
+
 export default function App() {
   const [results, setResults] = useState(null)
   const [loading, setLoading] = useState(false)
   const [ranking, setRanking] = useState(null)
+  const [resetSignal, setResetSignal] = useState(0)
+  const [uploadedFilesCount, setUploadedFilesCount] = useState(0)
 
   useEffect(() => {
     async function loadExistingResults() {
@@ -38,8 +41,13 @@ export default function App() {
   async function handleSystemReset() {
     try {
       await fetch("http://127.0.0.1:8000/reset", { method: "POST" })
+
       setResults(null)
       setRanking(null)
+
+      // Trigger reset for child components
+      setResetSignal(prev => prev + 1)
+
     } catch (err) {
       console.error("Reset failed:", err)
     }
@@ -92,25 +100,22 @@ export default function App() {
 
         <CardContent className="flex flex-col items-center gap-6">
           {/* Upload input already has its own inner box → avoid duplicate styles */}
-          <UploadBox />
+          <UploadBox 
+            resetSignal={resetSignal}
+            setUploadedFilesCount={setUploadedFilesCount}
+          />
 
           {/* Buttons together like design */}
           <div className="flex gap-3">
-            <RunAnalysis setResults={setResults} setLoading={setLoading} />
+            <RunAnalysis 
+              setResults={setResults} 
+              setLoading={setLoading}
+              hasFiles={uploadedFilesCount > 0}
+            />
             <SystemControl onReset={handleSystemReset} />
           </div>
         </CardContent>
       </Card>
-
-      {/* Loading */}
-      {loading && (
-        <div className="flex items-center gap-3 bg-blue-600/20 border border-blue-400/30 px-6 py-3 rounded-xl">
-          <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-          <span className="text-blue-300 font-medium">
-            Running analysis...
-          </span>
-        </div>
-      )}
 
       {/* Results Card */}
       {results && (

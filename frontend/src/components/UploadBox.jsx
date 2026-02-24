@@ -1,22 +1,48 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Upload } from "lucide-react"
 
-export default function UploadBox() {
+export default function UploadBox({ resetSignal, setUploadedFilesCount }) {
   const [filesCount, setFilesCount] = useState(0)
+  const inputRef = useRef(null)
 
-  async function handleUpload(e) {
-    const files = e.target.files
-    if (!files.length) return
+  // Reset UI when parent triggers system reset
+  useEffect(() => {
+    setFilesCount(0)
+    setUploadedFilesCount(0)
 
-    setFilesCount(files.length)
+    if (inputRef.current) {
+      inputRef.current.value = ""
+    }
+  }, [resetSignal])
+
+  async function handleUpload(event) {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+
 
     const formData = new FormData()
-    for (let f of files) formData.append("files", f)
+    for (let file of files) {
+      formData.append("files", file)
+    }
 
-    await fetch("http://127.0.0.1:8000/upload", {
-      method: "POST",
-      body: formData,
-    })
+    try {
+      await fetch("http://127.0.0.1:8000/upload", {
+        method: "POST",
+        body: formData,
+      })
+
+      // Only update counter if upload succeeds
+      setFilesCount(files.length)
+      setUploadedFilesCount(files.length)
+
+    } catch (error) {
+      console.error("File upload failed:", error)
+    }
+
+    // Clear the file input to allow re-uploading the same files
+    if (inputRef.current) {
+      inputRef.current.value = ""
+    }
   }
 
   return (
@@ -26,6 +52,7 @@ export default function UploadBox() {
         <Upload className="w-4 h-4" />
         Select Files
         <input
+          ref={inputRef}
           type="file"
           multiple
           accept=".pdf,.png,.jpg,.jpeg,.bmp,.tiff,.webp"

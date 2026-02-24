@@ -97,7 +97,7 @@ export default function ResultsTable({ results }) {
               >
                 <div>
                   <p className="font-semibold text-white text-lg">
-                    {r["person name"]}
+                    {r["person_name"]}
                   </p>
                   <p className="text-sm text-gray-400">
                     {r.email}
@@ -179,6 +179,7 @@ export default function ResultsTable({ results }) {
                   <DownloadButton url={r.download_raw_url} label="Download Raw Text" />
                   <DownloadButton url={r.download_photo_url} label="Download Photo" />
                   <DownloadButton url={r.download_skill_tables_url} label="Download Skill Tables" />
+                  <DownloadButton url={r.download_gliner_json_url} label="Download GLiNER Info" />
                 </div>
               </div>
             )}

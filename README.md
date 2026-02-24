@@ -44,6 +44,7 @@ pip install pymupdf
 pip install ultralytics opencv-python pillow
 pip install gliner transformers sentence-transformers
 pip install pytesseract pycountry
+pip install phonenumbers
 ```
 
 Extra libraries used internally:
