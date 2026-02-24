@@ -68,8 +68,7 @@ SKILL_LABELS_V1 = [
     # General
     "skill", "competency", "area of expertise", "area of specialization",
     "professional skill", "technical skill", "soft skill", "hard skill",
-    "interpersonal skill", "leadership skill", "management skill",
-    "personal attribute", "competence",
+    "interpersonal skill", "leadership skill", "management skill", "competence",
 
     # Technical / IT
     "programming language", "software framework", "library", "database",
