@@ -1,24 +1,9 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
-const WEIGHTS = {
-  semantic_raw: 0.20,
-  semantic_skills: 0.40,
-  exact_skills: 0.15,
-  semantic_job_title: 0.06,
-  experience: 0.08,
-  degree: 0.05,
-  language: 0.06,
-}
-
 function clamp01(x) {
   if (x == null || isNaN(x)) return 0
   return Math.min(1, Math.max(0, x))
-}
-
-// converte cosine [-1,1] para [0,1]
-function cosineTo01(x) {
-  return clamp01((Number(x) + 1) / 2)
 }
 
 function toPercent(x) {
@@ -29,10 +14,27 @@ function downloadRankingCSV() {
   window.open("http://127.0.0.1:8000/download-ranking", "_blank")
 }
 
-export default function RankingTable({ ranking }) {
+export default function RankingTable({ ranking, weights }) {
   const [openIndex, setOpenIndex] = useState(null)
 
   if (!ranking || !Array.isArray(ranking)) return null
+
+  const normalizedWeights = weights
+    ? Object.fromEntries(
+        Object.entries(weights).map(([k, v]) => [k, Number(v) / 100])
+      )
+    : {
+        semantic_raw: 0.27,
+        semantic_skills: 0.30,
+        exact_skills: 0.03,
+        semantic_job_title: 0.08,
+        experience_general: 0.02,
+        experience_specific: 0.14,
+        degree: 0.05,
+        language: 0.06,
+        document_length: 0.03,
+        photo: 0.02,
+      }
 
   return (
     <>
@@ -57,40 +59,57 @@ export default function RankingTable({ ranking }) {
             const metrics = [
               {
                 label: "Skills (semantic)",
-                value: cosineTo01(r?.semantic_skills_score),
-                weight: WEIGHTS.semantic_skills,
+                value: clamp01(r?.semantic_skills_score),
+                weight: normalizedWeights.semantic_skills,
               },
               {
                 label: "Skills (exact)",
                 value: clamp01(r?.exact_skill_score),
-                weight: WEIGHTS.exact_skills,
+                weight: normalizedWeights.exact_skills,
               },
               {
                 label: "Profile Fit",
-                value: cosineTo01(r?.semantic_raw_score),
-                weight: WEIGHTS.semantic_raw,
+                value: clamp01(r?.semantic_raw_score),
+                weight: normalizedWeights.semantic_raw,
               },
               {
                 label: "Job Title Fit",
-                value: cosineTo01(r?.semantic_job_title_score),
-                weight: WEIGHTS.semantic_job_title,
+                value: clamp01(r?.semantic_job_title_score),
+                weight: normalizedWeights.semantic_job_title,
               },
               {
-                label: "Experience",
-                value: clamp01(r?.experience_score),
-                weight: WEIGHTS.experience,
+                label: "Experience (general)",
+                value: clamp01(r?.experience_score_general),
+                weight: normalizedWeights.experience_general,
                 extra: `${r?.experience_years ?? 0} years`,
+              },
+              {
+                label: "Experience (specific)",
+                value: clamp01(r?.experience_score_specific),
+                weight: normalizedWeights.experience_specific,
               },
               {
                 label: "Education",
                 value: clamp01(r?.degree_score),
-                weight: WEIGHTS.degree,
+                weight: normalizedWeights.degree,
                 extra: r?.highest_degree,
               },
               {
                 label: "Languages",
                 value: clamp01(r?.language_score),
-                weight: WEIGHTS.language,
+                weight: normalizedWeights.language,
+              },
+              {
+                label: "Document Length",
+                value: clamp01(r?.document_length_score),
+                weight: normalizedWeights.document_length,
+                extra: `${r?.ocr_text_length ?? 0} text / ${r?.num_text_blocks ?? 0} blocks`,
+              },
+              {
+                label: "Photo Presence",
+                value: clamp01(r?.photo_score),
+                weight: normalizedWeights.photo,
+                extra: `${r?.num_photos ?? 0} photo(s)`,
               },
             ]
 
@@ -133,7 +152,7 @@ export default function RankingTable({ ranking }) {
 
               {/* Expanded content */}
               {isOpen && (
-                <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {metrics.map((m, idx) => {
                     const valuePct = toPercent(m.value)
                     const weightPct = Math.round(m.weight * 100)

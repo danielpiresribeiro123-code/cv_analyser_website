@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
@@ -16,15 +16,23 @@ from pipeline.ranking.compute_ranking import (
     MODEL_NAME,
     DEGREE_LEVELS,
     split_items,
+    split_multi_value_field,
     safe_float,
     normalize_text,
     infer_highest_degree,
     embed_mean,
     cosine_sim,
-    minmax_norm,
     experience_log_scale,
-    extract_skills_from_query
+    extract_skills_from_query,
+    weighted_job_degree_company_score,
+    binary_presence_score,
+    saturating_log_score,
+    _language_count_score,
+    split_text_for_semantic_matching,
+    topk_semantic_text_score,
 )
+
+
 
 # =========================================================
 # Project backend root resolution
@@ -40,12 +48,16 @@ def rank_cvs(
     *,
     sep: str = ";",
     folder_col: str = "cv_output_folder",
-    raw_filename: str = "raw_text.txt",
+    raw_filename: str = "gliner_input.txt",
+    fallback_raw_filename: str = "raw_text.txt",
     skills_col: str = "skills",
     exp_col: str = "experience_years",
     degree_col: str = "degree",
     id_col: str = "source_file",
     name_col: str = "person_name",
+    ocr_len_col: str = "ocr_text_length",
+    text_blocks_col: str = "num_text_blocks",
+    photos_col: str = "num_photos",
     batch_size: int = 64,
     top_k: int | None = None,
     weights: Dict[str, float] | None = None,
@@ -68,13 +80,16 @@ def rank_cvs(
 
     if weights is None:
         weights = {
-            "semantic_raw": 0.20,
-            "semantic_skills": 0.40,
-            "exact_skills": 0.15,
-            "semantic_job_title": 0.06,
-            "experience": 0.08,
+            "semantic_raw": 0.27,
+            "semantic_skills": 0.30,
+            "exact_skills": 0.03,
+            "semantic_job_title": 0.08,
+            "experience_general": 0.02,
+            "experience_specific": 0.14,
             "degree": 0.05,
             "language": 0.06,
+            "document_length": 0.03,
+            "photo": 0.02,
         }
 
     # Load main CSV from outputs folder
@@ -131,7 +146,7 @@ def rank_cvs(
     q_skills_emb = embed_mean(model, query_skills_list, batch_size=batch_size)
 
     # -----------------------------------------------------
-    # Load raw_text.txt from each CV folder
+    # Load gliner_input.txt or raw_text.txt from each CV folder
     # -----------------------------------------------------
     raw_texts = []
     valid_indices = []
@@ -151,6 +166,9 @@ def rank_cvs(
         raw_path = folder_path / raw_filename
 
         if not raw_path.exists():
+            raw_path = folder_path / fallback_raw_filename
+
+        if not raw_path.exists():
             continue
 
         text = raw_path.read_text(encoding="utf-8", errors="ignore")
@@ -168,11 +186,23 @@ def rank_cvs(
     d = df.loc[valid_indices].copy()
 
     # -----------------------------------------------------
-    # Semantic similarity (raw text)
+    # Semantic similarity (raw text / top-k chunks)
     # -----------------------------------------------------
-    raw_embs = model.encode(raw_texts, batch_size=batch_size, show_progress_bar=True)
     raw_sims = np.array(
-        [cosine_sim(raw_embs[i], q_raw_emb) for i in range(len(raw_embs))],
+        [
+            topk_semantic_text_score(
+                model=model,
+                query_emb=q_raw_emb,
+                text=text,
+                batch_size=batch_size,
+                top_k=3,
+                chunk_size=600,
+                overlap=50,
+                min_chunk_len=120,
+                default_score=0.0,
+            )
+            for text in raw_texts
+        ],
         dtype=float,
     )
 
@@ -297,23 +327,35 @@ def rank_cvs(
     exact_skill_scores = np.array(exact_skill_scores, dtype=float)
 
     # -----------------------------------------------------
-    # Semantic similarity (job_title)
+    # Semantic similarity (job titles + degrees + companies)
     # -----------------------------------------------------
     DEFAULT_EMPTY_JOB_SCORE = 0.2
 
     job_norm = []
 
     for _, row in d.iterrows():
-        value = row.get("job_title")
+        job_titles = split_multi_value_field(row.get("job_title", ""))
+        degrees = split_multi_value_field(row.get(degree_col, ""))
+        companies = split_multi_value_field(row.get("company", ""))
 
-        if pd.isna(value) or not str(value).strip():
-            job_norm.append(DEFAULT_EMPTY_JOB_SCORE)
-        else:
-            jt = normalize_text(str(value))
-            jt_emb = model.encode([jt], batch_size=batch_size, show_progress_bar=False)[0]
-            sim = cosine_sim(jt_emb, q_raw_emb)
-            norm_sim = (sim + 1.0) / 2.0
-            job_norm.append(norm_sim)
+        score = weighted_job_degree_company_score(
+            model=model,
+            query_emb=q_raw_emb,
+            job_titles=job_titles,
+            degrees=degrees,
+            companies=companies,
+            batch_size=batch_size,
+            default_score=DEFAULT_EMPTY_JOB_SCORE,
+            job_weight=0.85,
+            degree_weight=0.12,
+            company_weight=0.03,
+            fraction_divisor=5,
+            min_top_n=1,
+            max_top_n=5,   # or 6 if u want to limit it
+            max_companies=4,
+        )
+
+        job_norm.append(score)
 
     job_norm = np.array(job_norm, dtype=float)
 
@@ -341,6 +383,36 @@ def rank_cvs(
     degree_norm = degree_levels / float(max(DEGREE_LEVELS.values()))
 
     # -----------------------------------------------------
+    # Document length scoring
+    # -----------------------------------------------------
+    ocr_lengths = np.array(
+        [safe_float(x, 0.0) for x in d.get(ocr_len_col, pd.Series([0] * len(d)))],
+        dtype=float,
+    )
+
+    text_blocks = np.array(
+        [safe_float(x, 0.0) for x in d.get(text_blocks_col, pd.Series([0] * len(d)))],
+        dtype=float,
+    )
+
+    # Approximate "useful length" saturation:
+    # fast gains for short CVs, diminishing gains for long CVs.
+    ocr_len_score = saturating_log_score(ocr_lengths, reference_value=2500)
+    text_blocks_score = saturating_log_score(text_blocks, reference_value=40)
+
+    document_length_score = 0.8 * ocr_len_score + 0.2 * text_blocks_score
+
+    # -----------------------------------------------------
+    # Photo scoring
+    # -----------------------------------------------------
+    num_photos = np.array(
+        [safe_float(x, 0.0) for x in d.get(photos_col, pd.Series([0] * len(d)))],
+        dtype=float,
+    )
+
+    photo_score = binary_presence_score(num_photos)
+
+    # -----------------------------------------------------
     # Language scoring (with extra language bonus)
     # -----------------------------------------------------
 
@@ -354,72 +426,96 @@ def rank_cvs(
 
     language_scores = []
 
-    if not query_languages:
-        language_scores = np.ones(len(d))
-    else:
-        query_lang_lower_set = {ql.lower() for ql in query_languages}
-        for _, row in d.iterrows():
-            details_raw = row.get("languages_details", "")
-            score_values = []
-            extra_levels = []
+    query_lang_lower_set = {ql.lower() for ql in query_languages}
 
-            try:
-                details = ast.literal_eval(details_raw) if isinstance(details_raw, str) else []
-            except Exception:
+    for _, row in d.iterrows():
+        details_raw = row.get("languages_details", "")
+        score_values = []
+        extra_levels = []
+
+        try:
+            if isinstance(details_raw, str):
+                try:
+                    details = ast.literal_eval(details_raw)
+                except Exception:
+                    details = []
+            elif isinstance(details_raw, list):
+                details = details_raw
+            else:
                 details = []
+        except Exception:
+            details = []
 
-            cv_lang_map = {}
-            for item in details:
-                lang_name = str(item.get("language", "")).lower()
-                level = item.get("level", None)
+        cv_lang_map = {}
+        for item in details:
+            lang_name = str(item.get("language", "")).lower().strip()
+            level = item.get("level", None)
+
+            if lang_name:
                 cv_lang_map[lang_name] = level.lower() if isinstance(level, str) else None
 
-            # ---- Requested languages score ----
-            for q_lang in query_languages:
-                q_lang_lower = q_lang.lower()
+        # -------------------------------------------------
+        # No languages explicitly requested in the query
+        # -------------------------------------------------
+        if not query_languages:
+            language_scores.append(_language_count_score(len(cv_lang_map)))
+            continue
 
-                if q_lang_lower in cv_lang_map:
-                    level = cv_lang_map[q_lang_lower]
-                    score_values.append(LEVEL_MAPPING.get(level, 0.50))
-                else:
-                    score_values.append(0.0)
+        # -------------------------------------------------
+        # Requested languages score
+        # -------------------------------------------------
+        for q_lang in query_languages:
+            q_lang_lower = q_lang.lower()
 
-            requested_score = float(np.mean(score_values)) if score_values else 0.0
-
-            # ---- Extra languages bonus ----
-            for cv_lang, level in cv_lang_map.items():
-                if cv_lang not in query_lang_lower_set:
-                    extra_levels.append(LEVEL_MAPPING.get(level, 0.50))
-
-            if extra_levels:
-                extra_bonus = min(0.25, float(np.mean(extra_levels)) * 0.25)
+            if q_lang_lower in cv_lang_map:
+                level = cv_lang_map[q_lang_lower]
+                score_values.append(LEVEL_MAPPING.get(level, 0.50))
             else:
-                extra_bonus = 0.0
+                score_values.append(0.0)
 
-            final_language_score = 0.75 * requested_score + (extra_bonus if requested_score > 0 else 0)
-            language_scores.append(final_language_score)
+        requested_score = float(np.mean(score_values)) if score_values else 0.0
 
-        language_scores = np.array(language_scores, dtype=float)
+        # -------------------------------------------------
+        # Extra languages bonus
+        # -------------------------------------------------
+        for cv_lang, level in cv_lang_map.items():
+            if cv_lang not in query_lang_lower_set:
+                extra_levels.append(LEVEL_MAPPING.get(level, 0.50))
+
+        if extra_levels:
+            extra_bonus = min(0.25, float(np.mean(extra_levels)) * 0.25)
+        else:
+            extra_bonus = 0.0
+
+        final_language_score = 0.75 * requested_score + (extra_bonus if requested_score > 0 else 0)
+        language_scores.append(final_language_score)
+
+    language_scores = np.array(language_scores, dtype=float)
 
     # -----------------------------------------------------
     # Normalize semantic scores to 0–1
     # -----------------------------------------------------
-    raw_norm = (raw_sims + 1.0) / 2.0
-    skills_norm = (skill_sims + 1.0) / 2.0
-    job_sim = job_norm*2.0 -1.0
+    # raw_norm = (raw_sims + 1.0) / 2.0
+    raw_norm_v2 = np.clip(raw_sims / 0.6, 0.0, 1.0)
+    skill_norm = np.clip(skill_sims / 0.85, 0.0, 1.0)
+    job_sims = np.clip((job_norm - 0.5) / 0.4, 0.0, 1.0)
+    exp_specific = np.clip((((job_sims + skill_norm)*exp_norm)/2) / 0.7, 0.0, 1.0)
     # Normalize weights
     weight_sum = sum(max(v, 0.0) for v in weights.values()) or 1.0
     w = {k: max(v, 0.0) / weight_sum for k, v in weights.items()}
 
-    # Final weighted score
     final_score = (
-        w.get("semantic_raw", 0) * raw_sims
-        + w.get("semantic_skills", 0) * skill_sims
+        w.get("semantic_raw", 0) * raw_norm_v2
+        + w.get("semantic_skills", 0) * skill_norm
         + w.get("exact_skills", 0) * exact_skill_scores
-        + w.get("semantic_job_title", 0) * job_sim
-        + w.get("experience", 0) * exp_norm
+        + w.get("semantic_job_title", 0) * job_sims
+        + w.get("experience_general", 0) * exp_norm
+        + w.get("experience_specific", 0) * exp_specific
         + w.get("degree", 0) * degree_norm
-        + w.get("language", 0) * language_scores)
+        + w.get("language", 0) * language_scores
+        + w.get("document_length", 0) * document_length_score
+        + w.get("photo", 0) * photo_score
+    )
 
     # -----------------------------------------------------
     # Build output dataframe
@@ -434,16 +530,23 @@ def rank_cvs(
         "email": col_or_empty("email"),
         "linkedin": col_or_empty("linkedin"),
         "experience_years": exp_years,
-        "experience_score": exp_norm,
+        "experience_score_general": exp_norm,
+        "experience_score_specific": exp_specific,
         "highest_degree": degree_labels,
         "degree_score": degree_norm,
         "language_score": language_scores,
-        "semantic_raw_score": raw_sims,
-        "semantic_skills_score": skill_sims,
+        "ocr_text_length": ocr_lengths,
+        "num_text_blocks": text_blocks,
+        "num_photos": num_photos,
+        "document_length_score": document_length_score,
+        "photo_score": photo_score,
+        "semantic_raw_score": raw_norm_v2,
+        "semantic_skills_score": skill_norm,
         "exact_skill_score": exact_skill_scores,
-        "semantic_job_title_score": job_sim,
+        "semantic_job_title_score": job_sims,
         "final_score": final_score,
-        "cv_output_folder": d[folder_col].astype(str),})
+        "cv_output_folder": d[folder_col].astype(str),
+    })
 
     ranking_df = ranking_df.sort_values("final_score", ascending=False).reset_index(drop=True)
 
@@ -455,3 +558,4 @@ def rank_cvs(
     ranking_df.to_csv(ranking_path, index=False, encoding="utf-8")
 
     return ranking_df
+

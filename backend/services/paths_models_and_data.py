@@ -27,7 +27,7 @@ FRONTEND_ROOT = PROJECT_ROOT / "frontend"
 
 # Data folders
 UPLOADS_DIR_ORIGINAL =BACKEND_ROOT / "uploads"
-UPLOADS_DIR = Path("C:/Users/danie/Dropbox/CV GYRO - CV Parsing")
+UPLOADS_DIR = BACKEND_ROOT / "uploads"
 OUTPUTS_DIR = BACKEND_ROOT / "outputs"
 
 # Model paths

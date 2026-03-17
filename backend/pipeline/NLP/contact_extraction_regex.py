@@ -3,11 +3,8 @@ import pandas as pd
 from typing import Dict, List, Optional, Union, TypedDict, Tuple, Mapping, Sequence, Any
 from re import Pattern
 
-from datetime import datetime
-CURRENT_YEAR = datetime.now().year
-
 import pycountry
-from services.paths_models_and_data import LANGUAGES, COUNTRIES_AND_CAPITALS 
+from services.paths_models_and_data import LANGUAGES, COUNTRIES_AND_CAPITALS, LANGUAGES_SMALL
 
 import phonenumbers
 from phonenumbers import NumberParseException
@@ -845,10 +842,12 @@ def extract_languages_details(text: str) -> List[LanguageInfo]:
 # ==========================================================
 EMAIL_REGEX = re.compile(
     r"""
-    (?<![\w.+-@])           
+    (?<![\w.+-@])
     [A-Za-z0-9._%+-]+
-    @[A-Za-z0-9.-]+
+    @
+    [A-Za-z0-9.-]+
     \.[A-Za-z]{2,}
+    (?![\w.-])
     """,
     re.VERBOSE | re.IGNORECASE,
 )
@@ -862,6 +861,12 @@ EMAIL_PROVIDERS = {
     "live.com",
 }
 
+COMMON_TLDS = {
+    "com", "org", "net", "edu", "gov", "io", "ai", "co",
+    "app", "dev", "me", "tv", "info", "biz"}
+
+VALID_TLDS = {t.lower() for t in LANGUAGES_SMALL} | COMMON_TLDS
+
 PHONE_REGEX = re.compile(
     r"""
     (?:
@@ -873,6 +878,93 @@ PHONE_REGEX = re.compile(
     re.VERBOSE,
 )
 
+# ----------------------------------------------------------
+# Helpers for Emails
+# ----------------------------------------------------------
+def repair_broken_emails(text: str) -> str:
+    """
+    Repair emails broken by OCR/newlines, especially around '@' and domain parts.
+
+    Examples:
+        guilhermemconceicao@
+        gmail.com
+        ->
+        guilhermemconceicao@gmail.com
+
+        Email address:Duarte.d.esteves@gmail.com
+        -> unchanged
+    """
+    if not text:
+        return ""
+
+    repaired = text
+
+    # Case 1: newline/spaces immediately after @
+    repaired = re.sub(
+        r'([A-Za-z0-9._%+-]+)\s*@\s*[\r\n]+\s*([A-Za-z0-9.-]+\.[A-Za-z]{2,})',
+        r'\1@\2',
+        repaired,
+        flags=re.IGNORECASE
+    )
+
+    # Case 2: newline/spaces inside domain before TLD
+    # Example: name@gmail.\ncom -> name@gmail.com
+    repaired = re.sub(
+        r'([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+)\s*\.\s*[\r\n]+\s*([A-Za-z]{2,})',
+        r'\1.\2',
+        repaired,
+        flags=re.IGNORECASE
+    )
+
+    # Case 3: spaces/newlines around @ in general
+    repaired = re.sub(
+        r'([A-Za-z0-9._%+-]+)\s*@\s*([A-Za-z0-9.-]+\.[A-Za-z]{2,})',
+        r'\1@\2',
+        repaired,
+        flags=re.IGNORECASE
+    )
+
+    return repaired
+
+def extract_probable_emails_without_at(text: str) -> List[str]:
+    if not text:
+        return []
+
+    found = set()
+
+    providers_pattern = "|".join(
+        re.escape(p) for p in sorted(EMAIL_PROVIDERS, key=len, reverse=True)
+    )
+
+    pattern = re.compile(
+        rf"""
+        \b
+        ([A-Za-z0-9._%+-]{{2,}})
+        [ \t]+
+        ({providers_pattern})
+        \b
+        """,
+        re.VERBOSE | re.IGNORECASE,
+    )
+
+    for m in pattern.finditer(text):
+        local = m.group(1).strip()
+        domain = m.group(2).strip().lower()
+
+        if local.lower() in {"email", "mail", "contact", "address"}:
+            continue
+
+        # tornar a heurística mais conservadora
+        if len(local) < 5:
+            continue
+
+        if not re.search(r"[._%+-]|\d", local):
+            continue
+
+        found.add(f"{local}@{domain}".lower())
+
+    return sorted(found)
+
 # ==========================================================
 # Regex Sites
 # ==========================================================
@@ -882,50 +974,128 @@ GITHUB_REGEX = re.compile(r"(https?://)?(www\.)?github\.com/[^\s]+",re.IGNORECAS
 
 URL_REGEX = re.compile(r"""\b(?:https?://|www\.)[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+(?:/[^\s]*)?""",re.VERBOSE | re.IGNORECASE,)
 
+BARE_DOMAIN_REGEX = re.compile(
+    r"""
+    (?<!@)
+    (?<!://)
+    \b
+    (?:www\.)?
+    [A-Za-z0-9-]+
+    (?:\.[A-Za-z0-9-]+)+
+    (?:/[^\s,;:]*)?
+    """,
+    re.VERBOSE | re.IGNORECASE,
+)
 
 # ----------------------------------------------------------
 # Sites functions
 # ----------------------------------------------------------
+def _has_valid_tld(domain_or_url: str) -> bool:
+    if not domain_or_url:
+        return False
+
+    value = domain_or_url.lower().strip()
+    value = re.sub(r"^https?://", "", value)
+    value = re.sub(r"^www\.", "", value)
+
+    domain = value.split("/")[0].strip()
+    if "." not in domain:
+        return False
+
+    tld = domain.rsplit(".", 1)[-1]
+    return tld in VALID_TLDS
+
+def _has_min_website_length(domain_or_url: str, min_length: int = 13) -> bool:
+    if not domain_or_url:
+        return False
+
+    value = domain_or_url.strip()
+    value = re.sub(r"^https?://", "", value, flags=re.IGNORECASE)
+
+    return len(value) >= min_length
+
 def extract_all_websites(text: str) -> List[str]:
     if not text:
         return []
 
     urls = set()
 
-    # Extrair emails primeiro para remover depois
-    emails = extract_all(EMAIL_REGEX, text)
+    repaired_text = repair_broken_emails(text)
+
+    # Extrair emails primeiro para evitar confundir domínios de email com websites
+    emails_strict = extract_all(EMAIL_REGEX, repaired_text)
+    emails_probable = extract_probable_emails_without_at(repaired_text)
+
+    all_email_candidates = set(emails_strict) | set(emails_probable)
+
     email_domains = {
         e.split("@")[1].lower()
-        for e in emails
+        for e in all_email_candidates
         if "@" in e
     }
 
-    for match in URL_REGEX.finditer(text):
-        url = match.group(0).strip()
-
-        # Normalizar
+    def normalize_url(url: str) -> str:
+        url = url.strip().rstrip(".,;:)]}")
         if not url.startswith(("http://", "https://")):
             url = "https://" + url
+        return url
 
-        domain = re.sub(r"https?://(www\.)?", "", url)
+    # 1) URLs com protocolo ou www
+    for match in URL_REGEX.finditer(repaired_text):
+        url = normalize_url(match.group(0))
+
+        domain = re.sub(r"^https?://", "", url, flags=re.IGNORECASE)
+        domain = re.sub(r"^www\.", "", domain, flags=re.IGNORECASE)
         domain = domain.split("/")[0].lower()
 
-        # Ignorar se for domínio de email extraído
         if domain in email_domains:
             continue
 
-        # Ignorar se for provider genérico
         if domain in EMAIL_PROVIDERS:
             continue
 
-        # Ignorar domínios muito curtos (ex: www.)
-        if len(domain.split(".")) < 2:
+        if not _has_valid_tld(url):
             continue
 
         urls.add(url)
 
+    # 2) Domínios sem protocolo nem www
+    for match in BARE_DOMAIN_REGEX.finditer(repaired_text):
+        raw = match.group(0).strip().rstrip(".,;:)]}")
+
+        domain = raw.split("/")[0].lower()
+        domain_no_www = re.sub(r"^www\.", "", domain, flags=re.IGNORECASE)
+
+        if domain_no_www in email_domains:
+            continue
+
+        if domain_no_www in EMAIL_PROVIDERS:
+            continue
+
+        if not _has_valid_tld(raw):
+            continue
+
+        # filtro de tamanho só para domínios nus
+        if not _has_min_website_length(raw):
+            continue
+
+        # evitar apanhar emails parcialmente
+        start, end = match.span()
+        context_left = repaired_text[max(0, start - 1):start]
+        if context_left == "@":
+            continue
+
+        urls.add(normalize_url(raw))
+
     return sorted(urls)
 
+def _normalize_optional_url(url: Optional[str]) -> Optional[str]:
+    if not url:
+        return None
+    url = url.strip().rstrip(".,;:)]}")
+    if not url.startswith(("http://", "https://")):
+        url = "https://" + url
+    return url
 
 # ==========================================================
 # Regex Adress
@@ -1016,308 +1186,6 @@ def extract_address(text: str) -> Optional[str]:
         return geo
 
     return None
-
-
-# ----------------------------------------------------------
-# Regex experience
-# ----------------------------------------------------------
-EXPLICIT_YEARS_REGEX = re.compile(
-    r"""
-    (?:
-        # optional qualifiers before the number
-        less\ than|
-        under|
-        more\ than|
-        over|
-        at\ least|
-        minimum|
-        min\.?|
-        up\ to|
-        approx\.?|
-        around|
-        about
-    )?
-    \s*
-
-    (\d{1,2})        # number of years
-    \+?              # optional plus (e.g., 5+)
-
-    \s*
-    (?:
-        years?|yrs?|y
-    )
-
-    (?:
-        \s+of\s+experience|
-        \s+experience|
-        \s+exp\.?
-    )?
-    """,
-    re.IGNORECASE | re.VERBOSE,
-)
-
-DATE_RANGE_REGEX = re.compile(
-    r"""
-    (?:
-        # optional prefixes
-        (?:since|from|year\s+)?\s*
-    )
-
-    # ---------------- START DATE ----------------
-    (?:
-        (?:\d{1,2}[/-]){0,2}      # optional day/month
-        (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|
-           January|February|March|April|June|July|August|
-           September|October|November|December)?\s*
-        (\d{2,4})                 # start year
-    )
-
-    \s*
-    (?:-|–|—|~|\bto\b|\buntil\b|\btill\b|\bthrough\b|→|~)
-    \s*
-
-    # ---------------- END DATE ----------------
-    (?:
-        (?:\d{1,2}[/-]){0,2}
-        (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|
-           January|February|March|April|June|July|August|
-           September|October|November|December)?\s*
-        (\d{2,4}|Present|Current|Today|Now)
-    )
-    """,
-    re.IGNORECASE | re.VERBOSE,
-)
-
-SINCE_REGEX = re.compile(
-    r"""
-    (?:since|from)\s+
-    (\d{2,4})
-    """,
-    re.IGNORECASE | re.VERBOSE,
-)
-
-EDU_KEYWORDS = {"education", "bachelor", "master","degree", "course", "student", "academic"}
-
-WORK_KEYWORDS = {"experience", "work", "employment", "career", "history", "intern", "job", "company"}
-
-
-# ----------------------------------------------------------
-# Helpers for Experience
-# ----------------------------------------------------------
-def _normalize_year(y: str) -> Optional[int]:
-    """Converts text year to valid integer."""
-    y = y.lower()
-
-    if y in {"present", "current", "today", "now", "nowadays", "contemporary"}:
-        return CURRENT_YEAR
-
-    try:
-        year = int(y)
-    except ValueError:
-        return None
-
-
-    # tratar anos curtos tipo 23 → 2023
-    if year < 100:
-        year += 2000
-
-    if 1950 <= year <= CURRENT_YEAR + 1:
-        return year
-
-    return None
-
-def _context_has_keywords(text: str, pos: int, direction: str, window_words: int) -> str:
-    """
-    Search for keywords on the right or left.
-    Returns: "edu", "work", or "".
-    """
-    words = re.split(r"\s+", text)
-
-    # encontrar índice aproximado da posição
-    char_count = 0
-    idx = 0
-    for i, w in enumerate(words):
-        char_count += len(w) + 1
-        if char_count >= pos:
-            idx = i
-            break
-
-    if direction == "right":
-        segment = words[idx : idx + window_words]
-    else:
-        segment = words[max(0, idx - window_words) : idx]
-
-    segment_set = {
-        re.sub(r"[^\w]", "", w.lower())
-        for w in segment
-        if w}
-
-
-    if segment_set & EDU_KEYWORDS:
-        return "edu"
-    if segment_set & WORK_KEYWORDS:
-        return "work"
-    return ""
-
-def _merge_intervals(intervals: List[tuple[int, int]]) -> int:
-    """Combine overlapping intervals and return total duration in years."""
-    if not intervals:
-        return 0
-
-    intervals = sorted(intervals)
-    merged = [intervals[0]]
-
-    for start, end in intervals[1:]:
-        last_start, last_end = merged[-1]
-
-        # overlap → extend interval
-        if start <= last_end:
-            merged[-1] = (last_start, max(last_end, end))
-        else:
-            merged.append((start, end))
-
-    # total duration
-    return sum(max(0, end - start) for start, end in merged)
-
-
-# ----------------------------------------------------------
-# Experience functions
-# ----------------------------------------------------------
-def extract_experience_years(text: str) -> Optional[int]:
-    """
-    Estimate the total number of professional experience years from CV text.
-
-    The estimation combines multiple complementary strategies:
-
-    1) Explicit mentions of experience duration
-       Examples:
-           "5 years", "7+ years of experience", "over 3 yrs"
-
-    2) Closed date ranges describing employment periods
-       Examples:
-           "2019–2024", "May 2017 - April 2019", "2020 to Present"
-
-    3) Open date ranges using "since"
-       Examples:
-           "since 2020", "working since 2018"
-
-    4) Semantic context filtering
-       - Excludes education-related periods
-       - Keeps work/professional periods
-       - Uses:
-           • short right-side context (≈10 words)
-           • long left-side context (≈400 words, section titles)
-
-    5) Interval merging
-       - Prevents double counting overlapping jobs
-
-    Returns
-    -------
-    Optional[int]
-        Total estimated years of professional experience.
-        Returns None if no reliable estimation is possible.
-    """
-
-    # Safety check
-    if not text:
-        return None
-
-    text = clean_text(text)
-
-    # ------------------------------------------------------
-    # 1) Explicit experience mentions (e.g., "5 years")
-    # ------------------------------------------------------
-    explicit_years = [
-        int(m.group(1))
-        for m in EXPLICIT_YEARS_REGEX.finditer(text)
-        if 0 < int(m.group(1)) <= 50
-    ]
-
-    # ------------------------------------------------------
-    # 2) Closed date ranges (start → end)
-    # ------------------------------------------------------
-    intervals: List[tuple[int, int]] = []
-
-    for m in DATE_RANGE_REGEX.finditer(text):
-
-        start_raw, end_raw = m.group(1), m.group(2)
-
-        start = _normalize_year(start_raw)
-        end = _normalize_year(end_raw)
-
-        # Discard invalid or reversed ranges
-        if not start or not end or end <= start:
-            continue
-
-        pos = m.start()
-
-        # ---- Context classification ----
-        right_ctx = _context_has_keywords(text, pos, "right", 10)
-
-        # Ignore education periods
-        if right_ctx == "edu":
-            continue
-
-        # Accept if clearly work-related
-        if right_ctx == "work":
-            intervals.append((start, end))
-            continue
-
-        # Fallback: inspect section titles on the left
-        left_ctx = _context_has_keywords(text, pos, "left", 400)
-
-        if left_ctx == "work":
-            intervals.append((start, end))
-            continue
-
-    # ------------------------------------------------------
-    # 2b) Open intervals like "since 2020"
-    # ------------------------------------------------------
-    for m in SINCE_REGEX.finditer(text):
-
-        start = _normalize_year(m.group(1))
-        if not start:
-            continue
-
-        pos = m.start()
-
-        right_ctx = _context_has_keywords(text, pos, "right", 10)
-
-        # Ignore education context
-        if right_ctx == "edu":
-            continue
-
-        left_ctx = _context_has_keywords(text, pos, "left", 400)
-
-        # Accept only if work-related and avoid duplicates
-        if right_ctx == "work" or (left_ctx == "work" and right_ctx != "edu"):
-            interval = (start, CURRENT_YEAR)
-            if interval not in intervals:
-                intervals.append(interval)
-
-    # ------------------------------------------------------
-    # 3) Merge overlapping intervals and sum durations
-    # ------------------------------------------------------
-    total_years = _merge_intervals(intervals)
-
-    # Reject unrealistic values
-    if total_years > 50:
-        return None
-
-    # ------------------------------------------------------
-    # 4) Fallback to explicit mentions if no intervals found
-    # ------------------------------------------------------
-    if total_years == 0:
-        if explicit_years:
-            return max(explicit_years)
-        if intervals:
-            return _merge_intervals(intervals)
-
-    if total_years < 0:
-        return None
-    else:
-        return total_years
-
 
 # ==========================================================
 # Text loading (Memory-based)
@@ -1417,7 +1285,6 @@ class ContactInfo(TypedDict):
     phone: Optional[str]
     all_phones: List[str]
     address: Optional[str]
-    experience_years: Optional[int]
     languages: List[str]
     languages_details: List[LanguageInfo]
     linkedin: Optional[str]
@@ -1425,10 +1292,14 @@ class ContactInfo(TypedDict):
     all_websites: List[str]
 
 def extract_contact_info(text: str) -> ContactInfo:
-    emails = [normalize_email(e) for e in extract_all(EMAIL_REGEX, text)]
-    address = extract_address(text)
+    repaired_text = repair_broken_emails(text)
 
-    raw_phones = extract_all(PHONE_REGEX, text)
+    emails = {normalize_email(e) for e in extract_all(EMAIL_REGEX, repaired_text)}
+    emails.update(extract_probable_emails_without_at(repaired_text))
+    emails = sorted(emails)
+    address = extract_address(repaired_text)
+
+    raw_phones = extract_all(PHONE_REGEX, repaired_text)
     normalized_phones = []
 
     # Detect region from address if possible
@@ -1455,20 +1326,20 @@ def extract_contact_info(text: str) -> ContactInfo:
                 normalized_phones.append(norm)
 
     # If at least one international number exists → keep only international
+    normalized_phones = list(dict.fromkeys(normalized_phones))
+    
     if international_found:
         phones = [p for p in normalized_phones if p.startswith("+")]
     else:
         phones = normalized_phones
 
-    linkedin = extract_first(LINKEDIN_REGEX, text)
-    github = extract_first(GITHUB_REGEX, text)
-    
-    experience_years = extract_experience_years(text)
+    linkedin = _normalize_optional_url(extract_first(LINKEDIN_REGEX, repaired_text))
+    github = _normalize_optional_url(extract_first(GITHUB_REGEX, repaired_text))
 
-    languages_details = extract_languages_details(text)
+    languages_details = extract_languages_details(repaired_text)
     languages = [l["language"] for l in languages_details]
 
-    all_websites = extract_all_websites(text)
+    all_websites = extract_all_websites(repaired_text)
 
     return {
         "email": emails[0] if emails else None,
@@ -1476,7 +1347,6 @@ def extract_contact_info(text: str) -> ContactInfo:
         "phone": phones[0] if phones else None,
         "all_phones": phones,
         "address": address,
-        "experience_years": experience_years,
         "languages": languages,
         "languages_details": languages_details,
         "linkedin": linkedin,

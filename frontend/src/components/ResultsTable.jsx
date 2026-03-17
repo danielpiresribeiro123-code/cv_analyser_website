@@ -180,6 +180,7 @@ export default function ResultsTable({ results }) {
                   <DownloadButton url={r.download_photo_url} label="Download Photo" />
                   <DownloadButton url={r.download_skill_tables_url} label="Download Skill Tables" />
                   <DownloadButton url={r.download_gliner_json_url} label="Download GLiNER Info" />
+                  <DownloadButton url={r.download_gliner_txt_url} label="Download GLiNER Text" />
                 </div>
               </div>
             )}

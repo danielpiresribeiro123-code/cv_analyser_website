@@ -59,7 +59,7 @@ def clear_all_storage(uploads_dir: Path,outputs_dir: Path,project_root: Path) ->
     """
     Clear uploads, outputs, and YOLO 'runs' folders.
     """
-    # clear_uploads(uploads_dir)
+    clear_uploads(uploads_dir)
     clear_outputs(outputs_dir)
     clear_yolo_runs(project_root)
 

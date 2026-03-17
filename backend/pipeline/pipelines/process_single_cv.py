@@ -17,7 +17,6 @@ This module:
 from pathlib import Path
 from typing import Union, Optional, Any
 import io
-import sys
 import re
 import pandas as pd
 import numpy as np
@@ -34,8 +33,8 @@ from pipeline.vision.cv_filter_yolo import CVFilter
 from pipeline.vision.layout_detection_yolo import detect_and_segment_cv 
 from pipeline.text_reader.ocr_engine_tesseract import process_image_with_bbox
 from pipeline.text_reader.pdf_parser import process_pdf_with_bboxes
-from pipeline.NLP.raw_text_preprocessing import remove_exact_duplicate_lines
-from pipeline.NLP.gliner_preprocessing import preprocess_ocr_for_gliner
+from pipeline.NLP.raw_text_preprocessing import preprocess_raw_text
+from pipeline.NLP.gliner_preprocessing import preprocess_ocr_for_gliner, remove_known_contacts_from_text
 from pipeline.NLP.entity_extraction_gliner import process_texts_gliner
 from pipeline.NLP.contact_extraction_regex import extract_contact_info
 
@@ -179,6 +178,7 @@ def process_single_cv(
     crop_skill_table: bool = False,
     analyse_individual_pages: bool = False,
     save_ocr_txt: bool = False,
+    save_gliner_txt: bool = False,
     save_csv_single: bool = False,
     gliner_model: Any | None = None,
     debug_save_json: bool = False,
@@ -481,7 +481,7 @@ def process_single_cv(
         # ---------------------------------------------
         # Raw text deduplication
         # ---------------------------------------------
-        raw_text = remove_exact_duplicate_lines(raw_text)
+        raw_text = preprocess_raw_text(raw_text)
 
         # -------------------------------------------------
         # Accumulate
@@ -498,19 +498,39 @@ def process_single_cv(
         # -------------------------------------------------
         if analyse_individual_pages:
 
+            # ---- Regex contacts ----
+            contact_info = extract_contact_info(raw_text)
+
+            # ---- Remove known contacts before GLiNER ----
+            gliner_input_text = remove_known_contacts_from_text(
+                raw_text,
+                emails=contact_info.get("all_emails"),
+                phones=contact_info.get("all_phones"),
+                websites=contact_info.get("all_websites"),
+            )
+
             # ---- GLiNER ----
-            preprocessed_text = preprocess_ocr_for_gliner(raw_text)
+            preprocessed_text = preprocess_ocr_for_gliner(gliner_input_text)
+
+            # -----------------------------------------------------
+            # Optional: save GLiNER preprocessed text
+            # -----------------------------------------------------
+            if save_gliner_txt and cv_folder is not None:
+                gliner_text_path = cv_folder / f"gliner_input_p{page_num:02d}.txt"
+                gliner_text_path.write_text(preprocessed_text, encoding="utf-8")
+
+                if verbose:
+                    print(f"     GLiNER preprocessed text saved to: {gliner_text_path}")
+
             debug_path = cv_folder if debug_save_json else None
 
             gliner_df = process_texts_gliner(
-                texts=[preprocessed_text],
+                texts=[{"gliner_text": preprocessed_text,"raw_text": raw_text,}],
                 model=gliner_model,
                 gliner_threshold=gliner_threshold,
                 debug_save_json=debug_save_json,
-                debug_output_path=debug_path)
-
-            # ---- Regex contacts ----
-            contact_info = extract_contact_info(raw_text)
+                debug_output_path=debug_path,
+            )
 
             result_row = {} if gliner_df.empty else gliner_df.iloc[0].to_dict()
 
@@ -527,7 +547,7 @@ def process_single_cv(
                 "all_phones": ", ".join(phones),
 
                 "address": _merge_address_priority(address_gliner,address_regex),
-                "experience_years": contact_info.get("experience_years"),
+                "experience_years": result_row.get("experience_years"),
 
                 "languages": ", ".join(contact_info.get("languages", [])),
                 "languages_details": contact_info.get("languages_details"),
@@ -558,19 +578,36 @@ def process_single_cv(
         full_text = "\n".join(all_texts)
 
         # Deduplicação global final (entre páginas)
-        full_text = remove_exact_duplicate_lines(full_text)
+        full_text = preprocess_raw_text(full_text)
         
-        preprocessed_text = preprocess_ocr_for_gliner(full_text)
+        contact_info = extract_contact_info(full_text)
+
+        gliner_input_text = remove_known_contacts_from_text(
+            full_text,
+            emails=contact_info.get("all_emails"),
+            phones=contact_info.get("all_phones"),
+            websites=contact_info.get("all_websites"),
+        )
+
+        preprocessed_text = preprocess_ocr_for_gliner(gliner_input_text)
+
+        # save aggregated GLiNER input text
+        if save_gliner_txt and cv_folder is not None:
+            gliner_text_path = cv_folder / "gliner_input.txt"
+            gliner_text_path.write_text(preprocessed_text, encoding="utf-8")
+
+            if verbose:
+                print(f"     GLiNER preprocessed text saved to: {gliner_text_path}")
+
         debug_path = cv_folder if debug_save_json else None
 
         gliner_df = process_texts_gliner(
-            texts=[preprocessed_text],
+            texts=[{"gliner_text": preprocessed_text,"raw_text": full_text,}],
             model=gliner_model,
             gliner_threshold=gliner_threshold,
             debug_save_json=debug_save_json,
-            debug_output_path=debug_path)
-
-        contact_info = extract_contact_info(full_text)
+            debug_output_path=debug_path,
+        )
 
         result_row = {} if gliner_df.empty else gliner_df.iloc[0].to_dict()
 
@@ -587,7 +624,7 @@ def process_single_cv(
             "all_phones": ", ".join(phones),
 
             "address": _merge_address_priority(address_gliner,address_regex),
-            "experience_years": contact_info.get("experience_years"),
+            "experience_years": result_row.get("experience_years"),
 
             "languages": ", ".join(contact_info.get("languages", [])),
             "languages_details": contact_info.get("languages_details"),

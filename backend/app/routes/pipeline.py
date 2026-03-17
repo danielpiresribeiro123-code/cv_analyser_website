@@ -3,12 +3,13 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 import shutil
 import pandas as pd
-from pydantic import BaseModel
 import numpy as np
 import os
 import zipfile
 import tempfile
 from fastapi import Request
+from typing import Dict
+from pydantic import BaseModel, Field, model_validator
 
 # =========================================================
 # Internal services
@@ -86,11 +87,12 @@ def run_pipeline():
         crop_photo=True,
         crop_skill_table=True,
         save_ocr_txt=True,
+        save_gliner_txt=True,
         analyse_individual_pages=False,
         cv_confidence_threshold=0.3,
         cv_min_detections=5,
-        yolo_confidence=0.25,
-        gliner_threshold=0.3,
+        yolo_confidence=0.10,
+        gliner_threshold=0.15,
         save_csv_single=False,
         gliner_model=get_gliner_model(),
         debug_save_json = True,
@@ -133,6 +135,7 @@ def get_results(request: Request):
             r["download_photo_url"] = None
             r["download_skill_tables_url"] = None
             r["download_gliner_json_url"] = None
+            r["download_gliner_txt_url"] = None
             continue
 
         folder_path = Path(folder)
@@ -179,6 +182,16 @@ def get_results(request: Request):
             f"{base_url}/download-gliner-json?folder={folder}"
             if json_path.exists()
             else None)
+        
+        # GLiNER PREPROCESSED TXT
+        gliner_txt_path = folder_path / "gliner_input.txt"
+
+        r["download_gliner_txt_url"] = (
+            f"{base_url}/download-gliner-txt?folder={folder}"
+            if gliner_txt_path.exists()
+            else None
+        )
+
     return {
         "num_cvs": len(records),
         "results": records,
@@ -350,25 +363,95 @@ def download_gliner_json(folder: str):
     )
 
 # ---------------------------------------------------------
-# Job description and ranking of the results
+# Download GLiNER preprocessed TXT
 # ---------------------------------------------------------
+@router.get("/download-gliner-txt")
+def download_gliner_txt(folder: str):
+    folder_path = Path(folder).resolve()
+
+    # if its really inside OUTPUTS_DIR
+    if not str(folder_path).startswith(str(OUTPUTS_DIR.resolve())):
+        return {"error": "Invalid folder path"}
+
+    txt_path = folder_path / "gliner_input.txt"
+
+    if not txt_path.exists():
+        return {"error": "GLiNER preprocessed text not found"}
+
+    return FileResponse(
+        txt_path,
+        media_type="text/plain",
+        filename="gliner_input.txt",
+    )
+
+# ---------------------------------------------------------
+# Job description, ranking and weights of the results
+# ---------------------------------------------------------
+ALLOWED_WEIGHT_KEYS = {
+    "semantic_raw",
+    "semantic_skills",
+    "exact_skills",
+    "semantic_job_title",
+    "experience_general",
+    "experience_specific",
+    "degree",
+    "language",
+    "document_length",
+    "photo",
+}
+
 class RankingRequest(BaseModel):
     job_description: str
+    weights: Dict[str, float] = Field(default_factory=dict)
 
+    @model_validator(mode="after")
+    def validate_weights(self):
+        if not self.job_description or not self.job_description.strip():
+            raise ValueError("job_description cannot be empty")
+
+        if not self.weights:
+            raise ValueError("weights are required")
+
+        unknown_keys = set(self.weights.keys()) - ALLOWED_WEIGHT_KEYS
+        missing_keys = ALLOWED_WEIGHT_KEYS - set(self.weights.keys())
+
+        if unknown_keys:
+            raise ValueError(f"Unknown weight keys: {sorted(unknown_keys)}")
+
+        if missing_keys:
+            raise ValueError(f"Missing weight keys: {sorted(missing_keys)}")
+
+        for key, value in self.weights.items():
+            if not isinstance(value, (int, float)):
+                raise ValueError(f"Weight '{key}' must be numeric")
+            if value < 0:
+                raise ValueError(f"Weight '{key}' cannot be negative")
+
+        total = sum(float(v) for v in self.weights.values())
+
+        if abs(total - 1.0) > 1e-6:
+            raise ValueError("Weights must sum to 1.0")
+
+        return self
 
 @router.post("/rank-candidates")
 def rank_candidates(request: RankingRequest):
     """
-    Run semantic ranking over processed CVs.
+    Run semantic ranking over processed CVs with custom weights.
     """
 
-    ranking_df = rank_cvs(request.job_description, gliner_model=get_gliner_model())
+    ranking_df = rank_cvs(
+        request.job_description,
+        gliner_model=get_gliner_model(),
+        weights=request.weights,
+    )
 
-    # Converter para JSON-friendly
     ranking_df = ranking_df.replace({np.nan: None})
 
-    return ranking_df.to_dict(orient="records")
-
+    return {
+        "weights_used": request.weights,
+        "results": ranking_df.to_dict(orient="records"),
+    }
 
 # ---------------------------------------------------------
 # Download Ranking CSV

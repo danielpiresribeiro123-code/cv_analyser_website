@@ -19,6 +19,7 @@ export default function App() {
   const [ranking, setRanking] = useState(null)
   const [resetSignal, setResetSignal] = useState(0)
   const [uploadedFilesCount, setUploadedFilesCount] = useState(0)
+  const [rankingWeights, setRankingWeights] = useState(null)
 
   useEffect(() => {
     async function loadExistingResults() {
@@ -47,6 +48,9 @@ export default function App() {
 
       // Trigger reset for child components
       setResetSignal(prev => prev + 1)
+
+      // Reset weights od the ranking
+      setRankingWeights(null)
 
     } catch (err) {
       console.error("Reset failed:", err)
@@ -131,7 +135,10 @@ export default function App() {
         <Card className="w-full max-w-5xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl text-white">
 
           <CardContent className="pt-7 pb-8 px-8">
-            <JobDescriptionBox setRanking={setRanking} />
+            <JobDescriptionBox 
+              setRanking={setRanking}
+              setRankingWeights={setRankingWeights}
+            />
           </CardContent>
         </Card>
       )}
@@ -141,7 +148,7 @@ export default function App() {
         <Card className="w-full max-w-5xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl text-white">
 
           <CardContent className="pt-7 pb-8 px-8">
-            <RankingTable ranking={ranking} />
+            <RankingTable ranking={ranking} weights={rankingWeights} />
           </CardContent>
         </Card>
       )}
