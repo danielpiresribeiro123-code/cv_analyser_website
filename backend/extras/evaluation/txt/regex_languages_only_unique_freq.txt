@@ -1,0 +1,4 @@
+REGEX_LANGUAGE_ENTITIES_ONLY
+============================
+
+English	7

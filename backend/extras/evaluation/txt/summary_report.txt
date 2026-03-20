@@ -1,0 +1,33 @@
+SUMMARY REPORT
+==============
+
+EXECUTION INFO
+--------------
+JSON folder: C:\Users\danie\Downloads\ResumesJsonAnnotated\ResumesJsonAnnotated
+Start index: 1
+End index: 10
+Requested CVs: 10
+Existing files found: 10
+Processed CVs: 10
+Missing files: 0
+GLiNER / regex errors: 0
+
+ENTITY COUNTS
+-------------
+Unique dataset entities: 208
+Total dataset entity occurrences: 313
+Unique GLiNER entities + regex languages: 174
+Total GLiNER entity occurrences + regex languages: 254
+Unique regex language-only entities: 1
+Total regex language-only occurrences: 7
+Matched entity occurrences (including overrides): 249
+Entities only in dataset: 81
+Entities only in GLiNER + regex languages: 5
+
+METRICS
+-------
+Intersection percentage: 78.30%
+Precision: 98.03%
+Recall: 79.55%
+F1 score: 87.83%
+

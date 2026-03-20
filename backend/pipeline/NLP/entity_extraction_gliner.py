@@ -27,9 +27,124 @@ SIMPLE_JOB_TITLES = {
     "actor","singer","producer","web developer","architect","animator", "painter",
     "tutor", "headteacher", "counsellor", "nurse", "doctor", "personal trainer",
     "pharmacist","dentist", "orthodontist", "dietitian", "housekeeper", "porter",
-    "tour guide", "supervisor", "director",
+    "tour guide", "supervisor", "director", "makeup artist","hairstylist","lecturer",
+    "professional staff","engineer","intern","developer","assistant","captain",
+    "analyzer","wardrobe stylist","chairman","accountant","fire fighter","sailor",
+    "co-ordinator","coordinator","orthopaedics","plumber","account assistant",
+    "quality control & testing department","quality control & testing engineer",
+    "quantity survey assistant","computer operator & store department","assistant Engineer",
+    "head of the department","house captain","orthopaedic surgeon","surgeon","technicians",
+    "technician","secretary","site consultants","super admin","super-admin","admin",
+    "referees","Manicurist","assistant manager", "hunter","Hairstylist & Makeup Artist",
 
+    # First 500
+    'Assistant General Manager', 'Business Development Executive', 'Cashier/Accountant', 
+    'Civil Supervisor', 'Document Controller', 'Draughtsman', 'Duct Charge Hand', 'Duct Man', 
+    'Electrical Supervisor', 'Founder', 'Graduate Engineer Trainee', 'HR Assistant', 'HR Executive', 
+    'HSE Officer', 'Instructor', 'Junior Engineer', 'Junior Executive', 'Junior Specialist', 
+    'Logistics/Store Executive', 'Locum Specialist', 'Maintenance Engineer', 'Manager MEP Services', 
+    'Marketing Executive', 'Medical Doctor', 'Medical Officer', 'Medical Representative', 'MEP Head', 
+    'MIS Executive', 'Office Executive', 'Road Surveyor Assistant', 'Site In Charge', 'Store Keeper', 
+    'Technical Coordinator', 'Technical Manager', 'Volunteer Assistant Accountant', 'Worker',
 
+    # 500 - 1000
+    'AC Technician', 'Account & Finance Executive', 'Account Manager', 'Account Officer', 
+    'Accounts Assistant', 'Admin Officer', 'Administration Officer', 'Advocate', 'Aluminium Fabricator', 
+    'Assistant Production Manager', 'Credit Analyst', 'Electrical Design Engineer', 'Field Engineer', 
+    'Field Survey Officer', 'HVAC Technician', 'IT Support Engineer', 'Maintenance Engineer', 'Manager', 
+    'Production Engineer', 'Production Manager', 'Sales Executive', 'Salesman', 'Senior Executive', 
+    'Shift Engineer', 'Site Manager', 'Specialist Intern', 'Store Executive', 'Teaching Assistant', 
+    'Trainee Engineer', 'Transmission Engineer', 'Vice President', 'Web Designer', 'Web Designer & Developer',
+
+    # 1000 - 1500
+    'Account Coordinator', 'Accounts Assistant', 'Administration Assistant', 'Area Sales Manager', 
+    'Article Clerk', 'Assistant Commandant', 'Assistant Lecturer', 'Assistant Manager', 'Assistant Site Engineer', 
+    'Assistant Storekeeper', 'Audit Assistant', 'Auditor', 'Back Office Executive', 'Banking Training Manager', 
+    'BI Consultant', 'Branch Engineer', 'Business Development Executive', 'CAD Draughtsman', 'Civil Engineer', 
+    'Commercial Officer', 'Deputy Manager', 'Duty Manager', 'Electrical Engineer', 'Engineer', 'Field Assistant', 
+    'Financial Manager', 'HSE Officer', 'HVAC Engineer', 'IT Engineer', 'Lecturer', 'Logistics Coordinator', 
+    'Maintenance Engineer', 'Mechanical Engineer', 'Office Assistant', 'Portfolio Manager', 'Production Manager', 
+    'Quality Engineer', 'RF Engineer', 'Sales Assistant', 'Scaffolding Coordinator', 'Scaffolding Specialist', 
+    'Security Officer', 'Shift Engineer', 'Site Engineer', 'Station Manager', 'Store Manager', 'Technical Assistant', 
+    'Technician', 'Telecommunication Engineer', 'Test Manager', 'Testing Engineer', 'Trainee Engineer', 'Web Designer',
+
+    # 1500 - 2000
+    'Accountant', 'Assistant Manager', 'Assistant Site Engineer', 'Cashier', 'Celebrity Makeup Artist', 'Chairman', 
+    'Chief Accountant', 'Chief Engineer', 'Civil Draughtsman', 'Civil Engineer', 'Civil Foreman', 'Civil Quantity Surveyor', 
+    'Civil Site Supervisor', 'Clerk', 'Client Executive', 'Commercial Executive', 'Commissioning Engineer', 'Company Secretary',  
+    'Consultant Engineer', 'Consultant Orthopaedic Surgeon', 'Coordinator', 'Cost Accountant', 'County Administrator', 
+    'Engineer', 'Manager', 'Production Manager', 'Sales Manager', 'Security Officer', 'Site Supervisor', 'Store Manager', 'Technician',
+
+    # 2000 - 2500
+    'Accounts Executive', 'Assistant Instruments Technician', 'Customer Relationship Executive', 'Dean of Students', 'Deputy Finance Manager', 
+    'Deputy Manager', 'Deputy Team Leader', 'Design Consultant', 'Design Engineer', 'Desk Executive', 'Development Manager', 'Diesel Mechanic', 
+    'Diploma Engineer', 'Diploma Engineer Trainee', 'Director', 'Distinguished Professor', 'Document Controller', 'Draftsman', 'Economist', 
+    'Editor in Chief', 'Editorial Board Member', 'Electrical Engineer', 'Electrical Instrument Officer', 'Electrical Supervisor', 'Electrician', 
+    'Emergency Medical Officer', 'Engineer', 'Estimation Engineer', 'Executive', 'Finance Manager', 'Instruments Technician', 'Manager', 
+    'Orthopedic Surgeon', 'Piping Stress Engineer', 'Production Manager', 'Professor', 'Relation Ship Manager', 'Secretary', 'Service Engineer', 
+    'Shift In-Charge', 'Site Engineer', 'Supervisor', 'Teaching Assistant', 'Technician', 'Team Leader',
+
+    # 2500 - 3000
+    'Entrepreneur', 'Enumerator', 'Engineer Trainee', 'Engineering Consultant', 'Executive Secretary', 'Excise Clerk', 'Exercise Grader', 
+    'Facility Executive', 'Factory Manager', 'Faculty Member', 'Finance Executive', 'Fire and Security Officer', 'Fitter', 'Foreman', 
+    'Foundation Doctor', 'Fund Administrator', 'General Accountant', 'General Manager', 'General Practitioner', 
+    'Global Lead Knowledge Manager', 'Glims Administrator',
+
+    # 3000 - 3500
+    'Government Apprentice Trainee', 'Graduate Engineer', 'Guest Relation Officer', 'HSE Officer', 'Hair Stylist', 'Hand Surgeon', 
+    'Head of Department', 'Head Lecturer', 'Helpdesk Consultant', 'Helper Electrical', 'Housekeeping Team Leader', 'HR Manager', 'HR Officer', 
+    'HR Recruiter', 'HR Trainee', 'HVAC Consultant', 'HVAC Professional', 'Incident Controller', 'Industrial Trainee', 'Installation Technician', 
+    'Instrument Technician', 'Instructor', 'Intern Trainee', 'Junior Electrical Engineer', 'Logistics Coordinator', 'Manager', 'Medical Practitioner', 
+    'Orthopedic Surgeon', 'Receptionist', 'Security Officer', 'Site Engineer', 'Supervisor', 'Technician', 'Team Leader',
+
+    # 3500 - 4000
+    'IT Consultant', 'IT Executive', 'IT Secretary', 'Junior Accountant', 'Junior Web Developer', 'Junior Maintenance Engineer', 'Junior Production Executive', 
+    'Junior Consultant', 'Lab Instructor', 'Lathe Machine Operator', 'Legal Intern', 'Logistics Coordinator', 'Logistics Assistant', 'Maintenance Engineer', 
+    'Maintenance Manager', 'Maintenance Technician', 'Manager', 'Marketing Manager', 'NDT Technician', 'Officer', 'Orthopaedic Surgeon', 'Registrar', 
+    'Service Engineer', 'Site Engineer', 'Specialist Registrar', 'Technician',
+
+    # 4000 - 4500
+    'Major Trauma Consultant', 'Course Coordinator', 'Make Up Artist', 'Makeup Artist & Hairstylist', 'Makeup Intern', 'Management Trainee', 'Manager', 
+    'Safety Officer', 'Marketing Manager', 'Mechanical Foreman', 'Mechanical Technician', 'Media Group Leader', 'Medical Officer', 'Mens Groomer', 
+    'MEP Designer Engineer', 'Meter Reader', 'Middle Level Executive', 'Mobile Sales Manager', 'Module Leader', 'Lecturer', 'Motivational Speaker', 
+    'Trainee Engineer', 'Piping Stress Engineer', 'Junior Engineer', 'Maintenance Engineer', 'Environment Engineer', 'Warehouse Assistant', 'NDT Technician', 
+    'QC Technician', 'Neurosurgeon',
+
+    # 4500 - 5000
+    'Office Assistant', 'Office Coordinator', 'Safety Officer', 'IT Consultant', 'IT Executive', 'IT Secretary', 'Onsite/Offshore Coordinator', 
+    'Orthopaedic Surgeon', 'Orthopedic Consultant', 'Orthopedic Surgery Registrar', 'Personal Assistant', 'Personal Accountant', 'Piping Design Engineer', 
+    'Piping Designer', 'Planning Engineer', 'Plant Manager', 'Plastic Surgeon', 'Restaurant Manager', 'Sales Retail Executive', 'Site Engineer', 'Store Officer', 
+    'Supervisor', 'Technician', 'Testing Engineer', 'Medical Officer', 'Executive Engineer', 'Cashier', 'Consultant',
+
+    # 5000 - 5500
+    'Presales Engineer', 'President', 'Production Engineer', 'Production Supervisor', 'Procurement Executive', 'Process Developer', 'Programmer', 'Project Engineer', 
+    'QA/QC Engineer', 'QC Inspector', 'Quality Engineer', 'Quality Executive', 'Quality Head', 'Quantity Surveyor', 'Radio Officer', 'Regional Manager', 'Registrar', 
+    'Relationship Manager', 'Repair Technician', 'Report Writer', 'Resident Engineer', 'Resident Registrar', 'Residential Medical Officer', 'Restaurant Cashier', 
+    'Retail Banking Officer', 'Reviewer',
+
+    # 5500 - 6000
+    'Rig Mechanic', 'Safety Engineer', 'Sales Consultant', 'Sales Representative', 'Scaffolder', 'Scaffolding Foreman', 'Scaffolding Inspector', 'Security Executive', 
+    'Security Officer', 'Senior Consultant', 'Senior Design Engineer', 'Senior Medical Officer', 'Senior Piping Designer', 'Senior Safety Officer', 
+    'Senior Scaffolding Supervisor', 'Senior Site Engineer', 'Service Engineer', 'Shift In-Charge', 'Site Electrical Engineer', 'Site Engineer', 'Site Inspector', 
+    'Site Supervisor', 'Site Technician', 'Software Developer', 'Software Tester', 'Solar Energy Installer', 'Solar Thermal Energy Engineer', 'Specialist Registrar', 
+    'Specialty Doctor', 'Spine Surgeon', 'Store Keeper', 'Supervisor', 'Technician',
+
+    # 6000 - 6500
+    'Sr. General Manager', 'Sr. HR Executive', 'Sr. Production Manager', 'Sr. Telecom Technician', 'Staff Neurosurgeon', 'Store Assistant', 'Store Incharge', 
+    'Store Manager', 'Store Officer', 'Store Supervisor', 'Structure Consultant', 'Sub Investigator', 'Summer Trainee', 'Supervisor', 'Support Engineer', 
+    'Support Executive', 'System Integrator', 'Tax Department Intern', 'Table Instructor', 'Tactical Security Officer', 'TBM Manager', 'Team Head', 'Team Lead', 
+    'Technical Assistant', 'Technical Support Coordinator', 'Technical Voice Support', 'Technical Writer', 'Technician', 'Telecaller', 'Telecom Technician', 
+    'Test Engineer', 'Testing & Commissioning Engineer', 'Testing Engineer', 'QA/QC Manager', 'Quality Control Specialist', 'Commercial Officer', 'Construction Manager', 
+    'HSE Manager', 'General Manager', 'Plant Engineer', 'Lab Technician', 'Site Manager',
+
+    # 6500 - 7000
+    'Tower Officer', 'Tower Officer Supervisor', 'Trainee Engineer', 'Trainee Sonographer', 'Training Coordinator', 'Training Manager', 'Service Engineer', 
+    'Estimation Engineer', 'Accounts Assistant', 'Teaching Assistant', 'VA Developer', 'Vice-President', 'Visiting Consultant', 'Visiting Faculty', 
+    'Voluntary Medical Officer', 'Warehouse Assistant Supervisor', 'Welder', 'Administrative Assistant', 'Audit Assistant', 'Civil Engineer', 'Engineer', 
+    'HVAC Engineer', 'Junior Engineer', 'Locum Specialist', 'Medical Officer', 'Office Assistant', 'Quality Engineer', 'Relationship Manager', 'Shift Engineer', 
+    'Site Manager', 'Branch Manager', 'Mechanical Engineer', 'MEP Engineer', 'Room Technician', 'Sales Manager', 'Document Controller', 'Sales Executive', 
+    'Workshop In Charge', 'Yard Manager', 'Manager',
+    
     # PT
     "professor", "professora", "gestor", "gerente", "analista", "engenheiro",
     "engenheira", "desenvolvedor", "desenvolvedora", "consultor", "consultora",
@@ -185,17 +300,398 @@ DEGREE_NORMALIZATION_MAP = {
 }
 
 SOFTWARE_AS_SKILL = {
-    "canva",
-    "solidworks",
-    "microsoft",
-    "excel",
-    "word",
-    "powerpoint",
-    "blender",
-    "spyder",
-    "vscode",
-    "visual studio code",
-    "davinci resolve"}
+    # Productivity / Office
+    "microsoft office", "office", "microsoft", "ms office", 
+    "excel", "word", "powerpoint", "outlook", "onenote",
+    "google docs", "google sheets", "google slides", "google drive",
+    "libreoffice", "wps office", "ms-paint","ms paint",
+    "ms excel", "ms word", "ms powerpoint", "ms outlook", "ms onenote",
+
+    # Operating systems / basic tools
+    "windows", "window", "win7", "winxp", "win10", "win11",
+    "linux", "ubuntu", "debian", "fedora", "centos", "red hat",
+    "macos","windows 8","windows 9","windows 10","windows 11","windows 7","windows XP",
+    "windows8","windows9","windows10","windows11","windows7","windowsXP",
+    "window8","window9","window10","window11","window7","windowXP",
+    "window 8","window 9","window 10","window 11","window 7","window XP",
+    "winrar", "win-rar", "7zip", "7-zip",
+
+    # Design / CAD / 3D
+    "autocad", "auto cad","solidworks","solid works","catia", "revit", "sketchup", "fusion 360",
+    "blender", "3ds max", "maya", "cinema 4d", "rhino", "rhinoceros",
+    "inventor", "archicad", "microstation", "nozzle pro", "nozzlepro", 
+
+    # Graphic design / UI / video
+    "canva", "figma", "adobe xd",
+    "photoshop", "adobe photoshop",
+    "illustrator", "adobe illustrator",
+    "indesign", "adobe indesign", "photo shop",
+    "premiere pro", "adobe premiere pro",
+    "after effects", "adobe after effects",
+    "lightroom", "adobe lightroom",
+    "davinci resolve", "final cut pro", "capcut",
+
+    # Development environments / editors
+    "vscode", "visual studio code", "visual studio",
+    "pycharm", "intellij", "intellij idea",
+    "eclipse", "netbeans", "codeblocks", "code::blocks",
+    "android studio", "xcode", "spyder", "jupyter", "jupyter notebook",
+    "notepad++", "sublime text",
+
+    # Version control / Dev tools
+    "git", "github", "gitlab", "bitbucket",
+    "docker", "kubernetes", "jenkins", "ansible", "terraform",
+    "postman", "swagger",
+
+    # Databases / data tools
+    "mysql", "postgresql", "postgres", "sql server", "mssql",
+    "oracle", "sqlite", "mongodb", "access", "microsoft access",
+    "power bi", "tableau", "qlik", "qlikview", "looker",
+    "sas", "spss", "stata", "minitab", "matlab",
+
+    # Accounting / ERP / business software
+    "sap erp", "sap hana","sap",
+    "oracle erp", "odoo", "primavera", "sage", "tally",
+    "crm", "erp", "salesforce", "hubspot",
+
+    # Engineering / scientific
+    "ansys", "comsol", "labview", "simulink", "originlab",
+    "etabs", "robot structural analysis",
+
+    # Project / collaboration tools
+    "jira", "confluence", "trello", "asana", "notion",
+    "slack", "microsoft teams", "teams", "zoom",
+
+    # Web / CMS / marketing
+    "wordpress", "shopify", "woocommerce",
+    "google analytics", "meta business suite",
+
+    # GIS / mapping
+    "arcgis", "qgis",
+
+    # Cybersecurity / networking
+    "wireshark", "cisco packet tracer", "packet tracer", "nmap", "xampp",
+    
+    
+    # extra software / technical tools
+    "arduino",
+    "navis works",
+    "navisworks",
+    "psim",
+    "pv-elite",
+    "pv elite",
+    "caesar ii",
+    "caesar-ii",
+    "caesar ii piping stress analysis",
+    "tally 9.0",
+    "tally erp 9",
+    "ms-office",
+    "ms office",}
+
+PROGRAMMING_LIBRARIES = {
+    # ----------------------
+    # Programming Languages
+    # ----------------------
+    # Core / general purpose
+    "java", "python", "c", "c#", "c++", "rust", "assembly",
+
+    # Web
+    "javascript", "typescript", "html", "css", "sass", "scss",
+
+    # Backend / enterprise
+    "golang", "kotlin", "scala", "groovy",
+
+    # .NET
+    "vb.net", "f#", ".net",
+
+    # Scripting
+    "bash", "shell", "powershell", "perl",
+
+    # Data / scientific
+    "matlab", "octave", "julia",
+
+    # Mobile
+    "dart", "objective-c", "swift",
+
+    # Functional
+    "haskell", "ocaml", "erlang", "elixir", "clojure",
+
+    # Legacy / others
+    "fortran", "cobol", "pascal", "ada",
+
+    # Game dev / niche
+    "gdscript", "haxe",
+
+    # Hardware / low-level
+    "verilog", "vhdl",
+
+    # Query / data languages
+    "sql", "pl/sql", "t-sql","sql ",
+
+    # NoSQL / query-like
+    "cypher", "graphql",
+
+    # Common misspellings / variants
+    "pyhton", "javscript", "c plus plus", "c sharp",
+    # ---------------------
+    # Python - Data Science / ML
+    # ---------------------
+    "numpy", "pandas", "scipy", "matplotlib", "seaborn",
+    "scikit-learn", "sklearn",
+    "statsmodels",
+    "xgboost", "lightgbm", "catboost",
+    "tensorflow", "keras", "pytorch", "torch",
+    "fastai","plotly", "bokeh","streamlit",
+
+    # ---------------------
+    # Python - Backend / APIs
+    # ---------------------
+    "django", "flask", "fastapi",
+    "sqlalchemy", "alembic",
+    "pydantic",
+
+    # ---------------------
+    # Python - Utils
+    # ---------------------
+    "beautifulsoup", "beautifulsoup4", "bs4",
+    "pytest","celery", "beautiful soup",
+
+    # ---------------------
+    # JavaScript / Frontend
+    # ---------------------
+    "react.js", "reactjs",
+    "vue", "vue.js", "vuejs",
+    "angular", "angularjs",
+    "svelte",
+    "next.js", "nextjs",
+    "nuxt.js", "nuxtjs",
+
+    # UI frameworks
+    "bootstrap", "tailwind", "tailwindcss",
+    "material-ui",
+    "chakra-ui",
+
+    # ---------------------
+    # JavaScript / Backend
+    # ---------------------
+    "node.js", "nodejs",
+    "express.js",
+    "nestjs",
+    "socket.io",
+
+    # ---------------------
+    # Java / JVM
+    # ---------------------
+    "spring boot", "springboot",
+    "hibernate",
+
+    # ---------------------
+    # .NET
+    # ---------------------
+    ".net", "asp.net", "aspnet",
+    "entity framework", "ef core",
+
+    # ---------------------
+    # PHP
+    # ---------------------
+    "laravel", "symfony", "codeigniter",
+
+    # ---------------------
+    # Ruby
+    # ---------------------
+    "ruby on rails", "rails",
+
+    # ---------------------
+    # Databases / ORMs / connectors
+    # ---------------------
+    "mysql connector", "mysql-connector", "mysqlextra",
+    "psycopg2",
+    "sqlite3",
+    "mongodb driver", "mongoose",
+    "redis",
+
+    # ---------------------
+    # Data engineering
+    # ---------------------
+    "pyspark", 
+    "airflow",
+
+    # ---------------------
+    # Testing
+    # ---------------------
+    "jest", "mocha", "chai",
+    "junit",
+    "selenium",
+
+    # ---------------------
+    # Misc / common libs
+    # ---------------------
+    "lodash",
+    "axios",
+    "moment.js", "moment",
+    "three.js", "d3.js", "chart.js",
+    
+    
+    # engineering / technical concepts
+    "deep learning", "CNN", "NLP", "deeplearning", "machinelearning",
+    "machine learning","computer science",
+    "fault tree analysis",
+    "harmonic analysis",
+    }
+
+GENERAL_SKILLS ={
+    # engineering / technical concepts
+    "short circuit","voltage drop calculation","microprocessor based relay","numerical relay","circuit breaker","circuit breaker panel board","welding","dc welding","brazing",
+    "fabricator","method statement","preliminary stress analysis","soil testing","initial final testing","concrete consistence test","road levelling",
+    "pipe line","pipeline","reinforcement","foundation","shuttering","floor finishing","finishing work","plate rolling","marketing","finance","networking","driving license",
+    "flexible", "Fixing", "excellent communication","organize", "supervising","games","sciences","reliability",
+    
+    # specific useful skills / methodologies
+    "8d approach","6sigma","5s activities",
+    "cpk","poka yoke technique",
+
+    # usual adjectifs
+    "poka yoke","poka-yoke","poka -yoke", "poka-yoke", "creative",
+    "confident","positive thinking","responsible","sincere","good listener","hard worker","risk assessment","site execution","team worker",
+    "disciplined","net surfing","ambitious","fire fighting","firefighting","co-ordination","conduiting","confident and determined",
+    "coordination","confident", "determined","IT proficiency","team member","leader","good leader","team leader",
+    "internet browsing","arthroplasty","loop checking","suggestive selling","plastering","maintenance team","active listener","lathe",
+    "leadership quality","handling quick books", "making friends", "self-confident","multi-tasking","machine maintenance","manage",
+    "keen observer","server side technologies", "IT forte","duct sizing", "thermal testing", "Electrical internal & External Electrification",
+    "TRT testing","driving","good communication","honest","artistic","banking","brand maintenance","teaching","housing","respect","availability",
+    "team leader","coordinate","smart","drive","friendly","carrying","tenure","filling","dedicated","positive attitude","power distribution",
+    "efficient","motivated","learner","trading","positive attitude","preventive","preventive & maintenance","critical thinker","cross-team","department head",
+    "civil helper","civil maintenance","breakdown maintenance","supervise","analyze",
+
+    # First 500
+    'account reconciliation', 'accounts receivable', 'AutoCAD', 'AVR Studio', 'BMS interface', 'bookkeeping', 'C', 'C++', 'cash book', 'close loop checking', 
+    'CMD software', 'CNC', 'confined space entry', 'CoralDRAW', 'Coral Video Studio', 'design & layout', 'detailed estimation', 'DGPS', 'drafting software', 
+    'earth resistance testing', 'electrical panel maintenance', 'erection & commissioning', 'fire prevention & fire fighting', 'First Aid', 'fixed assets', 
+    'front end', 'function test', 'GD&T', 'H2S awareness', 'hazard identification', 'heat load calculation', 'high pot testing', 'HV testing', 'hydro testing', 
+    'Induction Motors', 'insulation resistance test', 'isometric drawing', 'JSA', 'keyword optimization', 'lighting layout', 'Load Runner', 'lumen testing',
+    'maintenance', 'manpower planning', 'manual handling', 'microcontroller', 'microprocessor', 'Microsoft Office', 'operation & maintenance', 
+    'open loop checking', 'password management', 'permit to work system', 'site supervision', 'testing', 'tool box talk', 'web/WWW', 'Win XP', 
+    'Win8', 'WordPress plugin', 'working at height', 'Xilinx',
+
+
+
+    # 500 - 1000
+    'PFD', 'PH meter', 'pressure gauge', 'pressure testing', 'pressure transmitter', 'Pro/E', 'ProE 2000i', 'pump head calculation', 'PVSyst', 'R software', 
+    'relays', 'Sand test', 'scaffold safety', 'scaffolding', 'smoke testing', 'SMTP', 'specific gravity', 'STAAD Pro', 'star delta', 'stock ledger', 
+    'subdivision distribution board', 'super tension cable', 'Tally', 'Tally ERP', 'TeamViewer', 'telephone systems', 'testing & commissioning', 'total station', 
+    'transmission & distribution', 'ultrasonic testing', 'web design', 'Windows', 'WinCC', 'working at height', '2D drawing', '3-phase power systems', '5S', '7QC tools', 
+    'Arc welding', '8051 microcontroller', 'AutoCAD', 'CAD tools', 'cash flow analysis', 'CCTV/IP camera setup', 'control systems', 'electrical design', 'estimation', 
+    'HVAC systems', 'inspection', 'instrumentation', 'maintenance', 'mechanical work', 'microcontroller', 'panel modifications', 'preventive maintenance', 
+    'quality control', 'scaffolding safety', 'testing', 'valves', 'welding',
+
+
+    # 1000 - 1500
+    'ARPA', 'artificial intelligence', 'asset management', 'audit', 'AutoCAD', 'AutoCAD 2D', 'AutoPLANT', 'AviCAD', 'AWG', 'AWT', 'balance sheet', 'bank reconciliation', 
+    'bar bending schedule', 'Barracuda firewall', 'basic firefighting', 'BMS', 'BMS & HVAC basics', 'board testing', 'bookkeeping', 'books of accounts', 'boundary survey', 
+    'breakdown maintenance', 'bug tracking', 'Bugzilla', 'building construction', 'building wiring', 'business analysis', 'business development', 'C', 'C++', 'CAD', 
+    'CADWorx', 'CAE software', 'Caesar II', 'calculation', 'cable laying', 'cable sizing', 'cable testing', 'CAD drafting', 'cash flow analysis', 'CCTV', 'control systems', 
+    'CPR', 'CRM', 'data analysis', 'electrical engineering', 'estimation', 'firefighting', 'HVAC', 'inspection', 'instrumentation', 'IT systems', 'maintenance', 
+    'mechanical engineering', 'PLC', 'SCADA', 'testing', 'welding',
+
+    # 1500 - 2000
+    'Capacitance measurement', 'capital asset identification', 'carbon dioxide detection', 'card testing', 'cardio pulmonary rehabilitation', 'cash book', 'cash handling', 
+    'CATIA V5', 'CB sizing calculation', 'centrifugal pumps', 'centroid calculation', 'change management', 'checkpoint firewalls', 'circuit design', 'circuit theory', 
+    'Citect SCADA', 'civil drafting', 'civil engineering', 'claim processing', 'client billing', 'client handling', 'CNC machines', 'CNC programming', 'cold calling', 
+    'collection of payments', 'commercial evaluation', 'commissioning', 'communication skills', 'component testing', 'compressor maintenance', 'computer literacy', 
+    'concrete batching', 'concrete casting', 'concrete mix design', 'conductivity measurement', 'confined space entry', 'construction management', 'construction quality management', 
+    'control systems', 'control panels', 'control circuits', 'control logix', 'coordination', 'corporate finance', 'cost accounting', 'cost control', 'cost reduction', 'CPR', 
+    'credit appraisal', 'credit control', 'Creo/Pro-E', 'crimping', 'critical task analysis',
+
+    # 2000 - 2500
+    'cross cut adhesion testing', 'cross selling', 'CRUD', 'cryptanalysis', 'CT analyzer', 'CT/PT sizing', 'current transformer sizing', 'Curve Tracer', 
+    'customer relationship management', 'Cyberoam firewall', 'Cygwin', 'data validation', 'DC sheath test', 'DC winding resistance', 'DCS FAT', 'debridement', 
+    'debtors & creditors', 'design & development', 'design drafting', 'detailed drawings', 'develop test cases', 'device net', 'dew point measurement', 
+    'DG set maintenance', 'DG sizing calculation', 'DGPS operations', 'diagnosing faults', 'DIALux', 'digital marketing', 'direct torque control', 'disaster management', 
+    'dispatch management', 'distribution planning', 'document control', 'documentation', 'DOL starter', 'Dropbox', 'DSP', 'DTMF decoder', 'duct design', 'duct leak test', 
+    'dumpy level', 'e-commerce', 'e-mail', 'E-plan', 'e-recruitment', 'E-survey', 'Eagle Layout Editor', 'earth resistance testing', 'earthworks', 'earthquake resistant design', 
+    'ECAD', 'EBITDA', 'EHS awareness', 'electrical control circuits', 'electrical distribution', 'electrical installation', 'electrical load calculation', 'electrical maintenance', 
+    'electrical systems maintenance', 'electromagnetism', 'electronics design', 'embedded C', 'embedded systems', 'emergency management',
+
+    # 2500 - 3000
+    'emulation', 'cryptography', 'energy management', 'EPABX systems', 'equipment layout', 'equipment selection', 'erection & commissioning', 'ERP modules', 
+    'error handling', 'Ethernet IP', 'ETL', 'evacuation planning', 'excavation', 'Excel', 'Exchange Server', 'export/import', 'extraction & reporting', 'fabrication', 
+    'fault current analysis', 'FAT analysis', 'FCAW welding', 'feedback loops', 'feeder maintenance', 'field calibration', 'field instrumentation', 'FileZilla', 
+    'filter press operation', 'finalization of accounts', 'financial analysis', 'fire detection systems', 'fire fighting design', 'fire prevention', 'firewall', 
+    'firmware upgrade', 'first aid', 'fishbone analysis', 'fixed asset management', 'flow measurement', 'Fluke instruments', 'foundation work', 'front office management', 
+    'functionality testing', 'fund flow analysis', 'gas cutting', 'gas welding', 'gate valves', 'GD&T', 'general ledger', 'generating leads', 'geotechnical analysis', 
+    'GMAW welding', 'GNU', 'Google Maps', 'gloss measurement',
+
+    # 3000 - 3500
+    'AutoCAD', 'PlanSwift', 'GRN (Goods Receipt Note)', 'graphic software', 'grouting', 'GSM', 'GST', 'heat load calculation', 'heat transfer', 'heat treatment', 
+    'hardness testing', 'hardware testing', 'hash tables', 'hazard management', 'HAZOP', 'HAP software', 'HVAC load calculation', 'HVAC systems', 'handset repair', 
+    'HMI (human machine interface)', 'humidity measurement', 'hydraulic systems', 'pneumatic systems', 'hydro testing', 'HPLC', 'HR management', 'HSE management', 
+    'HTML/HTTPS', 'hypercard', 'IBS testing', 'ICT support', 'identifying hazards', 'impact testing', 'import/export', 'incident management', 'incoming inspection', 
+    'industrial maintenance', 'inergen systems', 'information systems', 'inspection', 'installation & commissioning', 'instrumentation', 'insulation resistance testing', 
+    'integrated management systems', 'interpersonal skills', 'inventory control', 'in-process quality control', 'innovation', 'process improvement',
+
+    # 3500 - 4000
+    'international marketing', 'internet concepts', 'internet programming', 'inventory management', 'inverter systems', 'iptables', 'IPTV', 'isometric drawing', 
+    'IT desktop support', 'IT maintenance', 'ITIL', 'Jasper Reports', 'JQuery Mobile', 'k-means clustering', 'Kaizen', 'Karl Fischer titration', 'Key Account Management', 
+    'KNX systems', 'LAN networking', 'land surveying', 'lathe operations', 'layout design', 'leak testing', 'lean methodology', 'ledger management', 'legal documentation', 
+    'letter of credit', 'level transmitter', 'lighting load calculation', 'liquid penetrant testing', 'load calculation', 'lockout tagout (LOTO)', 'logistics management', 
+    'loop checking', 'lubrication systems', 'lux calculation', 'magnetic particle testing', 'mail server management', 'maintenance & troubleshooting', 'maintenance management', 
+    'MIS reporting', 'motor maintenance', 'machine handling', 'machine maintenance',
+
+    # 4000 - 4500
+    'audit', 'makefile', 'MAMP', 'management accounting', 'management information systems', 'manual testing', 'MapInfo', 'market analysis', 'material handling', 'material planning', 
+    'material take-off', 'Mathematica', 'Maximo', 'McQuay DuctSizer', 'mechanical design', 'MEP design', 'Mercury Quality Centre', 'Metasys', 'meter testing', 'microgrid', 
+    'MicroStation', 'microbial testing', 'microcontroller 8051', 'microcontroller AT89C51', 'MicroLogix', 'microprocessor 8085', 'MIG welding', 'TIG welding', 'MikroTik', 
+    'MIS audits', 'mixing and fluid testing', 'ModelSim', 'module testing', 'monitoring and inspection', 'MPLAB IDE', 'MPPT controller', 'MS Office', 'MS PowerPoint', 
+    'MS Publisher', 'MS-DOS', 'VLOOKUP', 'MTBF', 'MTTR', 'multimedia systems', 'multivariable statistics', 'MVC', 'Myrinet', 'numerical relay testing', 'Navicat', 'Navisworks', 
+    'NDT', 'network systems', 'NGT/NGR sizing', 'nitration', 'NNTP', 'non-destructive testing', 'normal and emergency lighting', 'motor maintenance', 'maintenance & repair', 
+    'maintenance troubleshooting', 'maintenance planning', 'cash handling', 'ledger scrutiny', 'invoice processing', 'banking operations', 'record keeping', 'safety management', 
+    'HSE management', 'site monitoring', 'installation & commissioning', 'inspection', 'mechanical works', 'electrical maintenance', 'cable laying', 'lubrication',
+
+    # 4500 - 5000
+    'Novec 1230 systems', 'numerical analysis', 'object oriented programming', 'object repository', 'object spy', 'OFC checking', 'OHSAS', 'oil handling', 'oil in water analysis', 
+    'Omron HMI', 'OpenNMS', 'operating systems', 'operation & maintenance', 'Oracle 10g', 'Oracle 11g', 'OrCAD', 'order to cash', 'osCommerce', 'Outlook Express', 'overhead tank sizing', 
+    'P&ID', 'P&ID mark-up', 'package AC systems', 'palletizing', 'Pareto analysis', 'particle count testing', 'password cracking', 'payroll management', 'PCB design', 'PCC & MCC panels', 
+    'PCS7', 'PDF tools', 'Peachtree accounting', 'penetrant testing', 'pencil hardness testing', 'performance analysis', 'period close analysis', 'petroleum exploration', 'PF Sense firewall', 
+    'phase sequencer', 'physical metallurgy', 'physiotherapy techniques', 'PIC microcontrollers', 'PID isometric drawings', 'pile foundation design', 'piping design', 'piping layout', 
+    'pivot tables', 'planning & scheduling', 'plant downtime calculation', 'plasma cutting', 'plastering', 'PLC programming', 'plot plans', 'plumbing systems', 'point of sale (POS)', 
+    'poka-yoke', 'polymer synthesis', 'POP3', 'poster design', 'postoperative pain management', 'power electronics', 'power plant management', 'power transmission',
+
+    # 5000 - 5500
+    'PPAP', 'PPC scheduling', 'practical accounting', 'pre-weld inspection', 'precast concrete', 'predictive maintenance', 'preventive maintenance', 'BOQ preparation', 
+    'tender preparation', 'bill preparation', 'as-built drawings', 'bar bending schedules', 'Primavera P6', 'Pro/E', 'problem solving', 'process planning', 'process safety', 
+    'process control', 'invoice processing', 'procurement', 'production planning', 'production management', 'quality control', 'quality assurance', 'quality systems', 'Profibus', 
+    'profit & loss accounting', 'programming', 'proofreading', 'prototype development', 'Proteus', 'PScad', 'psychrometric chart', 'pump head calculation', 'PV Elite', 'PV systems', 
+    'QC inspection', 'QA/QC', 'quantity surveying', 'QuickBooks', 'quotation management', 'radiographic testing', 'rainwater harvesting', 'RCCB', 'rebar fixing', 'reconciliation of accounts', 
+    'recruitment', 'reinforcement checking', 'relationship management', 'Relux lighting software', 'repair & maintenance', 'report writing', 'research', 'resource management', 'risk management', 
+    'root cause analysis', 'reading blueprints',
+
+    # 5500 - 6000
+    'risk assessment', 'rigging operations', 'rigging safety', 'rock testing', 'RSLogix', 'RSView32', 'rsync', 'RTOS', 'RTGS', 'safety management', 'sales planning', 'sales & marketing', 
+    'sample preparation', 'sanity testing', 'SAP BI', 'SAP FI', 'SCADA', 'scaffolding', 'scaffolding safety', 'schedule preparation', 'scheme checking', 'Scilab', 'scope meter', 'screening candidates', 
+    'scrutiny', 'sealing work', 'seaming machines', 'secondary surveys', 'selection & power calculation', 'self compacting concrete', 'selling techniques', 'server 2008', 'service & maintenance', 
+    'sewage treatment plant', 'Sewercad', 'sheet piling', 'sheet metal fitting', 'shift planning', 'short circuit calculation', 'shutdown planning', 'Silverlight', 'site evaluation', 'site execution', 
+    'site inspection', 'site mobilization', 'SketchUp', 'slab checking', 'sling psychrometer', 'slitting', 'smart grid', 'smart meters', 'SmartPlant 3D', 'SmartPlant P&ID', 'SMAW welding', 'SMPS', 'SMT', 
+    'software development', 'software testing', 'software testing life cycle', 'soil impact test', 'solar energy', 'solar panel installation', 'solar thermal design', 'SolidWorks', 'Solid Edge', 
+    'SonicWall firewall', 'SOP records', 'spatial indexing', 'speed control', 'spectrophotometer', 'spin coating', 'spinal surgery techniques', 'spot welding', 'spray nozzle systems', 
+    'sprint burndown charts', 'statistical quality control', 'SQC methods',
+
+    # 6000 - 6500
+    'SRAM', 'SRS', 'STAAD Pro', 'stabilization of patients', 'stage-wise testing', 'stakeout method', 'stamp concrete', 'star-delta starter', 'static pressure calculation', 'static regain method', 
+    'statutory audit', 'statutory reporting', 'steam blowing', 'steam turbine', 'steel erection', 'steel fixing', 'steganography', 'stock audit', 'stock management', 'stock taking', 
+    'stress analysis software', 'structural modelling', 'student supervision', 'Studio 5000', 'subnetting', 'SunOS', 'supervision & control', 'supplier quality management', 'surface preparation', 
+    'survey software', 'symmetric key cryptography', 'Systat', 'system integration', 'system testing', 'Tally ERP', 'team building', 'technical evaluation', 'technical support', 'telecalling', 
+    'telecom systems handling', 'Telerik', 'temperature transmitter', 'temperature & RH testing', 'TEMS', 'tendon suturing', 'tensile testing', 'testing & commissioning', 'earth resistance testing', 
+    'thermocouple', 'RTD', 'thermodynamics', 'thermal cycling', 'three-phase induction motor starter', 'theory of machines', 'tool box talks', 'topographic survey', 'torque testing', 
+    'total quality management', 'total station', 'total sulfur analyzer',
+
+    # 6500 - 7000
+    'TIA Portal / Totally Integrated Automation', 'tower crane erection', 'tower erection', 'tower maintenance', 'traceability matrix', 'traffic safety', 'first aid', 'training coordination', 
+    'training needs analysis', 'transformer sizing', 'transmission systems', 'traverse survey', 'trend and variance analysis', 'Trend Micro Antivirus', 'trial balance', 'troubleshooting', 
+    'ultrasonic testing', 'UG NX', 'Unigraphics NX', 'unit testing', 'UPS systems', 'utility and plant maintenance', 'V-Ray', 'valve systems', 'variance analysis', 'vector network analysis', 
+    'vendor management', 'VFD', 'visual and dimensional inspection', 'Visual Basic', 'Visual Studio', 'VLSI', 'VNC', 'voltage drop calculation', 'voltage regulation', 'VRML', 'VRF/VRV systems', 
+    'WAMP', 'WAN', 'waste management', 'effluent management', 'waterproofing', 'WaterCAD', 'WBS planning', 'web testing', 'website testing', 'welding', 'cutting', 'well testing', 'white box testing', 
+    'Wi-Fi / radio systems', 'WinBox', 'WinRAR', 'WinSCP', 'wire bonding', 'witness pressure testing', 'WMM checking', 'workshop management', 'WPS', 'WSUS', 'Xcode', 'Xilinx ISE', 'yield calculation', 'YOLO CNN',
+}
 
 ENTITY_GROUPS = {
     "skills": SKILL_LABELS,
@@ -227,13 +723,444 @@ ACADEMIC_KEYWORDS = {
 
 INVALID_ENTITIES = {
     "person_name": {
-        "person", "certificate","last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "academic background","academic","background","education", "experience", "hobbies"},
+        "person","personal","personal data","my responsibility","smoking","no smoking","role","designation","good","well","bad","real","job description","job prospectus","fast","hand","gay","certificate","last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "academic background","academic","background","education", "experience", "hobbies"},
     "job_title": {
-        "person","first name", "certificate","last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "academic background", "background","education", "experience", "hobbies", "kangaroo"},
+        "person","personal","personal data","my responsibility","smoking","no smoking","head","cool","intermediate","basic","high","advanced","role","designation","good","well","bad","real","job description","job prospectus","fast","hand","gay","first name", "certificate","last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "academic background", "background","education", "experience", "hobbies", "kangaroo",
+        "Area of interest",
+        "vista",
+        "career",
+        "Technical Qualification",
+        "civil",
+        "dir",
+        "Job Responsibilities",
+        "Married",
+        "challenging position",
+        "Executive",
+        "Trainee",
+        "abilities",
+        "cricket",
+        "Listening music",
+        "QTP",
+        "Basics",
+        "e-mail",
+        "potential",
+        "accounts",
+        "BOQ",
+        "Areas of Interest",
+        "DWG",
+        "Listening to music",
+        "craft persons",
+        "job satisfaction",
+        "laborers",
+        "makeup",
+        "Occupation",
+        "PCRs",
+        "tenants",
+        "Vogue",
+        "expert",
+        "Flaunt",
+        "Speak",
+        "Sr.",
+        "swimming",
+        "Glamour",
+        "HOD",
+        "Junior resident",
+        "Linguistic Proficiency",
+        "Playing cricket",
+        "Write",
+        "Askim Online English Tutorial",
+        "Badminton",
+        "Declaration",
+        "Elle",
+        "HAP",
+        "member",
+        "Personal Strength",
+        "post",
+        "Signature",
+        "Singing",
+        "Single",
+        "Supervisors",
+        "Turkish students",
+        "American Idol",
+        "analyze",
+        "attained maximum profit",
+        "CEO",
+        "CG Lux",
+        "Corel draw",
+        "dancing",
+        "DCA",
+        "erection",
+        "Field of Interest",
+        "Firefighting system",
+        "First Class",
+        "General",
+        "incumbent",
+        "KEIL",
+        "Major",
+        "MEP field",
+        "NDT",
+        "O & M",
+        "Plan",
+        "profession",
+        "R & D",
+        "Runway",
+        "Site Incharge",
+        "SLD",
+        "Specialist",
+        "Supervise",
+        "talents",
+        "Topic",
+        "Training & Development",
+        "VHDL",
+        "ACB",
+        "Apprentice",
+        "Basic Core",
+        "BasicKnowledgeofComputer",
+        "BOSS",
+        "C & I",
+        "casting",
+        "challenging career",
+        "Challenging job",
+        "Dealers",
+        "Directors",
+        "Event organizer",
+        "FirstAidfromRedCross",
+        "Graduation",
+        "hair",
+        "Hairstylist & Makeup Artist",
+        "Incharge",
+        "ISI testing of MCBs",
+        "key player",
+        "KEY Responsibilities",
+        "key role",
+        "Lead",
+        "Matriculation",
+        "MIG",
+        "patients",
+        "PDMS",
+        "Personal Information",
+        "personal trait",
+        "Personality Traits",
+        "Phillips Driver",
+        "Position Held",
+        "Predictive",
+        "Preparation of Bills of documents",
+        "Preparation of programme of works",
+        "Preparation of Tender documents",
+        "Preparation of variation orders",
+        "Professional environment",
+        "Resident","student", "students",
+        "Subject",
+        "symbiotic relationship", "Teen Vogue", "Testing & Quality Control Engineer Representative",
+        "Tiles Mason", "TRT testing","value addition",
+        "VFD", "Work Order",
+        "workers",
+        "Accounting Package",
+        "Aim",  "ARC",
+        "Architectural",
+        "asst",
+        "Austin Powers","Basics of launguages",
+        "Beginner","Bluemix","Brake test","Branch","calculation",
+        "Captain",
+        "challenging and responsible position",
+        "Checkpoint",
+        "civil helper",
+        "civil Maintenance",
+        "Communicator",
+        "Confined Space",
+        "Cost ascertainment",
+        "critical thinker",
+        "cross-team",
+        "department head",
+        "Dept.",
+        "development department",
+        "DTP",
+        "ECE",
+        "EFA",
+        "Effective communicator",
+        "Employee",
+        "Engg",
+        "EViews",
+        "exel",
+        "Familiarity",
+        "field",
+        "Friendly",
+        "Fundamentals",
+        "Global Warming",
+        "Graduate Apprentice Trainee",
+        "high-level position",
+        "HSE",
+        "in charge",
+        "in depth knowledge",
+        "In Style",
+        "install",
+        "Interest",
+        "interface",
+        "ISTP",
+        "key position",
+        "Key Result Areas",
+        "Knowledge in I nstallation of precast hollow core roof slabs",
+        "LA Confidential",
+        "ledger",
+        "level of study",
+        "Life member",
+        "Manual",
+        "Marie Claire",
+        "MCCB",
+        "MDB",
+        "Method",
+        "Micrometer",
+        "MIGO",
+        "My Role",
+        "Obtaining DEWA engineer",
+        "P&M",
+        "P.Point",
+        "packing issuer",
+        "PCC",
+        "permit to work",
+        "Personal Interests",
+        "Personal Qualities",
+        "positive attitude",
+        "potentials",
+        "preventive",
+        "preventive & maintenance",
+        "Reading novels",
+        "Responsible for attending the breakdown maintenance",
+        "RTD",
+        "S oil density testing",
+        "Site Diary",
+        "SMDB",
+        "Software Skils",
+        "soun d understanding",
+        "Specialisation",
+        "Spine Surgery",
+        "ss7",
+        "staffs",
+        "Structural",
+        "suitable position",
+        "suitable post",
+        "Surfing",
+        "Technical Abilties",
+        "technical inputs",
+        "technical issues",
+        "Technical Qualifications",
+        "TIG",
+        "TORA",
+        "towards life",
+        "Unmarried"},
     "skills": {
-        "person","first name", "certificate", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "academic background","academic","background","education", "experience", "hobbies", "c1", "first certificate"},
+        "person","personal","personal data","my responsibility","smoking","no smoking","head","cool","intermediate","basic","high","advanced","role","designation","good","well","bad","real","job description","job prospectus","fast","hand","gay","first name", "certificate", "last name", "surname","skill", "skills", "soft skill", "hard skill","job", "title", "position", "suffix", "prefix", "academic background","academic","background","education", "experience", "hobbies", "c1", "first certificate",
+        "Area of interest",
+        "vista",
+        "career",
+        "Technical Qualification",
+        "civil",
+        "dir",
+        "Job Responsibilities",
+        "Married",
+        "challenging position",
+        "Executive",
+        "Trainee",
+        "abilities",
+        "cricket",
+        "Listening music",
+        "QTP",
+        "Basics",
+        "e-mail",
+        "potential",
+        "accounts",
+        "BOQ",
+        "Areas of Interest",
+        "DWG",
+        "Listening to music",
+        "craft persons",
+        "job satisfaction",
+        "laborers",
+        "makeup",
+        "Occupation",
+        "PCRs",
+        "tenants",
+        "Vogue",
+        "expert",
+        "Flaunt",
+        "Speak",
+        "Sr.",
+        "swimming",
+        "Glamour",
+        "HOD",
+        "Junior resident",
+        "Linguistic Proficiency",
+        "Playing cricket",
+        "Write",
+        "Askim Online English Tutorial",
+        "Badminton",
+        "Declaration",
+        "Elle",
+        "HAP",
+        "member",
+        "Personal Strength",
+        "post",
+        "Signature",
+        "Singing",
+        "Single",
+        "Supervisors",
+        "Turkish students",
+        "American Idol",
+        "analyze",
+        "attained maximum profit",
+        "CEO",
+        "CG Lux",
+        "Corel draw",
+        "dancing",
+        "DCA",
+        "erection",
+        "Field of Interest",
+        "Firefighting system",
+        "First Class",
+        "General",
+        "incumbent",
+        "KEIL",
+        "Major",
+        "MEP field",
+        "NDT",
+        "O & M",
+        "Plan",
+        "profession",
+        "R & D",
+        "Runway",
+        "Site Incharge",
+        "SLD",
+        "Specialist",
+        "Supervise",
+        "talents",
+        "Topic",
+        "Training & Development",
+        "VHDL",
+        "ACB",
+        "Apprentice",
+        "Basic Core",
+        "BasicKnowledgeofComputer",
+        "BOSS",
+        "C & I",
+        "casting",
+        "challenging career",
+        "Challenging job",
+        "Dealers",
+        "Directors",
+        "Event organizer",
+        "FirstAidfromRedCross",
+        "Graduation",
+        "hair",
+        "Hairstylist & Makeup Artist",
+        "Incharge",
+        "ISI testing of MCBs",
+        "key player",
+        "KEY Responsibilities",
+        "key role",
+        "Lead",
+        "Matriculation",
+        "MIG",
+        "patients",
+        "PDMS",
+        "Personal Information",
+        "personal trait",
+        "Personality Traits",
+        "Phillips Driver",
+        "Position Held",
+        "Predictive",
+        "Preparation of Bills of documents",
+        "Preparation of programme of works",
+        "Preparation of Tender documents",
+        "Preparation of variation orders",
+        "Professional environment",
+        "Resident",
+        "student",
+        "students",
+        "Subject",
+        "symbiotic relationship",
+        "Teen Vogue",
+        "Testing & Quality Control Engineer Representative",
+        "Tiles Mason",
+        "TRT testing",
+        "value addition",
+        "VFD",
+        "Work Order",
+        "workers",
+        "Accounting Package",
+        "Aim",
+        "ARC",
+        "Architectural",
+        "asst",
+        "Austin Powers",
+        "Basics of launguages",
+        "Beginner",
+        "Bluemix",
+        "Brake test",
+        "Branch", "calculation",
+        "challenging and responsible position","Checkpoint","Communicator",
+        "Confined Space","Cost ascertainment","Dept.","development department",
+        "DTP","ECE", "EFA","Employee",
+        "Engg", "EViews",
+        "exel","Familiarity",
+        "field","Friendly","Fundamentals",
+        "Global Warming", 
+        "high-level position","HSE",
+        "in charge","in depth knowledge","In Style",
+        "install", "Interest",
+        "interface", "ISTP",
+        "key position",
+        "Key Result Areas",
+        "Knowledge in I nstallation of precast hollow core roof slabs",
+        "LA Confidential",
+        "ledger",
+        "level of study",
+        "Life member",
+        "Manual",
+        "Marie Claire",
+        "MCCB",
+        "MDB",
+        "Method",
+        "Micrometer",
+        "MIGO",
+        "My Role",
+        "Obtaining DEWA engineer",
+        "P&M",
+        "P.Point",
+        "packing issuer",
+        "PCC",
+        "permit to work",
+        "Personal Interests",
+        "Personal Qualities",
+        "positive attitude",
+        "potentials",
+        "preventive",
+        "preventive & maintenance",
+        "Reading novels",
+        "Responsible for attending the breakdown maintenance",
+        "RTD",
+        "S oil density testing",
+        "Site Diary",
+        "SMDB",
+        "Software Skils",
+        "soun d understanding",
+        "Specialisation",
+        "Spine Surgery",
+        "ss7",
+        "staffs",
+        "Structural",
+        "suitable position",
+        "suitable post",
+        "Surfing",
+        "Technical Abilties",
+        "technical inputs",
+        "technical issues",
+        "Technical Qualifications",
+        "TIG",
+        "TORA",
+        "towards life",
+        "Unmarried"},
     "degree": {"degree", "education", "diploma", "certificate", "executive education"},
-    "company": {"company", "organization", "linkedin", "github", "linkdin"},
+    "company": {"company", "organization", "linkedin", "github", "linkdin", "microsoft"},
     "address": {"address", "location"}}
 
 
@@ -254,6 +1181,403 @@ NAME_TOKEN_PATTERN = re.compile(r"^[A-Za-zÀ-ÖØ-öø-ÿ]+$")
 
 # Normalize language list once
 LANGUAGES_SET = {lang.lower().strip() for lang in LANGUAGES}
+
+
+# ----------------------------------------------------------
+# Langue Filters
+# ----------------------------------------------------------
+
+def _is_language_entity(text: str) -> bool:
+    """
+    True se a entidade corresponder a uma língua conhecida.
+    """
+    if not text:
+        return False
+
+    t = " ".join(text.lower().strip().split())
+
+    if t in LANGUAGES_SET:
+        return True
+
+    return False
+
+
+# ----------------------------------------------------------
+# Person Name Filters and Helpers
+# ----------------------------------------------------------
+
+def _contains_digits(text: str) -> bool:
+    return any(ch.isdigit() for ch in text or "")
+
+
+def _clean_single_person_name(text: str) -> Optional[str]:
+    """
+    Limpa uma única entidade person_name usando a lógica já existente.
+    """
+    cleaned = _clean_person_name([text])
+    return cleaned[0] if cleaned else None
+
+
+def _choose_best_person_name(
+    candidates: List[Dict[str, Any]],
+    score_margin: float = 0.05,
+) -> List[str]:
+    """
+    Escolhe apenas 1 nome.
+
+    Regras:
+    1. Maior score
+    2. Se diferença entre top1 e top2 < score_margin,
+       escolher o primeiro candidato sem números
+    3. Se não existir, usar o top1
+    """
+    if not candidates:
+        return []
+
+    # Deduplicar por texto limpo, mantendo:
+    # - maior score
+    # - menor posição (mais cedo no texto) em caso de empate
+    best_by_text: Dict[str, Dict[str, Any]] = {}
+
+    for c in candidates:
+        raw_text = str(c.get("text", "")).strip()
+        if not raw_text:
+            continue
+
+        cleaned = _clean_single_person_name(raw_text)
+        if not cleaned:
+            continue
+
+        score = float(c.get("score", 0.0))
+        start = int(c.get("start", 10**9))
+
+        key = cleaned.lower()
+        current = best_by_text.get(key)
+
+        candidate = {
+            "text": cleaned,
+            "score": score,
+            "start": start,
+        }
+
+        if current is None:
+            best_by_text[key] = candidate
+            continue
+
+        if candidate["score"] > current["score"]:
+            best_by_text[key] = candidate
+        elif candidate["score"] == current["score"] and candidate["start"] < current["start"]:
+            best_by_text[key] = candidate
+
+    final_candidates = list(best_by_text.values())
+    if not final_candidates:
+        return []
+
+    # Ordenar por:
+    # 1. score desc
+    # 2. posição asc
+    final_candidates.sort(key=lambda x: (-x["score"], x["start"]))
+
+    top1 = final_candidates[0]
+
+    if len(final_candidates) == 1:
+        return [top1["text"]]
+
+    top2 = final_candidates[1]
+    score_diff = top1["score"] - top2["score"]
+
+    # Se os scores forem muito próximos, escolher o primeiro sem números
+    if score_diff < score_margin:
+        first_without_digits = min(
+            (c for c in final_candidates if not _contains_digits(c["text"])),
+            key=lambda x: x["start"],
+            default=None
+        )
+        if first_without_digits is not None:
+            return [first_without_digits["text"]]
+
+    return [top1["text"]]
+
+def _extract_best_person_name_from_top(
+    text: str,
+    model: Optional[GLiNER] = None,
+    threshold: float = 0.15,
+    top_window: int = 450,
+) -> List[str]:
+    """
+    Extrai apenas o melhor person_name da zona de topo do CV.
+    """
+    if not text or not text.strip():
+        return []
+
+    top_text = text[:top_window]
+
+    entities = extract_entities_from_text(
+        top_text,
+        model=model,
+        threshold=threshold,
+        debug_save_json=False,
+        debug_output_path=None,
+    )
+
+    names = entities.get("person_name", []) or []
+
+    heuristic_name = extract_top_name_candidate(text)
+
+    if not names:
+        return [heuristic_name] if heuristic_name else []
+
+    # Se o GLiNER devolveu só 1 token e a heurística devolve nome completo,
+    # preferir a heurística
+    if heuristic_name:
+        first_found = names[0]
+
+        if len(first_found.split()) == 1 and len(heuristic_name.split()) >= 2:
+            first_token = first_found.lower()
+            heuristic_tokens = [t.lower() for t in heuristic_name.split()]
+
+            if first_token in heuristic_tokens:
+                return [heuristic_name]
+
+    return [names[0]]
+
+# ----------------------------------------------------------
+# Canonical normalization for controlled vocabularies
+# ----------------------------------------------------------
+
+_CAMEL_BOUNDARY_REGEX = re.compile(r"(?<=[a-zà-öø-ÿ])(?=[A-ZÀ-ÖØ-Þ])")
+_MULTI_SEP_REGEX = re.compile(r"\s*-\s*|\s+")
+
+
+def _split_camel_case(text: str) -> str:
+    """
+    MicrosoftOffice -> Microsoft Office
+    powerBI -> power BI
+    """
+    if not text:
+        return text
+    return _CAMEL_BOUNDARY_REGEX.sub(" ", text)
+
+
+def _normalize_vocab_surface(text: str) -> str:
+    """
+    Normalização leve para comparação contra vocabulários controlados.
+
+    Exemplos:
+        Microsoft Office     -> microsoft office
+        Microsoft-Office     -> microsoft office
+        Microsoft - Office   -> microsoft office
+        MicrosoftOffice      -> microsoft office
+        ms-office            -> ms office
+    """
+    if not text:
+        return ""
+
+    t = text.strip()
+
+    # 1) split camelCase / PascalCase
+    t = _split_camel_case(t)
+
+    # 2) normalizar hífen/espaços para um único espaço
+    t = _MULTI_SEP_REGEX.sub(" ", t)
+
+    # 3) limpar espaços repetidos
+    t = " ".join(t.split()).strip().lower()
+
+    return t
+
+
+def _canonical_display_form(text: str) -> str:
+    """
+    Forma de output:
+    - separa camel case
+    - troca hífens por espaço
+    - colapsa espaços
+    """
+    if not text:
+        return ""
+
+    t = _split_camel_case(text)
+    t = re.sub(r"\s*-\s*", " ", t)
+    t = " ".join(t.split()).strip()
+
+    return t
+
+
+def _canonical_choice_score(text: str) -> tuple:
+    """
+    Score para escolher a melhor forma canónica quando há duplicados
+    no vocabulário com a mesma normalização.
+    Preferências:
+    1) menos hífens
+    2) mais espaços legíveis
+    3) mais maiúsculas úteis
+    4) texto mais comprido
+    """
+    if not text:
+        return (10**9, -10**9, -10**9, -10**9)
+
+    hyphens = text.count("-")
+    spaces = text.count(" ")
+    uppers = sum(1 for ch in text if ch.isupper())
+    length = len(text)
+
+    return (hyphens, -spaces, -uppers, -length)
+
+
+def _build_vocab_index(vocab: Set[str]) -> Dict[str, str]:
+    """
+    Cria um índice:
+        forma_normalizada -> melhor forma canónica de output
+    """
+    index: Dict[str, str] = {}
+
+    for item in vocab:
+        if not item or not str(item).strip():
+            continue
+
+        raw = str(item).strip()
+        norm = _normalize_vocab_surface(raw)
+        display = _canonical_display_form(raw)
+
+        if not norm:
+            continue
+
+        current = index.get(norm)
+        if current is None:
+            index[norm] = display
+        else:
+            if _canonical_choice_score(display) < _canonical_choice_score(current):
+                index[norm] = display
+
+    return index
+
+def _build_flexible_vocab_regex(term: str) -> re.Pattern[str]:
+    """
+    Gera regex para apanhar:
+      - Microsoft Office
+      - Microsoft-Office
+      - Microsoft- Office
+      - Microsoft -Office
+      - Microsoft - Office
+      - MicrosoftOffice
+    """
+    normalized = _normalize_vocab_surface(term)
+    tokens = normalized.split()
+
+    if not tokens:
+        return re.compile(r"(?!x)x")
+
+    if len(tokens) == 1:
+        token = re.escape(tokens[0])
+        return re.compile(rf"(?<!\w){token}(?!\w)", re.IGNORECASE)
+
+    connector = r"(?:\s*-\s*|\s+|)"
+    pattern = r"(?<!\w)" + connector.join(re.escape(tok) for tok in tokens) + r"(?!\w)"
+    return re.compile(pattern, re.IGNORECASE)
+
+
+TARGET_NORMALIZATION_VOCAB = (
+    set(SIMPLE_JOB_TITLES)
+    | set(SOFTWARE_AS_SKILL)
+    | set(PROGRAMMING_LIBRARIES)
+    | set(GENERAL_SKILLS)
+)
+
+TARGET_NORMALIZATION_INDEX = _build_vocab_index(TARGET_NORMALIZATION_VOCAB)
+
+JOB_TITLE_NORMALIZATION_INDEX = _build_vocab_index(set(SIMPLE_JOB_TITLES))
+SOFTWARE_NORMALIZATION_INDEX = _build_vocab_index(set(SOFTWARE_AS_SKILL))
+PROGRAMMING_NORMALIZATION_INDEX = _build_vocab_index(set(PROGRAMMING_LIBRARIES))
+GENERAL_SKILLS_NORMALIZATION_INDEX = _build_vocab_index(set(GENERAL_SKILLS))
+
+
+def _normalize_if_in_vocab(text: str, vocab_index: Dict[str, str]) -> Optional[str]:
+    """
+    Só normaliza se a forma normalizada existir no vocabulário permitido.
+    """
+    if not text:
+        return None
+
+    norm = _normalize_vocab_surface(text)
+    if not norm:
+        return None
+
+    return vocab_index.get(norm)
+
+# ----------------------------------------------------------
+# Regex functions (fallback for gliner)
+# ----------------------------------------------------------
+def _extract_software_as_skill_from_text(text: str) -> List[str]:
+    if not text:
+        return []
+
+    results = []
+    seen = set()
+
+    for canonical_norm, canonical_display in sorted(
+        SOFTWARE_NORMALIZATION_INDEX.items(),
+        key=lambda x: len(x[0]),
+        reverse=True
+    ):
+        rx = _build_flexible_vocab_regex(canonical_display)
+
+        if rx.search(text):
+            key = canonical_display.lower()
+
+            if key not in seen and _is_valid_skill(canonical_display):
+                seen.add(key)
+                results.append(canonical_display)
+
+    return results
+
+
+def _extract_programming_libraries_from_text(text: str) -> List[str]:
+    if not text:
+        return []
+
+    results = []
+    seen = set()
+
+    for canonical_norm, canonical_display in sorted(
+        PROGRAMMING_NORMALIZATION_INDEX.items(),
+        key=lambda x: len(x[0]),
+        reverse=True
+    ):
+        rx = _build_flexible_vocab_regex(canonical_display)
+
+        if rx.search(text):
+            key = canonical_display.lower()
+
+            if key not in seen:
+                seen.add(key)
+                results.append(canonical_display)
+
+    return results
+
+
+def _extract_general_skills_from_text(text: str) -> List[str]:
+    if not text:
+        return []
+
+    results = []
+    seen = set()
+
+    for canonical_norm, canonical_display in sorted(
+        GENERAL_SKILLS_NORMALIZATION_INDEX.items(),
+        key=lambda x: len(x[0]),
+        reverse=True
+    ):
+        rx = _build_flexible_vocab_regex(canonical_display)
+
+        if rx.search(text):
+            key = canonical_display.lower()
+
+            if key not in seen:
+                seen.add(key)
+                results.append(canonical_display)
+
+    return results
 
 # ----------------------------------------------------------
 # Gliner functions
@@ -288,7 +1612,10 @@ def _extract_compound_job_titles_regex(text: str) -> List[str]:
 
 def _extract_simple_job_titles_from_lines(text: str) -> List[str]:
     """
-    Look for simple job titles line-by-line, which is often more precise for CVs.
+    Procura job titles simples linha a linha, aceitando variantes:
+    - espaço
+    - hífen
+    - camel case
     """
     if not text:
         return []
@@ -301,18 +1628,21 @@ def _extract_simple_job_titles_from_lines(text: str) -> List[str]:
         if not line_clean:
             continue
 
-        for match in SIMPLE_JOB_TITLE_REGEX.findall(line_clean):
-            title = " ".join(match.split()).strip()
-            if not title:
-                continue
+        for canonical_norm, canonical_display in sorted(
+            JOB_TITLE_NORMALIZATION_INDEX.items(),
+            key=lambda x: len(x[0]),
+            reverse=True
+        ):
+            rx = _build_flexible_vocab_regex(canonical_display)
 
-            if not _is_valid_job_title(title):
-                continue
+            if rx.search(line_clean):
+                if not _is_valid_job_title(canonical_display):
+                    continue
 
-            key = title.lower()
-            if key not in seen:
-                seen.add(key)
-                results.append(title)
+                key = canonical_display.lower()
+                if key not in seen:
+                    seen.add(key)
+                    results.append(canonical_display)
 
     return results
 
@@ -797,7 +2127,181 @@ def _is_valid_job_title(text: str, threshold: float = 0.4) -> bool:
 
     return ratio <= threshold
 
+def _map_label_to_group(label: str) -> Optional[str]:
+    """
+    Converte a label bruta do GLiNER no grupo final usado no pipeline.
+    """
+    for group_name, group_labels in ENTITY_GROUPS.items():
+        if label in group_labels:
+            return group_name
+    return None
 
+
+def _normalizar_entidade_para_conflito(texto: str) -> str:
+    """
+    Normalização leve para comparar entidades iguais vindas de classes diferentes.
+    """
+    return " ".join(texto.strip().lower().split())
+
+
+def _resolver_conflitos_por_score(
+    entities: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """
+    Se o mesmo texto aparecer em 2+ classes, mantém só a previsão com maior score.
+
+    Critério principal:
+    - maior score
+
+    Critério de desempate:
+    - ordem fixa de prioridade
+    """
+    if not entities:
+        return []
+
+    # prioridade só para desempate
+    priority = {
+        "person_name": 7,
+        "job_title": 6,
+        "company": 5,
+        "university": 4,
+        "degree": 3,
+        "address": 2,
+        "skills": 1,
+    }
+
+    best_by_text: Dict[str, Dict[str, Any]] = {}
+
+    for ent in entities:
+        raw_text = str(ent.get("text", "")).strip()
+        label = str(ent.get("label", "")).strip()
+        score = float(ent.get("score", 0.0))
+
+        if not raw_text or not label:
+            continue
+
+        group = _map_label_to_group(label)
+        if group is None:
+            continue
+
+        key = _normalizar_entidade_para_conflito(raw_text)
+
+        candidate = {
+            **ent,
+            "_group": group,
+            "_score": score,
+        }
+
+        current = best_by_text.get(key)
+        if current is None:
+            best_by_text[key] = candidate
+            continue
+
+        current_score = float(current.get("_score", 0.0))
+        current_group = str(current.get("_group", ""))
+
+        if score > current_score:
+            best_by_text[key] = candidate
+        elif score == current_score:
+            if priority.get(group, 0) > priority.get(current_group, 0):
+                best_by_text[key] = candidate
+
+    return list(best_by_text.values())
+
+
+# ----------------------------------------------------------
+# Filters for numbers and symbols
+# ----------------------------------------------------------
+
+def _is_allowed_numeric_symbol_exception(text: str) -> bool:
+    """
+    Exceções permitidas mesmo contendo muitos números/símbolos:
+    - 12º ano / 12o ano / 12° ano
+    - 2D / 3D
+    """
+    if not text:
+        return False
+
+    t = " ".join(text.strip().split())
+
+    allowed_patterns = [
+        # Escolaridade
+        r"(?i)^\d{1,2}\s*[º°o]\s*ano$",          # 12º ano / 12o ano / 12° ano
+
+        # Dimensão / formato
+        r"(?i)^[23]\s*d$",                       # 2D / 3D
+
+        # Linguagens / stacks curtas com símbolos
+        r"(?i)^c\+$",                            # C+
+        r"(?i)^c\+\+$",                          # C++
+        r"(?i)^c#$",                             # C#
+        r"(?i)^f#$",                             # F#
+        r"(?i)^q#$",                             # Q#
+        r"(?i)^a#?$",                            # A / A#
+        r"(?i)^vb\.?net$",                       # VB.NET / VBNET
+        r"(?i)^asp\.?net$",                      # ASP.NET / ASPNET
+        r"(?i)^ado\.?net$",                      # ADO.NET / ADONET
+        r"(?i)^net$",                            # NET
+        r"(?i)^\.net$",                          # .NET
+
+        # Web / frontend / backend
+        r"(?i)^node\.?js$",                      # Node.js / NodeJS
+        r"(?i)^next\.?js$",                      # Next.js / NextJS
+        r"(?i)^nuxt\.?js$",                      # Nuxt.js / NuxtJS
+        r"(?i)^vue\.?js$",                       # Vue.js / VueJS
+        r"(?i)^react\.?js$",                     # React.js / ReactJS
+        r"(?i)^angular\.?js$",                   # Angular.js / AngularJS
+        r"(?i)^express\.?js$",                   # Express.js / ExpressJS
+        r"(?i)^socket\.?io$",                    # Socket.IO / SocketIO
+
+        # Outras tecnologias comuns
+        r"(?i)^d3\.?js$",                        # D3.js / D3JS
+        r"(?i)^chart\.?js$",                     # Chart.js / ChartJS
+        r"(?i)^three\.?js$",                     # Three.js / ThreeJS
+        r"(?i)^svelte\.?js$",                    # Svelte.js / SvelteJS
+        r"(?i)^gatsby\.?js$",                    # Gatsby.js / GatsbyJS
+        r"(?i)^tensorflow\.?js$",                # TensorFlow.js / TensorFlowJS
+
+        # DevOps / dados / cloud
+        r"(?i)^ms-?sql$",                        # MSSQL / MS-SQL
+        r"(?i)^t-?sql$",                         # T-SQL
+        r"(?i)^pl/?sql$",                        # PL/SQL
+        r"(?i)^postgre\s*sql$",                  # Postgre SQL
+        r"(?i)^postgre-?sql$",                   # Postgre-SQL
+        r"(?i)^my\s*sql$",                       # MySQL escrito separado
+        r"(?i)^no\s*sql$",                       # NoSQL escrito separado
+    ]
+
+    return any(re.fullmatch(pattern, t) for pattern in allowed_patterns)
+
+
+def _has_more_than_60_percent_numbers_or_symbols(text: str) -> bool:
+    """
+    True se mais de 60% dos caracteres relevantes forem números ou símbolos.
+
+    - ignora espaços
+    - considera como "problemáticos":
+        * dígitos
+        * símbolos/pontuação
+    - letras NÃO contam como problemáticas
+    - exceções permitidas: 12º ano, 2D, 3D
+    """
+    if not text:
+        return False
+
+    if _is_allowed_numeric_symbol_exception(text):
+        return False
+
+    chars = [c for c in text if not c.isspace()]
+    if not chars:
+        return False
+
+    problematic = sum(
+        1 for c in chars
+        if c.isdigit() or (not c.isalpha() and not c.isdigit())
+    )
+
+    return (problematic / len(chars)) > 0.6
 
 # ----------------------------------------------------------
 # Regex experience
@@ -1652,19 +3156,180 @@ def _nearby_lines_have_job_title(
         if any(jt in line_lower or line_lower in jt for jt in extracted_titles):
             return True
 
-    # 2) regex fallback
+    # 2) fallback com o novo matching flexível
+    nearby_text = "\n".join(nearby_lines)
+
+    if _extract_simple_job_titles_from_lines(nearby_text):
+        return True
+
     for line_clean in nearby_lines:
         if not _is_valid_job_title(line_clean):
             continue
-
-        if SIMPLE_JOB_TITLE_REGEX.search(line_clean):
-            return True
 
         for rx in COMPOUND_JOB_TITLE_REGEXES:
             if rx.search(line_clean):
                 return True
 
     return False
+
+def dividir_texto_em_chunks(
+    texto: str,
+    max_chars: int = 650,
+    overlap: int = 100,
+) -> List[str]:
+    """
+    Divide texto longo em chunks com overlap.
+    """
+    texto = texto.strip()
+    if not texto:
+        return []
+
+    blocos = re.split(r"\n+", texto)
+    blocos = [b.strip() for b in blocos if b.strip()]
+
+    chunks: List[str] = []
+    chunk_atual = ""
+
+    for bloco in blocos:
+        candidato = f"{chunk_atual}\n{bloco}".strip() if chunk_atual else bloco
+
+        if len(candidato) <= max_chars:
+            chunk_atual = candidato
+        else:
+            if chunk_atual:
+                chunks.append(chunk_atual)
+
+            if len(bloco) <= max_chars:
+                chunk_atual = bloco
+            else:
+                inicio = 0
+                passo = max(1, max_chars - overlap)
+
+                while inicio < len(bloco):
+                    fim = inicio + max_chars
+                    pedaco = bloco[inicio:fim].strip()
+                    if pedaco:
+                        chunks.append(pedaco)
+                    inicio += passo
+
+                chunk_atual = ""
+
+    if chunk_atual:
+        chunks.append(chunk_atual)
+
+    return chunks
+
+def _agrupar_entidades_dicts(entidades_chunks: List[Dict[str, List[str]]]) -> Dict[str, List[str]]:
+    """
+    Junta entidades vindas de vários chunks, removendo duplicados
+    e preservando a ordem de primeira aparição.
+    """
+    labels = [
+        "person_name",
+        "job_title",
+        "company",
+        "university",
+        "degree",
+        "address",
+        "skills",
+    ]
+
+    resultado: Dict[str, List[str]] = {label: [] for label in labels}
+    vistos: Dict[str, Set[str]] = {label: set() for label in labels}
+
+    for entidades in entidades_chunks:
+        for label in labels:
+            for valor in entidades.get(label, []):
+                if not isinstance(valor, str):
+                    continue
+
+                v = " ".join(valor.split()).strip()
+                if not v:
+                    continue
+
+                key = v.lower()
+                if key not in vistos[label]:
+                    vistos[label].add(key)
+                    resultado[label].append(v)
+
+    return resultado
+
+def _extrair_entidades_texto_longo(
+    text: str,
+    model: Optional[GLiNER] = None,
+    threshold: float = 0.15,
+    debug_save_json: bool = False,
+    debug_output_path: Optional[Path | str] = OUTPUTS_DIR,
+) -> Dict[str, List[str]]:
+    """
+    Processa texto longo por chunks e agrega as entidades detetadas.
+
+    Regra especial:
+    - person_name é extraído apenas do topo do CV
+    - restantes entidades são agregadas por chunks
+    """
+    empty_result = {
+        "person_name": [],
+        "job_title": [],
+        "company": [],
+        "university": [],
+        "degree": [],
+        "address": [],
+        "skills": [],
+    }
+
+    if not text or not text.strip():
+        return empty_result
+
+    if model is None:
+        model = get_gliner_model()
+
+    # -------------------------------
+    # 1) Nome: só no topo do CV
+    # -------------------------------
+    best_person_name = _extract_best_person_name_from_top(
+        text=text,
+        model=model,
+        threshold=threshold,
+        top_window=450,
+    )
+
+    chunks = dividir_texto_em_chunks(text)
+
+    # Se houver apenas 1 chunk
+    if len(chunks) <= 1:
+        entidades = extract_entities_from_text(
+            text,
+            model=model,
+            threshold=threshold,
+            debug_save_json=debug_save_json,
+            debug_output_path=debug_output_path,
+        )
+        entidades["person_name"] = best_person_name
+        return entidades
+
+    # -------------------------------
+    # 2) Restantes entidades por chunk
+    # -------------------------------
+    entidades_chunks: List[Dict[str, List[str]]] = []
+
+    for chunk in chunks:
+        entidades = extract_entities_from_text(
+            chunk,
+            model=model,
+            threshold=threshold,
+            debug_save_json=debug_save_json,
+            debug_output_path=debug_output_path,
+        )
+
+        # ignorar nomes vindos dos chunks
+        entidades["person_name"] = []
+        entidades_chunks.append(entidades)
+
+    resultado = _agrupar_entidades_dicts(entidades_chunks)
+    resultado["person_name"] = best_person_name
+
+    return resultado
 
 # ----------------------------------------------------------
 # Experience functions
@@ -2001,33 +3666,46 @@ def extract_entities_from_text(
         # ---------------------------------------
         # Apply threshold manually
         # ---------------------------------------
-        entities = []
+        entities_filtradas = []
 
         for ent in all_entities:
-
             label = ent.get("label")
-            score = ent.get("score", 0.0)
+            score = float(ent.get("score", 0.0))
 
             # person name: threshold mais permissivo
             if label in ENTITY_GROUPS["person_name"]:
                 if score >= 0.1:
-                    entities.append(ent)
-
+                    entities_filtradas.append(ent)
             else:
                 if score >= threshold:
-                    entities.append(ent)
+                    entities_filtradas.append(ent)
+
+        # Resolve conflitos entre classes para o mesmo texto
+        entities = _resolver_conflitos_por_score(entities_filtradas)
                     
     except Exception:
         return {label: [] for label in result_labels}
 
     entities_by_label = {label: [] for label in result_labels}
 
+    person_name_candidates: List[Dict[str, Any]] = []
+
     for entity in entities:
         raw_text = entity["text"]
         text_norm = raw_text.lower().strip()
         label = entity["label"]
+        resolved_group = entity.get("_group")
 
         if len(text_norm) <= 2:
+            continue
+        # Remove línguas do lado GLiNER.
+        # As línguas devem vir apenas do regex extractor.
+        if _is_language_entity(raw_text):
+            continue
+        
+        # rejeita entidades com mais de 50% de números ou símbolos,
+        # exceto casos permitidos como "12º ano", "2D" e "3D"
+        if _has_more_than_60_percent_numbers_or_symbols(raw_text):
             continue
 
         # remove genéricos
@@ -2043,31 +3721,45 @@ def extract_entities_from_text(
         if text_norm in GENERIC_INVALID:
             continue
 
-        # skills
-        if label in ENTITY_GROUPS["skills"]:
-            if _is_valid_skill(raw_text):
-                entities_by_label["skills"].append(raw_text)
+        if resolved_group == "skills":
+            normalized_skill = (
+                _normalize_if_in_vocab(raw_text, SOFTWARE_NORMALIZATION_INDEX)
+                or _normalize_if_in_vocab(raw_text, PROGRAMMING_NORMALIZATION_INDEX)
+                or _normalize_if_in_vocab(raw_text, GENERAL_SKILLS_NORMALIZATION_INDEX)
+                or raw_text
+            )
+
+            if _is_valid_skill(normalized_skill):
+                entities_by_label["skills"].append(normalized_skill)
             continue
 
-        if any(re.search(rf"\b{re.escape(sw)}\b", text_norm) for sw in SOFTWARE_AS_SKILL):
-            if _is_valid_skill(raw_text):
-                entities_by_label["skills"].append(raw_text)
-            continue
-        
         # address
-        if label in ENTITY_GROUPS["address"]:
+        if resolved_group == "address":
             expanded = _expand_address_smart(text, raw_text)
             entities_by_label["address"].append(expanded)
             continue
       
-        # outras labels diretas
-        for group_name, group_labels in ENTITY_GROUPS.items():
-            if group_name in ("skills", "address"):
-                continue
-            if label in group_labels:
-                entities_by_label[group_name].append(raw_text)
-                break
-        
+        # other direct labels
+        if resolved_group == "person_name":
+            person_name_candidates.append({
+                "text": raw_text,
+                "score": float(entity.get("_score", entity.get("score", 0.0))),
+                "start": int(entity.get("start", 10**9)),
+            })
+            continue
+
+        if resolved_group == "job_title":
+            normalized_job_title = _normalize_if_in_vocab(raw_text, JOB_TITLE_NORMALIZATION_INDEX) or raw_text
+            entities_by_label["job_title"].append(normalized_job_title)
+            continue
+
+        if resolved_group in {"company", "university", "degree"}:
+            entities_by_label[resolved_group].append(raw_text)
+            continue
+    
+    # Escolher apenas o melhor nome de pessoa
+    entities_by_label["person_name"] = _choose_best_person_name(person_name_candidates)
+
     # Fallback regex for job titles missed by GLiNER
     existing_job_titles = {t.lower() for t in entities_by_label["job_title"]}
 
@@ -2079,6 +3771,39 @@ def extract_entities_from_text(
         if key not in existing_job_titles:
             entities_by_label["job_title"].append(title)
             existing_job_titles.add(key)
+
+    # Fallback: softwares definidos em SOFTWARE_AS_SKILL
+    existing_skills = {s.lower() for s in entities_by_label["skills"]}
+
+    regex_software_skills = _extract_software_as_skill_from_text(text)
+
+    for software in regex_software_skills:
+        key = software.lower()
+        if key not in existing_skills:
+            entities_by_label["skills"].append(software)
+            existing_skills.add(key)
+    
+    # Fallback: programming libraries
+    existing_skills = {s.lower() for s in entities_by_label["skills"]}
+
+    regex_libraries = _extract_programming_libraries_from_text(text)
+
+    for lib in regex_libraries:
+        key = lib.lower()
+        if key not in existing_skills:
+            entities_by_label["skills"].append(lib)
+            existing_skills.add(key)
+
+    # Fallback: programming libraries
+    existing_skills = {s.lower() for s in entities_by_label["skills"]}
+
+    regex_libraries = _extract_general_skills_from_text(text)
+
+    for lib in regex_libraries:
+        key = lib.lower()
+        if key not in existing_skills:
+            entities_by_label["skills"].append(lib)
+            existing_skills.add(key)
 
     return entities_by_label
 
@@ -2114,7 +3839,7 @@ def process_texts_gliner(
                 gliner_text = item
                 raw_text = item
 
-            entities_dict = extract_entities_from_text(
+            entities_dict = _extrair_entidades_texto_longo(
                 gliner_text,
                 model=model,
                 threshold=gliner_threshold,
@@ -2145,25 +3870,30 @@ def process_texts_gliner(
                     if e_clean:
                         clean_entities.append(e_clean.strip())
 
+                if label == "job_title":
+                    clean_entities = [
+                        _normalize_if_in_vocab(e, JOB_TITLE_NORMALIZATION_INDEX) or e
+                        for e in clean_entities
+                    ]
+
+                if label == "skills":
+                    normalized_skills = []
+                    for e in clean_entities:
+                        normalized = (
+                            _normalize_if_in_vocab(e, SOFTWARE_NORMALIZATION_INDEX)
+                            or _normalize_if_in_vocab(e, PROGRAMMING_NORMALIZATION_INDEX)
+                            or _normalize_if_in_vocab(e, GENERAL_SKILLS_NORMALIZATION_INDEX)
+                            or e
+                        )
+                        normalized_skills.append(normalized)
+
+                    clean_entities = normalized_skills
+
                 if label == "person_name":
-                    clean_entities = _clean_person_name(clean_entities)
                     heuristic_name = extract_top_name_candidate(raw_text)
 
-                    if not clean_entities:
-                        if heuristic_name:
-                            clean_entities = [heuristic_name]
-                    else:
-                        if heuristic_name:
-                            first_found = clean_entities[0]
-
-                            # só substitui se GLiNER encontrou um único nome
-                            # e esse nome aparecer dentro do nome heurístico
-                            if len(first_found.split()) == 1 and len(heuristic_name.split()) >= 2:
-                                first_token = first_found.lower()
-                                heuristic_tokens = [t.lower() for t in heuristic_name.split()]
-
-                                if first_token in heuristic_tokens:
-                                    clean_entities = [heuristic_name]
+                    if not clean_entities and heuristic_name:
+                        clean_entities = [heuristic_name]
 
                 if label == "address":
                     clean_entities = _choose_first_address(clean_entities)

@@ -93,6 +93,7 @@ Run from project root:
 cd backend
 python -m extras.tests.run_process_cvs
 python -m extras.tests.run_ranking
+python -m extras.evaluation.extracted_entities_comparation
 ```
 
 Output:

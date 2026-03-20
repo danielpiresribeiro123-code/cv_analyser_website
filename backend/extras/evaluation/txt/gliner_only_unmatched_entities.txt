@@ -1,0 +1,8 @@
+ENTITIES_ONLY_IN_GLINER_PLUS_REGEX_LANGUAGES
+============================================
+
+e commerce	1
+fresher	1
+front end	1
+Market Analyzer	1
+Panda	1

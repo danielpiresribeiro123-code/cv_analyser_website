@@ -26,9 +26,9 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_ROOT = PROJECT_ROOT / "frontend"
 
 # Data folders
-UPLOADS_DIR_ORIGINAL =BACKEND_ROOT / "uploads"
 UPLOADS_DIR = BACKEND_ROOT / "uploads"
 OUTPUTS_DIR = BACKEND_ROOT / "outputs"
+EXTRAS_DIR = BACKEND_ROOT / "extras"
 
 # Model paths
 GLINER_MODEL_PATH = BACKEND_ROOT / "models" / "gliner"
@@ -40,7 +40,57 @@ SKILL_TABLE_YOLO_MODEL_PATH = BACKEND_ROOT / "models" / "yolo" / "yolo11s-skill_
 # =========================================================
 # DATA
 # =========================================================
-LANGUAGES = ['Afrikaans', 'Albanian', 'Amharic', 'Arabic', 'Armenian', 'Aymara', 'Azerbaijani', 'Basque', 'Belarusian', 'Bengali', 'Bislama', 'Bosnian', 'Bulgarian', 'Burmese', 'Castilian', 'Catalan', 'Cantonese','Chamorro', 'Chichewa', 'Chinese', 'Chinese (Simplified)','Croatian', 'Czech', 'Danish', 'Divehi', 'Dutch', 'Dzongkha', 'English', 'Estonian', 'Faroese', 'Fijian', 'Finnish', 'French', 'Fulah', 'Galician', 'Georgian', 'German', 'Guarani', 'Haitian', 'Hebrew', 'Hindi', 'Hungarian', 'Icelandic', 'Indonesian', 'Irish', 'Italian', 'Japanese', 'Kalaallisut', 'Kazakh', 'Khmer', 'Kinyarwanda', 'Kirghiz', 'Kongo', 'Korean', 'Kurdish', 'Lao', 'Latin', 'Latvian', 'Lingala', 'Lithuanian', 'Luba-Katanga', 'Luxembourgish', 'Macedonian', 'Malagasy', 'Malay', 'Maltese', 'Mandarin','Manx', 'Maori', 'Marshallese', 'Modern Greek', 'Greek', 'Mongolian', 'Nauru', 'Nepali', 'North Ndebele', 'Norwegian', 'Norwegian Bokmål', 'Norwegian Nynorsk', 'Occitan (post 1500)', 'Panjabi', 'Persian', 'Polish', 'Portuguese', 'Pushto', 'Quechua', 'Romanian', 'Rundi', 'Russian', 'Samoan', 'Sango', 'Serbian', 'Shona', 'Sinhala', 'Slovak', 'Slovenian', 'Somali', 'South Ndebele', 'Southern Sotho', 'Spanish', 'Swahili', 'Swati', 'Swedish', 'Tajik', 'Tamil', 'Thai', 'Tigrinya', 'Tonga (Tonga Islands)', 'Tsonga', 'Tswana', 'Turkish', 'Turkmen', 'Ukrainian', 'Urdu', 'Uzbek', 'Venda', 'Vietnamese', 'Xhosa', 'Zulu']
+LANGUAGES = ['Afrikaans', 'Albanian', 'Amharic', 'Arabic', 'Armenian', 'Aymara', 'Azerbaijani', 'Basque', 'Belarusian', 'Bengali', 'Bislama', 'Bosnian', 'Bulgarian', 'Burmese', 'Castilian', 'Catalan', 'Cantonese','Chamorro', 'Chichewa', 'Chinese', 'Chinese (Simplified)','Croatian', 'Czech', 'Danish', 'Divehi', 'Dutch', 'Dzongkha', 'English', 'Estonian', 'Faroese', 'Fijian', 'Finnish', 'French', 'Fulah', 'Galician', 'Georgian', 'German', 'Guarani', 'Haitian', 'Hebrew', 'Hindi', 'Hungarian', 'Icelandic', 'Indonesian', 'Irish', 'Italian', 'Japanese', 'Kalaallisut', 'Kazakh', 'Khmer', 'Kinyarwanda', 'Kirghiz', 'Kongo', 'Korean', 'Kurdish', 'Lao', 'Latin', 'Latvian', 'Lingala', 'Lithuanian', 'Luba-Katanga', 'Luxembourgish', 'Macedonian', 'Malagasy', 'Malay', 'Maltese', 'Mandarin','Manx', 'Maori', 'Marshallese', 'Modern Greek', 'Greek', 'Mongolian', 'Nauru', 'Nepali', 'North Ndebele', 'Norwegian', 'Norwegian Bokmål', 'Norwegian Nynorsk', 'Occitan (post 1500)', 'Panjabi', 'Persian', 'Polish', 'Portuguese', 'Pushto', 'Quechua', 'Romanian', 'Rundi', 'Russian', 'Samoan', 'Sango', 'Serbian', 'Shona', 'Sinhala', 'Slovak', 'Slovenian', 'Somali', 'South Ndebele', 'Southern Sotho', 'Spanish', 'Swahili', 'Swati', 'Swedish', 'Tajik', 'Tamil', 'Thai', 'Tigrinya', 'Tonga (Tonga Islands)', 'Tsonga', 'Tswana', 'Turkish', 'Turkmen', 'Ukrainian', 'Urdu', 'Uzbek', 'Venda', 'Vietnamese', 'Xhosa', 'Zulu', "Telugu", "Oriya", "Odia", "Kannada", "Malayalam", "Tulu", "Rajastani", "Sanskrit", "Gujarati","Kiswahili","Hindu","Luhya","Esperanto","Marwari",
+    "Hindi",
+    "Bengali",
+    "Marathi",
+    "Telugu",
+    "Tamil",
+    "Gujarati",
+    "Urdu",
+    "Kannada",
+    "Odia",
+    "Malayalam",
+    "Punjabi",
+    "Assamese",
+    "Maithili",
+    "Santali",
+    "Kashmiri",
+    "Nepali",
+    "Konkani",
+    "Sindhi",
+    "Dogri",
+    "Manipuri",
+    "Bodo",
+    "Sanskrit",
+    "Bhojpuri",
+    "Rajasthani",
+    "Chhattisgarhi",
+    "Magahi",
+    "Haryanvi",
+    "Garhwali",
+    "Kumaoni",
+    "Tulu",
+    "Gondi",
+    "Bhili",
+    "Kurukh",
+    "Mundari",
+    "Khasi",
+    "Mizo",
+    "Kokborok",
+    "Angika",
+    "Bajjika",
+    "Bundeli",
+    "Ladakhi",
+    "Lepcha",
+    "Limbu",
+    "Karbi",
+    "Nyishi",
+    "Mishing",
+    "Deori",
+    "Nicobarese",
+    "Pahari"]
+
 LANGUAGES_SMALL=['af', 'am', 'ar', 'ay', 'az', 'be', 'bg', 'bi', 'bn', 'bs', 'ca', 'ch', 'cs', 'da', 'de', 'dv', 'dz', 'el', 'en', 'es', 'et', 'eu', 'fa', 'ff', 'fi', 'fj', 'fo', 'fr', 'ga', 'gl', 'gn', 'gv', 'he', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kg', 'kk', 'kl', 'km', 'ko', 'ku', 'ky', 'la', 'lb', 'ln', 'lo', 'lt', 'lu', 'lv', 'mg', 'mh', 'mi', 'mk', 'mn', 'ms', 'mt', 'my', 'na', 'nb', 'nd', 'ne', 'nl', 'nn', 'no', 'nr', 'ny', 'oc', 'pa', 'pl', 'ps', 'pt', 'qu', 'rn', 'ro', 'ru', 'rw', 'sg', 'si', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'sr', 'ss', 'st', 'sv', 'sw', 'ta', 'tg', 'th', 'ti', 'tk', 'tn', 'to', 'tr', 'ts', 'uk', 'ur', 'uz', 've', 'vi', 'xh', 'zh', 'zu']
 LANGUAGES_COMPLETE={'af': 'Afrikaans', 'am': 'Amharic', 'ar': 'Arabic', 'ay': 'Aymara', 'az': 'Azerbaijani', 'be': 'Belarusian', 'bg': 'Bulgarian', 'bi': 'Bislama', 'bn': 'Bengali', 'bs': 'Bosnian', 'ca': 'Catalan', 'ch': 'Chamorro', 'cs': 'Czech', 'da': 'Danish', 'de': 'German', 'dv': 'Divehi', 'dz': 'Dzongkha', 'el': 'Modern Greek (1453-)', 'en': 'English', 'es': 'Spanish', 'et': 'Estonian', 'eu': 'Basque', 'fa': 'Persian', 'ff': 'Fulah', 'fi': 'Finnish', 'fj': 'Fijian', 'fo': 'Faroese', 'fr': 'French', 'ga': 'Irish', 'gl': 'Galician', 'gn': 'Guarani', 'gv': 'Manx', 'he': 'Hebrew', 'hi': 'Hindi', 'hr': 'Croatian', 'ht': 'Haitian', 'hu': 'Hungarian', 'hy': 'Armenian', 'id': 'Indonesian', 'is': 'Icelandic', 'it': 'Italian', 'ja': 'Japanese', 'ka': 'Georgian', 'kg': 'Kongo', 'kk': 'Kazakh', 'kl': 'Kalaallisut', 'km': 'Khmer', 'ko': 'Korean', 'ku': 'Kurdish', 'ky': 'Kirghiz', 'la': 'Latin', 'lb': 'Luxembourgish', 'ln': 'Lingala', 'lo': 'Lao', 'lt': 'Lithuanian', 'lu': 'Luba-Katanga', 'lv': 'Latvian', 'mg': 'Malagasy', 'mh': 'Marshallese', 'mi': 'Maori', 'mk': 'Macedonian', 'mn': 'Mongolian', 'ms': 'Malay (macrolanguage)', 'mt': 'Maltese', 'my': 'Burmese', 'na': 'Nauru', 'nb': 'Norwegian Bokmål', 'nd': 'North Ndebele', 'ne': 'Nepali (macrolanguage)', 'nl': 'Dutch', 'nn': 'Norwegian Nynorsk', 'no': 'Norwegian', 'nr': 'South Ndebele', 'ny': 'Chichewa', 'oc': 'Occitan (post 1500)', 'pa': 'Panjabi', 'pl': 'Polish', 'ps': 'Pushto', 'pt': 'Portuguese', 'qu': 'Quechua', 'rn': 'Rundi', 'ro': 'Romanian', 'ru': 'Russian', 'rw': 'Kinyarwanda', 'sg': 'Sango', 'si': 'Sinhala', 'sk': 'Slovak', 'sl': 'Slovenian', 'sm': 'Samoan', 'sn': 'Shona', 'so': 'Somali', 'sq': 'Albanian', 'sr': 'Serbian', 'ss': 'Swati', 'st': 'Southern Sotho', 'sv': 'Swedish', 'sw': 'Swahili (macrolanguage)', 'ta': 'Tamil', 'tg': 'Tajik', 'th': 'Thai', 'ti': 'Tigrinya', 'tk': 'Turkmen', 'tn': 'Tswana', 'to': 'Tonga (Tonga Islands)', 'tr': 'Turkish', 'ts': 'Tsonga', 'uk': 'Ukrainian', 'ur': 'Urdu', 'uz': 'Uzbek', 've': 'Venda', 'vi': 'Vietnamese', 'xh': 'Xhosa', 'zh': 'Chinese', 'zu': 'Zulu'}
 

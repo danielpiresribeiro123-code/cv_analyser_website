@@ -1,0 +1,91 @@
+ONLY_DATASET
+============
+Data	7
+Business	4
+Technology	4
+Analytics	3
+Building	3
+Engineering	3
+Mining	3
+Application	2
+Detection	2
+Management	2
+OCR	2
+Science	2
+Technologies	2
+Algorithms	1
+Amazon	1
+Analysis	1
+AP	1
+Applications	1
+Automate	1
+AZURE	1
+Batch	1
+Benefits	1
+Building Applications	1
+Character	1
+Classification	1
+Cloud infrastructure	1
+Communications	1
+Compression	1
+Computer Science Engineering	1
+Containers	1
+Core Java	1
+Customer Analysis	1
+Data analyst	1
+Data analytics	1
+Data compression	1
+Database	1
+Electrical	1
+Electronics	1
+Engagement	1
+Grasp	1
+Groups	1
+HMI	1
+IDEA	1
+Infrastructure	1
+Infrastructure Services	1
+Insights	1
+Intelligence	1
+Labs	1
+Machine learning application	1
+Management Solutions	1
+Manipulation	1
+Market Research	1
+ML	1
+Modeling	1
+Models	1
+network	1
+Niche	1
+Ondevice machine learning	1
+Ontology	1
+Parking	1
+Premium	1
+Probability	1
+Product	1
+Proficient	1
+R programming	1
+Reasoning	1
+Recognition	1
+RedShift	1
+Robust	1
+RTO	1
+Satellite	1
+scikit	1
+Semiconductor	1
+Shipment	1
+Stella	1
+SVM	1
+technology solutions	1
+UI	1
+UI/UX	1
+Understanding	1
+UX	1
+
+ONLY_GLINER_ENTITIES_PLUS_REGEX_LANGUAGES
+=========================================
+e commerce	1
+fresher	1
+front end	1
+Market Analyzer	1
+Panda	1

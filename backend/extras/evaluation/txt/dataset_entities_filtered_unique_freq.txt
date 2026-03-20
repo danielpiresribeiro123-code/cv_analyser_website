@@ -1,0 +1,211 @@
+DATASET_ENTITIES
+================
+
+python	10
+Data	9
+machine learning	8
+Analyst	6
+Business	4
+Data analyst	4
+Detection	4
+Engineer	4
+Engineering	4
+java	4
+Management	4
+Models	4
+Programming	4
+Software Developer	4
+Technology	4
+Algorithms	3
+Analytics	3
+Building	3
+Classification	3
+Data Mining	3
+Deep Learning	3
+Mining	3
+NLP	3
+numpy	3
+Research	3
+Software Engineer	3
+Analysis	2
+Application	2
+AZURE	2
+Computer Vision	2
+data science	2
+Database	2
+Insights	2
+Intelligence	2
+Market Research	2
+matplotlib	2
+Modeling	2
+Motivated	2
+MYSQL	2
+OCR	2
+Ontology	2
+pandas	2
+PySpark	2
+Research analyst	2
+Science	2
+Springboot	2
+Technologies	2
+Amazon	1
+Amazon RedShift	1
+Anaconda	1
+AP	1
+Application building	1
+Application development	1
+Applications	1
+Artificial Intelligence	1
+Associate	1
+Attention to detail	1
+Audience	1
+Automate	1
+AWS	1
+Batch	1
+Benefits	1
+Big Data	1
+Big Data analytics	1
+Building Applications	1
+Business Analyst	1
+Business Analytics	1
+Business management	1
+Character	1
+Cleaning	1
+cloud	1
+Cloud infrastructure	1
+Cloud Infrastructure Services	1
+CNN	1
+Communications	1
+Components	1
+Compression	1
+computer science	1
+Computer Science Engineering	1
+Containers	1
+Coordination	1
+Core Java	1
+CSS	1
+Customer Analysis	1
+Customer engagement	1
+cybersecurity	1
+Data Analysis	1
+Data analytics	1
+Data compression	1
+Data Designer	1
+Data Insights	1
+data manipulation	1
+Data Ontology	1
+Data Scientist	1
+data structures	1
+data warehousing	1
+Database management	1
+DataBricks	1
+Dataset management	1
+DBMS	1
+Design	1
+Display	1
+Django	1
+Docker	1
+Docker Containers	1
+Electrical	1
+Electronics	1
+Encoding	1
+Engagement	1
+Excel	1
+Firebase	1
+Formulation	1
+Framework	1
+Grasp	1
+Groups	1
+HADOOP	1
+HDFS	1
+Hive	1
+HMI	1
+HTML	1
+IDEA	1
+Informatica	1
+Infrastructure	1
+Infrastructure Services	1
+Instrumentation	1
+JavaScript	1
+Jenkins	1
+Kubeflow	1
+Labs	1
+Laravel	1
+Lemmatization	1
+Libraries	1
+Machine Learning algorithms	1
+Machine learning application	1
+Machine Learning Engineer	1
+Management Solutions	1
+Manager	1
+Manipulation	1
+Mapreduce	1
+microsoft	1
+Microsoft Azure	1
+ML	1
+network	1
+Neural Network	1
+Niche	1
+NLTK	1
+Object detection	1
+Ondevice machine learning	1
+OOP	1
+OpenCV	1
+Parking	1
+Pattern	1
+Patterns	1
+PHP	1
+PI	1
+PowerBi	1
+Prediction	1
+Predictive Analysis	1
+Predictive Modeling	1
+Premium	1
+Probability	1
+Process improvement	1
+Product	1
+Proficient	1
+Python Programming	1
+Pytorch	1
+R programming	1
+RDBMS	1
+Reasoning	1
+Recognition	1
+RedShift	1
+Requirements Gathering	1
+Research assistant	1
+Research Associate	1
+Retention	1
+Robust	1
+RTO	1
+SAP	1
+Satellite	1
+Scientist	1
+scikit	1
+Scikit learn	1
+Semiconductor	1
+Shipment	1
+Smart	1
+Software Development	1
+spaCy	1
+SPARK	1
+sql	1
+Stella	1
+Stemming	1
+Streamlit	1
+SVM	1
+tableau	1
+Talend	1
+technology solutions	1
+TensorFlow	1
+Text analytics	1
+UI	1
+UI/UX	1
+Understanding	1
+UX	1
+Warehouse	1
+Warehousing	1
+Web	1
+Web Development	1
+Word	1
+Yarn	1

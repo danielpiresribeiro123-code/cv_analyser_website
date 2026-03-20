@@ -1,0 +1,177 @@
+GLINER_PLUS_REGEX_LANGUAGE_ENTITIES
+===================================
+
+machine learning	10
+python	10
+English	7
+analyst	6
+developer	6
+intern	6
+deep learning	4
+Engineer	4
+java	4
+programming	4
+Software Developer	4
+c++	3
+Data Analyst	3
+Data Mining	3
+NLP	3
+numpy	3
+research	3
+Software Engineer	3
+Algorithms	2
+Computer Vision	2
+Data Science	2
+Data Structures	2
+matplotlib	2
+motivated	2
+MySQL	2
+pandas	2
+PySpark	2
+software development	2
+spring boot	2
+springboot	2
+a market research specialist	1
+Amazon Redshift	1
+Anaconda	1
+analyzer	1
+and database warehouse manager	1
+application building	1
+application development	1
+arduino	1
+artificial intelligence	1
+assistant	1
+Associate	1
+attention to detail	1
+Audience	1
+AWS	1
+Azure Databricks	1
+beautiful soup	1
+Big Data	1
+Big Data Analyst	1
+Big data analytics	1
+Business Analyst	1
+Business Analytics	1
+Business Intelligence	1
+business management	1
+c#	1
+Character Detection	1
+cleaning	1
+Cloud	1
+cloud infrastructure services	1
+CNN	1
+co ordination	1
+computer science	1
+coordination	1
+css	1
+Customer browsing patterns	1
+Customer Engagement	1
+cybersecurity	1
+data	1
+data analysis	1
+Data Insights	1
+Data Manipulation	1
+Data Modeling	1
+DATA Ontology	1
+Data Scientist	1
+data warehousing	1
+database management	1
+database warehouse manager	1
+Dataset Management	1
+DBMS	1
+Defect detection and classification	1
+descriptor formulation	1
+designer	1
+Developed and integrated	1
+django	1
+docker	1
+Docker containers	1
+e commerce	1
+excel	1
+Fast text libraries	1
+Firebase	1
+fresher	1
+front end	1
+grassroot level design	1
+Hadoop	1
+Hdfs	1
+Head Up Display	1
+Hive	1
+HMI framework	1
+html	1
+Informatica	1
+instrumentation	1
+Intern Developer	1
+Intern Trainee	1
+javascript	1
+JB Management Software Developer Intern	1
+jenkins	1
+Junior DATA Evangelist	1
+Junior Developer	1
+Junior Software Developer	1
+Kubeflow	1
+laravel	1
+lemmatization	1
+machine learning algorithms	1
+machine learning models	1
+Manager	1
+Mapreduce	1
+Market Analyst	1
+Market Analyzer	1
+Market Research	1
+Market Research Analyst	1
+market research specialist	1
+microsoft	1
+Microsoft Azure	1
+Neural Network	1
+NLTK	1
+Object Detection	1
+object oriented programming	1
+Object-detection	1
+OCR Insights	1
+OCR models	1
+Ontology	1
+OOP	1
+OpenCV	1
+Panda	1
+Pattern Recognition	1
+PHP	1
+power bi	1
+Prediction of material properties	1
+Predictive Analysis	1
+predictive and decision models	1
+Predictive Modeling	1
+process improvement	1
+professional machine learning engineer	1
+Python Programming	1
+PyTorch	1
+Raspberry Pi	1
+Rdbms	1
+Requirements Gathering	1
+Research Analyst	1
+Research Assistant	1
+Research Associate	1
+Retention	1
+risk management	1
+sap	1
+scientist	1
+scikit learn	1
+smart	1
+Spacy	1
+Spark	1
+sql	1
+stemming	1
+streamlit	1
+SVM Classification	1
+tableau	1
+Talend	1
+Technology Solutions Software Engineer	1
+TensorFlow	1
+Text Analytics	1
+UI components	1
+web developer	1
+Web Development	1
+word	1
+word encoding	1
+YARN	1
+YOLO CNN	1

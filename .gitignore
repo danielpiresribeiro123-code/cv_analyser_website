@@ -5,6 +5,7 @@ __pycache__/
 # uploads temporários
 backend/uploads/*
 backend/outputs/*
+backend/extras/evaluation/txt/*
 
 # Node
 frontend/node_modules

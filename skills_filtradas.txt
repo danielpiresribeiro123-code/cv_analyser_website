@@ -1,0 +1,193 @@
+Academic
+Anaconda
+Analyst
+Analytical
+Analytics
+AP
+Application
+Application building
+Applications
+Artificial Intelligence
+Attention to detail
+Audience
+AWS
+AZURE
+Big Data
+Big Data analytics
+Building Applications
+Business
+Business Analyst
+Business Analytics
+Business Objectives
+CAN
+Challenging
+Character
+Cleaning
+Clients
+cloud
+CNN
+COLA
+College
+communication
+Communication Skills
+Communications
+Company
+Components
+Compression
+Computer
+computer science
+Computer Science Engineering
+Computer Vision
+Computers
+Containers
+Coordination
+Core Java
+CSS
+Data Analysis
+Data analyst
+Data analytics
+Data compression
+Data Designer
+Data Insights
+Data Mining
+Data Ontology
+data science
+Data Scientist
+data structures
+data warehousing
+DataBricks
+Deep Learning
+delivery
+Design
+Detail
+Detection
+Display
+Django
+Docker
+Docker Containers
+Electrical
+Electronics
+Encoding
+Engineering
+Evaluation
+Excel
+Exchange
+Focused
+Formulation
+Groups
+HADOOP
+Handling
+HDFS
+History
+Hive
+HMI
+HTML
+IDEA
+Innovation
+Insights
+Insurance
+Intelligence
+IS
+IT
+java
+Jenkins
+Language Processing
+Laravel
+Level
+Libraries
+Life
+microsoft
+Microsoft Azure
+Mining
+ML
+Modeling
+Models
+Motivated
+Music
+MYSQL
+Natural Language
+Natural Language Processing
+network
+Neural Network
+Niche
+NLP
+NLTK
+numpy
+Object detection
+Objectives
+OCR
+Ontology
+OOP
+OpenCV
+Operations
+Parking
+Patterns
+Personal
+PHP
+PI
+PowerBi
+Prediction
+Predictive Analysis
+Predictive Modeling
+Processing
+Product
+Production
+Professional
+Proficient
+Programming
+Programming Language
+Project
+PySpark
+python
+Python Programming
+Pytorch
+R programming
+RedShift
+Research analyst
+Results
+Retention
+RISK
+Robust
+RTO
+SAP
+Satellite
+scikit
+Scikit learn
+Search
+Semiconductor
+Services
+Software
+Software Developer
+Software Engineer
+solutions
+spaCy
+SPARK
+Springboot
+sql
+Stella
+Stemming
+Stock
+Streamlit
+SVM
+System
+tableau
+Talend
+TARGET
+Tech
+Technologies
+Technology
+technology solutions
+TensorFlow
+TEXT
+Text analytics
+UI
+UI/UX
+Understanding
+USE
+UX
+Warehouse
+Warehousing
+Web
+WELL
+Word
+Yarn
