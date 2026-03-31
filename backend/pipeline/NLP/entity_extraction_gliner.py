@@ -1,12 +1,27 @@
 import re
 from gliner import GLiNER
 import pandas as pd
-from typing import Union, List, Dict, Optional, Any, cast, Tuple, Set
+from typing import Union, List, Dict, Optional, Any, cast, Tuple, Set, Callable
 from pathlib import Path
 from datetime import datetime
 
 CURRENT_DATE = datetime.now()
 from services.paths_models_and_data import get_gliner_model, SKILL_LABELS, COUNTRIES_AND_CAPITALS, COUNTRIES_NAMES, CAPITALS_NAMES, LANGUAGES, OUTPUTS_DIR
+
+# ----------------------------------------------------------
+# Performance / fallback flags
+# ----------------------------------------------------------
+USE_REGEX_FALLBACKS = True
+
+USE_JOB_TITLE_REGEX_FALLBACK = True
+USE_SKILL_REGEX_FALLBACK = True
+
+USE_SOFTWARE_REGEX_FALLBACK = True
+USE_PROGRAMMING_REGEX_FALLBACK = True
+USE_GENERAL_SKILLS_REGEX_FALLBACK = False   # este costuma ser o mais caro e mais ruidoso
+
+USE_REGEX_FALLBACKS_ON_CHUNKS = False       # importante para performance
+
 
 # ----------------------------------------------------------
 # Gliner labels, regex, etc
@@ -1179,8 +1194,220 @@ NUMBER_PATTERN = re.compile(r"\b(nº|no\.?|number)?\s?\d+\b", re.IGNORECASE)
 
 NAME_TOKEN_PATTERN = re.compile(r"^[A-Za-zÀ-ÖØ-öø-ÿ]+$")
 
+
+# ----------------------------------------------------------
+# Canonical normalization for controlled vocabularies
+# ----------------------------------------------------------
+
+_CAMEL_BOUNDARY_REGEX = re.compile(r"(?<=[a-zà-öø-ÿ])(?=[A-ZÀ-ÖØ-Þ])")
+_MULTI_SEP_REGEX = re.compile(r"\s*-\s*|\s+")
+
+
+def _split_camel_case(text: str) -> str:
+    """
+    MicrosoftOffice -> Microsoft Office
+    powerBI -> power BI
+    """
+    if not text:
+        return text
+    return _CAMEL_BOUNDARY_REGEX.sub(" ", text)
+
+
+def _canonical_display_form(text: str) -> str:
+    """
+    Forma de output:
+    - separa camel case
+    - troca hífens por espaço
+    - colapsa espaços
+    """
+    if not text:
+        return ""
+
+    t = _split_camel_case(text)
+    t = re.sub(r"\s*-\s*", " ", t)
+    t = " ".join(t.split()).strip()
+
+    return t
+
+
+def _canonical_choice_score(text: str) -> tuple:
+    """
+    Score para escolher a melhor forma canónica quando há duplicados
+    no vocabulário com a mesma normalização.
+    Preferências:
+    1) menos hífens
+    2) mais espaços legíveis
+    3) mais maiúsculas úteis
+    4) texto mais comprido
+    """
+    if not text:
+        return (10**9, -10**9, -10**9, -10**9)
+
+    hyphens = text.count("-")
+    spaces = text.count(" ")
+    uppers = sum(1 for ch in text if ch.isupper())
+    length = len(text)
+
+    return (hyphens, -spaces, -uppers, -length)
+
+
+def _normalize_if_in_vocab(text: str, vocab_index: Dict[str, str]) -> Optional[str]:
+    """
+    Só normaliza se a forma normalizada existir no vocabulário permitido.
+    """
+    if not text:
+        return None
+
+    norm = _normalize_vocab_surface(text)
+    if not norm:
+        return None
+
+    return vocab_index.get(norm)
+
+
+
+def _normalize_vocab_surface(text: str) -> str:
+    """
+    Normalização leve para comparação contra vocabulários controlados.
+
+    Exemplos:
+        Microsoft Office     -> microsoft office
+        Microsoft-Office     -> microsoft office
+        Microsoft - Office   -> microsoft office
+        MicrosoftOffice      -> microsoft office
+        ms-office            -> ms office
+    """
+    if not text:
+        return ""
+
+    t = text.strip()
+
+    # 1) split camelCase / PascalCase
+    t = _split_camel_case(t)
+
+    # 2) normalizar hífen/espaços para um único espaço
+    t = _MULTI_SEP_REGEX.sub(" ", t)
+
+    # 3) limpar espaços repetidos
+    t = " ".join(t.split()).strip().lower()
+
+    return t
+
+
+def _build_flexible_vocab_regex(term: str) -> re.Pattern[str]:
+    """
+    Gera regex para apanhar:
+      - Microsoft Office
+      - Microsoft-Office
+      - Microsoft- Office
+      - Microsoft -Office
+      - Microsoft - Office
+      - MicrosoftOffice
+    """
+    normalized = _normalize_vocab_surface(term)
+    tokens = normalized.split()
+
+    if not tokens:
+        return re.compile(r"(?!x)x")
+
+    if len(tokens) == 1:
+        token = re.escape(tokens[0])
+        return re.compile(rf"(?<!\w){token}(?!\w)", re.IGNORECASE)
+
+    connector = r"(?:\s*-\s*|\s+|)"
+    pattern = r"(?<!\w)" + connector.join(re.escape(tok) for tok in tokens) + r"(?!\w)"
+    return re.compile(pattern, re.IGNORECASE)
+
+
+def _build_vocab_index(vocab: Set[str]) -> Dict[str, str]:
+    """
+    Cria um índice:
+        forma_normalizada -> melhor forma canónica de output
+    """
+    index: Dict[str, str] = {}
+
+    for item in vocab:
+        if not item or not str(item).strip():
+            continue
+
+        raw = str(item).strip()
+        norm = _normalize_vocab_surface(raw)
+        display = _canonical_display_form(raw)
+
+        if not norm:
+            continue
+
+        current = index.get(norm)
+        if current is None:
+            index[norm] = display
+        else:
+            if _canonical_choice_score(display) < _canonical_choice_score(current):
+                index[norm] = display
+
+    return index
+
+
+
+# ----------------------------------------------------------
+# Normalize labels, regex, etc
+# ----------------------------------------------------------
+
+
 # Normalize language list once
 LANGUAGES_SET = {lang.lower().strip() for lang in LANGUAGES}
+
+
+JOB_TITLE_NORMALIZATION_INDEX = _build_vocab_index(set(SIMPLE_JOB_TITLES))
+SOFTWARE_NORMALIZATION_INDEX = _build_vocab_index(set(SOFTWARE_AS_SKILL))
+PROGRAMMING_NORMALIZATION_INDEX = _build_vocab_index(set(PROGRAMMING_LIBRARIES))
+GENERAL_SKILLS_NORMALIZATION_INDEX = _build_vocab_index(set(GENERAL_SKILLS))
+
+
+JOB_TITLE_ITEMS_SORTED = sorted(
+    JOB_TITLE_NORMALIZATION_INDEX.items(),
+    key=lambda x: len(x[0]),
+    reverse=True
+)
+
+SOFTWARE_ITEMS_SORTED = sorted(
+    SOFTWARE_NORMALIZATION_INDEX.items(),
+    key=lambda x: len(x[0]),
+    reverse=True
+)
+
+PROGRAMMING_ITEMS_SORTED = sorted(
+    PROGRAMMING_NORMALIZATION_INDEX.items(),
+    key=lambda x: len(x[0]),
+    reverse=True
+)
+
+GENERAL_SKILLS_ITEMS_SORTED = sorted(
+    GENERAL_SKILLS_NORMALIZATION_INDEX.items(),
+    key=lambda x: len(x[0]),
+    reverse=True
+)
+
+JOB_TITLE_REGEX_PATTERNS = [
+    (_build_flexible_vocab_regex(canonical_display), canonical_display)
+    for _, canonical_display in JOB_TITLE_ITEMS_SORTED
+]
+
+SOFTWARE_REGEX_PATTERNS = [
+    (_build_flexible_vocab_regex(canonical_display), canonical_display)
+    for _, canonical_display in SOFTWARE_ITEMS_SORTED
+]
+
+PROGRAMMING_REGEX_PATTERNS = [
+    (_build_flexible_vocab_regex(canonical_display), canonical_display)
+    for _, canonical_display in PROGRAMMING_ITEMS_SORTED
+]
+
+GENERAL_SKILLS_REGEX_PATTERNS = [
+    (_build_flexible_vocab_regex(canonical_display), canonical_display)
+    for _, canonical_display in GENERAL_SKILLS_ITEMS_SORTED
+]
+
+
 
 
 # ----------------------------------------------------------
@@ -1318,6 +1545,12 @@ def _extract_best_person_name_from_top(
         threshold=threshold,
         debug_save_json=False,
         debug_output_path=None,
+        use_regex_fallbacks=False,
+        use_job_title_regex_fallback=False,
+        use_skill_regex_fallback=False,
+        use_software_regex_fallback=False,
+        use_programming_regex_fallback=False,
+        use_general_skills_regex_fallback=False,
     )
 
     names = entities.get("person_name", []) or []
@@ -1327,8 +1560,6 @@ def _extract_best_person_name_from_top(
     if not names:
         return [heuristic_name] if heuristic_name else []
 
-    # Se o GLiNER devolveu só 1 token e a heurística devolve nome completo,
-    # preferir a heurística
     if heuristic_name:
         first_found = names[0]
 
@@ -1341,243 +1572,56 @@ def _extract_best_person_name_from_top(
 
     return [names[0]]
 
-# ----------------------------------------------------------
-# Canonical normalization for controlled vocabularies
-# ----------------------------------------------------------
-
-_CAMEL_BOUNDARY_REGEX = re.compile(r"(?<=[a-zà-öø-ÿ])(?=[A-ZÀ-ÖØ-Þ])")
-_MULTI_SEP_REGEX = re.compile(r"\s*-\s*|\s+")
-
-
-def _split_camel_case(text: str) -> str:
-    """
-    MicrosoftOffice -> Microsoft Office
-    powerBI -> power BI
-    """
-    if not text:
-        return text
-    return _CAMEL_BOUNDARY_REGEX.sub(" ", text)
-
-
-def _normalize_vocab_surface(text: str) -> str:
-    """
-    Normalização leve para comparação contra vocabulários controlados.
-
-    Exemplos:
-        Microsoft Office     -> microsoft office
-        Microsoft-Office     -> microsoft office
-        Microsoft - Office   -> microsoft office
-        MicrosoftOffice      -> microsoft office
-        ms-office            -> ms office
-    """
-    if not text:
-        return ""
-
-    t = text.strip()
-
-    # 1) split camelCase / PascalCase
-    t = _split_camel_case(t)
-
-    # 2) normalizar hífen/espaços para um único espaço
-    t = _MULTI_SEP_REGEX.sub(" ", t)
-
-    # 3) limpar espaços repetidos
-    t = " ".join(t.split()).strip().lower()
-
-    return t
-
-
-def _canonical_display_form(text: str) -> str:
-    """
-    Forma de output:
-    - separa camel case
-    - troca hífens por espaço
-    - colapsa espaços
-    """
-    if not text:
-        return ""
-
-    t = _split_camel_case(text)
-    t = re.sub(r"\s*-\s*", " ", t)
-    t = " ".join(t.split()).strip()
-
-    return t
-
-
-def _canonical_choice_score(text: str) -> tuple:
-    """
-    Score para escolher a melhor forma canónica quando há duplicados
-    no vocabulário com a mesma normalização.
-    Preferências:
-    1) menos hífens
-    2) mais espaços legíveis
-    3) mais maiúsculas úteis
-    4) texto mais comprido
-    """
-    if not text:
-        return (10**9, -10**9, -10**9, -10**9)
-
-    hyphens = text.count("-")
-    spaces = text.count(" ")
-    uppers = sum(1 for ch in text if ch.isupper())
-    length = len(text)
-
-    return (hyphens, -spaces, -uppers, -length)
-
-
-def _build_vocab_index(vocab: Set[str]) -> Dict[str, str]:
-    """
-    Cria um índice:
-        forma_normalizada -> melhor forma canónica de output
-    """
-    index: Dict[str, str] = {}
-
-    for item in vocab:
-        if not item or not str(item).strip():
-            continue
-
-        raw = str(item).strip()
-        norm = _normalize_vocab_surface(raw)
-        display = _canonical_display_form(raw)
-
-        if not norm:
-            continue
-
-        current = index.get(norm)
-        if current is None:
-            index[norm] = display
-        else:
-            if _canonical_choice_score(display) < _canonical_choice_score(current):
-                index[norm] = display
-
-    return index
-
-def _build_flexible_vocab_regex(term: str) -> re.Pattern[str]:
-    """
-    Gera regex para apanhar:
-      - Microsoft Office
-      - Microsoft-Office
-      - Microsoft- Office
-      - Microsoft -Office
-      - Microsoft - Office
-      - MicrosoftOffice
-    """
-    normalized = _normalize_vocab_surface(term)
-    tokens = normalized.split()
-
-    if not tokens:
-        return re.compile(r"(?!x)x")
-
-    if len(tokens) == 1:
-        token = re.escape(tokens[0])
-        return re.compile(rf"(?<!\w){token}(?!\w)", re.IGNORECASE)
-
-    connector = r"(?:\s*-\s*|\s+|)"
-    pattern = r"(?<!\w)" + connector.join(re.escape(tok) for tok in tokens) + r"(?!\w)"
-    return re.compile(pattern, re.IGNORECASE)
-
-
-TARGET_NORMALIZATION_VOCAB = (
-    set(SIMPLE_JOB_TITLES)
-    | set(SOFTWARE_AS_SKILL)
-    | set(PROGRAMMING_LIBRARIES)
-    | set(GENERAL_SKILLS)
-)
-
-TARGET_NORMALIZATION_INDEX = _build_vocab_index(TARGET_NORMALIZATION_VOCAB)
-
-JOB_TITLE_NORMALIZATION_INDEX = _build_vocab_index(set(SIMPLE_JOB_TITLES))
-SOFTWARE_NORMALIZATION_INDEX = _build_vocab_index(set(SOFTWARE_AS_SKILL))
-PROGRAMMING_NORMALIZATION_INDEX = _build_vocab_index(set(PROGRAMMING_LIBRARIES))
-GENERAL_SKILLS_NORMALIZATION_INDEX = _build_vocab_index(set(GENERAL_SKILLS))
-
-
-def _normalize_if_in_vocab(text: str, vocab_index: Dict[str, str]) -> Optional[str]:
-    """
-    Só normaliza se a forma normalizada existir no vocabulário permitido.
-    """
-    if not text:
-        return None
-
-    norm = _normalize_vocab_surface(text)
-    if not norm:
-        return None
-
-    return vocab_index.get(norm)
 
 # ----------------------------------------------------------
 # Regex functions (fallback for gliner)
 # ----------------------------------------------------------
-def _extract_software_as_skill_from_text(text: str) -> List[str]:
+def _extract_from_precompiled_patterns(
+    text: str,
+    patterns: List[Tuple[re.Pattern[str], str]],
+    validator: Optional[Callable[[str], bool]] = None,
+) -> List[str]:
     if not text:
         return []
 
-    results = []
-    seen = set()
+    results: List[str] = []
+    seen: Set[str] = set()
 
-    for canonical_norm, canonical_display in sorted(
-        SOFTWARE_NORMALIZATION_INDEX.items(),
-        key=lambda x: len(x[0]),
-        reverse=True
-    ):
-        rx = _build_flexible_vocab_regex(canonical_display)
-
+    for rx, canonical_display in patterns:
         if rx.search(text):
             key = canonical_display.lower()
 
-            if key not in seen and _is_valid_skill(canonical_display):
-                seen.add(key)
-                results.append(canonical_display)
+            if key in seen:
+                continue
+
+            if validator is not None and not validator(canonical_display):
+                continue
+
+            seen.add(key)
+            results.append(canonical_display)
 
     return results
 
+def _extract_software_as_skill_from_text(text: str) -> List[str]:
+    return _extract_from_precompiled_patterns(
+        text,
+        SOFTWARE_REGEX_PATTERNS,
+        validator=_is_valid_skill,
+    )
 
 def _extract_programming_libraries_from_text(text: str) -> List[str]:
-    if not text:
-        return []
-
-    results = []
-    seen = set()
-
-    for canonical_norm, canonical_display in sorted(
-        PROGRAMMING_NORMALIZATION_INDEX.items(),
-        key=lambda x: len(x[0]),
-        reverse=True
-    ):
-        rx = _build_flexible_vocab_regex(canonical_display)
-
-        if rx.search(text):
-            key = canonical_display.lower()
-
-            if key not in seen:
-                seen.add(key)
-                results.append(canonical_display)
-
-    return results
-
+    return _extract_from_precompiled_patterns(
+        text,
+        PROGRAMMING_REGEX_PATTERNS,
+    )
 
 def _extract_general_skills_from_text(text: str) -> List[str]:
-    if not text:
-        return []
+    return _extract_from_precompiled_patterns(
+        text,
+        GENERAL_SKILLS_REGEX_PATTERNS,
+    )
 
-    results = []
-    seen = set()
 
-    for canonical_norm, canonical_display in sorted(
-        GENERAL_SKILLS_NORMALIZATION_INDEX.items(),
-        key=lambda x: len(x[0]),
-        reverse=True
-    ):
-        rx = _build_flexible_vocab_regex(canonical_display)
-
-        if rx.search(text):
-            key = canonical_display.lower()
-
-            if key not in seen:
-                seen.add(key)
-                results.append(canonical_display)
-
-    return results
 
 # ----------------------------------------------------------
 # Gliner functions
@@ -1611,12 +1655,6 @@ def _extract_compound_job_titles_regex(text: str) -> List[str]:
     return results
 
 def _extract_simple_job_titles_from_lines(text: str) -> List[str]:
-    """
-    Procura job titles simples linha a linha, aceitando variantes:
-    - espaço
-    - hífen
-    - camel case
-    """
     if not text:
         return []
 
@@ -1628,13 +1666,7 @@ def _extract_simple_job_titles_from_lines(text: str) -> List[str]:
         if not line_clean:
             continue
 
-        for canonical_norm, canonical_display in sorted(
-            JOB_TITLE_NORMALIZATION_INDEX.items(),
-            key=lambda x: len(x[0]),
-            reverse=True
-        ):
-            rx = _build_flexible_vocab_regex(canonical_display)
-
+        for rx, canonical_display in JOB_TITLE_REGEX_PATTERNS:
             if rx.search(line_clean):
                 if not _is_valid_job_title(canonical_display):
                     continue
@@ -2034,8 +2066,8 @@ def _expand_address_smart(full_text: str, address_fragment: str, window: int = 8
 
     Keeps the closest structural signals.
     """
-    COUNTRIES = set(COUNTRIES_AND_CAPITALS .keys())
-    CAPITALS = {v for v in COUNTRIES_AND_CAPITALS .values() if v}
+    COUNTRIES = set(COUNTRIES_AND_CAPITALS.keys())
+    CAPITALS = {v for v in COUNTRIES_AND_CAPITALS.values() if v}
     match = re.search(re.escape(address_fragment), full_text, re.IGNORECASE)
     if not match:
         return address_fragment
@@ -3254,12 +3286,70 @@ def _agrupar_entidades_dicts(entidades_chunks: List[Dict[str, List[str]]]) -> Di
 
     return resultado
 
+def _apply_regex_fallbacks_to_entities(
+    text: str,
+    entities_by_label: Dict[str, List[str]],
+    use_job_title_regex_fallback: bool = USE_JOB_TITLE_REGEX_FALLBACK,
+    use_skill_regex_fallback: bool = USE_SKILL_REGEX_FALLBACK,
+    use_software_regex_fallback: bool = USE_SOFTWARE_REGEX_FALLBACK,
+    use_programming_regex_fallback: bool = USE_PROGRAMMING_REGEX_FALLBACK,
+    use_general_skills_regex_fallback: bool = USE_GENERAL_SKILLS_REGEX_FALLBACK,
+) -> Dict[str, List[str]]:
+    if not text:
+        return entities_by_label
+
+    if use_job_title_regex_fallback:
+        existing_job_titles = {t.lower() for t in entities_by_label["job_title"]}
+
+        regex_job_titles: List[str] = []
+        regex_job_titles.extend(_extract_simple_job_titles_from_lines(text))
+        regex_job_titles.extend(_extract_compound_job_titles_regex(text))
+
+        for title in regex_job_titles:
+            key = title.lower()
+            if key not in existing_job_titles:
+                entities_by_label["job_title"].append(title)
+                existing_job_titles.add(key)
+
+    if use_skill_regex_fallback:
+        existing_skills = {s.lower() for s in entities_by_label["skills"]}
+
+        if use_software_regex_fallback:
+            for software in _extract_software_as_skill_from_text(text):
+                key = software.lower()
+                if key not in existing_skills:
+                    entities_by_label["skills"].append(software)
+                    existing_skills.add(key)
+
+        if use_programming_regex_fallback:
+            for lib in _extract_programming_libraries_from_text(text):
+                key = lib.lower()
+                if key not in existing_skills:
+                    entities_by_label["skills"].append(lib)
+                    existing_skills.add(key)
+
+        if use_general_skills_regex_fallback:
+            for skill in _extract_general_skills_from_text(text):
+                key = skill.lower()
+                if key not in existing_skills:
+                    entities_by_label["skills"].append(skill)
+                    existing_skills.add(key)
+
+    return entities_by_label
+
 def _extrair_entidades_texto_longo(
     text: str,
     model: Optional[GLiNER] = None,
     threshold: float = 0.15,
     debug_save_json: bool = False,
     debug_output_path: Optional[Path | str] = OUTPUTS_DIR,
+    use_regex_fallbacks: bool = USE_REGEX_FALLBACKS,
+    use_job_title_regex_fallback: bool = USE_JOB_TITLE_REGEX_FALLBACK,
+    use_skill_regex_fallback: bool = USE_SKILL_REGEX_FALLBACK,
+    use_software_regex_fallback: bool = USE_SOFTWARE_REGEX_FALLBACK,
+    use_programming_regex_fallback: bool = USE_PROGRAMMING_REGEX_FALLBACK,
+    use_general_skills_regex_fallback: bool = USE_GENERAL_SKILLS_REGEX_FALLBACK,
+    use_regex_fallbacks_on_chunks: bool = USE_REGEX_FALLBACKS_ON_CHUNKS,
 ) -> Dict[str, List[str]]:
     """
     Processa texto longo por chunks e agrega as entidades detetadas.
@@ -3304,6 +3394,12 @@ def _extrair_entidades_texto_longo(
             threshold=threshold,
             debug_save_json=debug_save_json,
             debug_output_path=debug_output_path,
+            use_regex_fallbacks=use_regex_fallbacks,
+            use_job_title_regex_fallback=use_job_title_regex_fallback,
+            use_skill_regex_fallback=use_skill_regex_fallback,
+            use_software_regex_fallback=use_software_regex_fallback,
+            use_programming_regex_fallback=use_programming_regex_fallback,
+            use_general_skills_regex_fallback=use_general_skills_regex_fallback,
         )
         entidades["person_name"] = best_person_name
         return entidades
@@ -3320,16 +3416,33 @@ def _extrair_entidades_texto_longo(
             threshold=threshold,
             debug_save_json=debug_save_json,
             debug_output_path=debug_output_path,
+            use_regex_fallbacks=use_regex_fallbacks if use_regex_fallbacks_on_chunks else False,
+            use_job_title_regex_fallback=use_job_title_regex_fallback if use_regex_fallbacks_on_chunks else False,
+            use_skill_regex_fallback=use_skill_regex_fallback if use_regex_fallbacks_on_chunks else False,
+            use_software_regex_fallback=use_software_regex_fallback if use_regex_fallbacks_on_chunks else False,
+            use_programming_regex_fallback=use_programming_regex_fallback if use_regex_fallbacks_on_chunks else False,
+            use_general_skills_regex_fallback=use_general_skills_regex_fallback if use_regex_fallbacks_on_chunks else False,
         )
 
-        # ignorar nomes vindos dos chunks
         entidades["person_name"] = []
         entidades_chunks.append(entidades)
 
     resultado = _agrupar_entidades_dicts(entidades_chunks)
     resultado["person_name"] = best_person_name
 
+    if use_regex_fallbacks and not use_regex_fallbacks_on_chunks:
+        resultado = _apply_regex_fallbacks_to_entities(
+            text=text,
+            entities_by_label=resultado,
+            use_job_title_regex_fallback=use_job_title_regex_fallback,
+            use_skill_regex_fallback=use_skill_regex_fallback,
+            use_software_regex_fallback=use_software_regex_fallback,
+            use_programming_regex_fallback=use_programming_regex_fallback,
+            use_general_skills_regex_fallback=use_general_skills_regex_fallback,
+        )
+
     return resultado
+
 
 # ----------------------------------------------------------
 # Experience functions
@@ -3603,7 +3716,14 @@ def extract_entities_from_text(
     model: Optional[GLiNER] = None,
     threshold: float = 0.15,
     debug_save_json: bool = False,
-    debug_output_path: Optional[Path | str] = OUTPUTS_DIR) -> Dict[str, List[str]]:
+    debug_output_path: Optional[Path | str] = OUTPUTS_DIR,
+    use_regex_fallbacks: bool = USE_REGEX_FALLBACKS,
+    use_job_title_regex_fallback: bool = USE_JOB_TITLE_REGEX_FALLBACK,
+    use_skill_regex_fallback: bool = USE_SKILL_REGEX_FALLBACK,
+    use_software_regex_fallback: bool = USE_SOFTWARE_REGEX_FALLBACK,
+    use_programming_regex_fallback: bool = USE_PROGRAMMING_REGEX_FALLBACK,
+    use_general_skills_regex_fallback: bool = USE_GENERAL_SKILLS_REGEX_FALLBACK,
+) -> Dict[str, List[str]]:
 
     result_labels = [
                 "person_name",
@@ -3703,7 +3823,7 @@ def extract_entities_from_text(
         if _is_language_entity(raw_text):
             continue
         
-        # rejeita entidades com mais de 50% de números ou símbolos,
+        # rejeita entidades com mais de 60% de números ou símbolos,
         # exceto casos permitidos como "12º ano", "2D" e "3D"
         if _has_more_than_60_percent_numbers_or_symbols(raw_text):
             continue
@@ -3760,59 +3880,35 @@ def extract_entities_from_text(
     # Escolher apenas o melhor nome de pessoa
     entities_by_label["person_name"] = _choose_best_person_name(person_name_candidates)
 
-    # Fallback regex for job titles missed by GLiNER
-    existing_job_titles = {t.lower() for t in entities_by_label["job_title"]}
-
-    regex_job_titles = _extract_simple_job_titles_from_lines(text)
-    regex_job_titles += _extract_compound_job_titles_regex(text)
-
-    for title in regex_job_titles:
-        key = title.lower()
-        if key not in existing_job_titles:
-            entities_by_label["job_title"].append(title)
-            existing_job_titles.add(key)
-
-    # Fallback: softwares definidos em SOFTWARE_AS_SKILL
-    existing_skills = {s.lower() for s in entities_by_label["skills"]}
-
-    regex_software_skills = _extract_software_as_skill_from_text(text)
-
-    for software in regex_software_skills:
-        key = software.lower()
-        if key not in existing_skills:
-            entities_by_label["skills"].append(software)
-            existing_skills.add(key)
-    
-    # Fallback: programming libraries
-    existing_skills = {s.lower() for s in entities_by_label["skills"]}
-
-    regex_libraries = _extract_programming_libraries_from_text(text)
-
-    for lib in regex_libraries:
-        key = lib.lower()
-        if key not in existing_skills:
-            entities_by_label["skills"].append(lib)
-            existing_skills.add(key)
-
-    # Fallback: programming libraries
-    existing_skills = {s.lower() for s in entities_by_label["skills"]}
-
-    regex_libraries = _extract_general_skills_from_text(text)
-
-    for lib in regex_libraries:
-        key = lib.lower()
-        if key not in existing_skills:
-            entities_by_label["skills"].append(lib)
-            existing_skills.add(key)
+    # --------------------------------------------------
+    # Optional regex fallbacks
+    # --------------------------------------------------
+    if use_regex_fallbacks:
+        entities_by_label = _apply_regex_fallbacks_to_entities(
+            text=text,
+            entities_by_label=entities_by_label,
+            use_job_title_regex_fallback=use_job_title_regex_fallback,
+            use_skill_regex_fallback=use_skill_regex_fallback,
+            use_software_regex_fallback=use_software_regex_fallback,
+            use_programming_regex_fallback=use_programming_regex_fallback,
+            use_general_skills_regex_fallback=use_general_skills_regex_fallback,
+        )
 
     return entities_by_label
 
 def process_texts_gliner(
-    texts: Union[List[str], List[Dict[str, str]], Dict[str, Any],],
+    texts: Union[List[str], List[Dict[str, str]], Dict[str, Any]],
     model: Optional[GLiNER] = None,
     gliner_threshold: float = 0.15,
     debug_save_json: bool = False,
-    debug_output_path: Optional[Path | str] = OUTPUTS_DIR
+    debug_output_path: Optional[Path | str] = OUTPUTS_DIR,
+    use_regex_fallbacks: bool = USE_REGEX_FALLBACKS,
+    use_job_title_regex_fallback: bool = USE_JOB_TITLE_REGEX_FALLBACK,
+    use_skill_regex_fallback: bool = USE_SKILL_REGEX_FALLBACK,
+    use_software_regex_fallback: bool = USE_SOFTWARE_REGEX_FALLBACK,
+    use_programming_regex_fallback: bool = USE_PROGRAMMING_REGEX_FALLBACK,
+    use_general_skills_regex_fallback: bool = USE_GENERAL_SKILLS_REGEX_FALLBACK,
+    use_regex_fallbacks_on_chunks: bool = USE_REGEX_FALLBACKS_ON_CHUNKS,
 ) -> pd.DataFrame:
 
     if model is None:
@@ -3844,7 +3940,14 @@ def process_texts_gliner(
                 model=model,
                 threshold=gliner_threshold,
                 debug_save_json=debug_save_json,
-                debug_output_path=debug_output_path
+                debug_output_path=debug_output_path,
+                use_regex_fallbacks=use_regex_fallbacks,
+                use_job_title_regex_fallback=use_job_title_regex_fallback,
+                use_skill_regex_fallback=use_skill_regex_fallback,
+                use_software_regex_fallback=use_software_regex_fallback,
+                use_programming_regex_fallback=use_programming_regex_fallback,
+                use_general_skills_regex_fallback=use_general_skills_regex_fallback,
+                use_regex_fallbacks_on_chunks=use_regex_fallbacks_on_chunks,
             )
 
             row: Dict[str, Any] = {}

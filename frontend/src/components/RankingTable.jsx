@@ -24,16 +24,16 @@ export default function RankingTable({ ranking, weights }) {
         Object.entries(weights).map(([k, v]) => [k, Number(v) / 100])
       )
     : {
-        semantic_raw: 0.27,
-        semantic_skills: 0.30,
-        exact_skills: 0.03,
-        semantic_job_title: 0.08,
-        experience_general: 0.02,
-        experience_specific: 0.14,
-        degree: 0.05,
-        language: 0.06,
-        document_length: 0.03,
-        photo: 0.02,
+          "semantic_raw": 0.23,
+          "semantic_skills": 0.28,
+          "exact_skills": 0.05,
+          "semantic_job_title": 0.07,
+          "experience_general": 0.02,
+          "experience_specific": 0.20,
+          "degree": 0.05,
+          "language": 0.05,
+          "document_length": 0.03,
+          "photo": 0.02,
       }
 
   return (

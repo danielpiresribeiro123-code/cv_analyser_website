@@ -599,9 +599,7 @@ def weighted_job_degree_company_score(
     # Only degree exists
     if degree_score is not None and job_score is None:
         return float(
-            (degree_weight / 2.0) * degree_score
-            + company_part
-        )
+            (degree_weight / 1.4) * degree_score + company_part)
 
     # Neither job nor degree exists
     return float(default_score + company_part)

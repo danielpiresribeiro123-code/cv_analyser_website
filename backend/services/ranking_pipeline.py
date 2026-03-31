@@ -80,14 +80,14 @@ def rank_cvs(
 
     if weights is None:
         weights = {
-            "semantic_raw": 0.27,
-            "semantic_skills": 0.30,
-            "exact_skills": 0.03,
-            "semantic_job_title": 0.08,
+            "semantic_raw": 0.23,
+            "semantic_skills": 0.28,
+            "exact_skills": 0.05,
+            "semantic_job_title": 0.07,
             "experience_general": 0.02,
-            "experience_specific": 0.14,
+            "experience_specific": 0.20,
             "degree": 0.05,
-            "language": 0.06,
+            "language": 0.05,
             "document_length": 0.03,
             "photo": 0.02,
         }
@@ -347,11 +347,11 @@ def rank_cvs(
             batch_size=batch_size,
             default_score=DEFAULT_EMPTY_JOB_SCORE,
             job_weight=0.85,
-            degree_weight=0.12,
-            company_weight=0.03,
+            degree_weight=0.10,
+            company_weight=0.05,
             fraction_divisor=5,
             min_top_n=1,
-            max_top_n=5,   # or 6 if u want to limit it
+            max_top_n=4,   # or 6 if u want to limit it
             max_companies=4,
         )
 
@@ -497,9 +497,9 @@ def rank_cvs(
     # -----------------------------------------------------
     # raw_norm = (raw_sims + 1.0) / 2.0
     raw_norm_v2 = np.clip(raw_sims / 0.6, 0.0, 1.0)
-    skill_norm = np.clip(skill_sims / 0.85, 0.0, 1.0)
-    job_sims = np.clip((job_norm - 0.5) / 0.4, 0.0, 1.0)
-    exp_specific = np.clip((((job_sims + skill_norm)*exp_norm)/2) / 0.7, 0.0, 1.0)
+    skill_norm = np.clip((skill_sims -0.2)/ 0.6, 0.0, 1.0)
+    job_sims = np.clip((job_norm - 0.45) / 0.35, 0.0, 1.0)
+    exp_specific = np.clip((((((job_sims + skill_norm)*(exp_norm)/2)))/ 0.7)-0.15, 0.0, 1.0)
     # Normalize weights
     weight_sum = sum(max(v, 0.0) for v in weights.values()) or 1.0
     w = {k: max(v, 0.0) / weight_sum for k, v in weights.items()}

@@ -2,14 +2,14 @@ import { useMemo, useState } from "react"
 import { Play } from "lucide-react"
 
 const DEFAULT_WEIGHTS = {
-  semantic_raw: 27,
-  semantic_skills: 30,
-  exact_skills: 3,
-  semantic_job_title: 8,
+  semantic_raw: 23,
+  semantic_skills: 28,
+  exact_skills: 5,
+  semantic_job_title: 7,
   experience_general: 2,
-  experience_specific: 14,
+  experience_specific: 20,
   degree: 5,
-  language: 6,
+  language: 5,
   document_length: 3,
   photo: 2,
 }
