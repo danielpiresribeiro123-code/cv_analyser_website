@@ -71,7 +71,7 @@ npm install framer-motion
 
 ---
 
-# 2 Download NLTK Stopwords (not relevante)
+# 2 Download NLTK Stopwords (not relevante/needed)
 
 ```bash
 python -m nltk.downloader stopwords
